@@ -1,10 +1,12 @@
 package main
 
 import (
-	"github.com/miekg/dns"
+	"fmt"
 	"log"
 	"net"
 	"strconv"
+
+	"github.com/miekg/dns"
 )
 
 var domainsToAddresses map[string]string = map[string]string{
@@ -17,6 +19,7 @@ type handler struct{}
 func (this *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	msg := dns.Msg{}
 	msg.SetReply(r)
+	fmt.Println("Received request: ", r.Question[0].String())
 	switch r.Question[0].Qtype {
 	case dns.TypeA:
 		msg.Authoritative = true

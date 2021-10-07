@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"net"
@@ -16,9 +17,11 @@ var domainsToAddresses map[string]string = map[string]string{
 	"ns2.messwithdns.com.": "213.188.214.254",
 }
 
-type handler struct{}
+type handler struct {
+	db *sql.DB
+}
 
-func (this *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
+func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	msg := dns.Msg{}
 	msg.SetReply(r)
 	fmt.Println("Received request: ", r.Question[0].String())
@@ -52,8 +55,11 @@ type UnknownRequest struct {
 }
 
 func main() {
+	db := connectDev()
 	srv := &dns.Server{Addr: ":" + strconv.Itoa(53), Net: "udp"}
-	srv.Handler = &handler{}
+	srv.Handler = &handler{
+		db: db,
+	}
 	if err := srv.ListenAndServe(); err != nil {
 		log.Fatalf("Failed to set udp listener %s\n", err.Error())
 	}

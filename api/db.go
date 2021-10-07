@@ -3,15 +3,16 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"os"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/miekg/dns"
 )
 
 // connect to planetscale
-func connectDev() *sql.DB {
+func connect() *sql.DB {
 	// get connection string from environment
-	db, err := sql.Open("mysql", "root:@tcp(localhost:3306)/messwithdns")
+	db, err := sql.Open("mysql", os.Getenv("PLANETSCALE_CONNECTION_STRING"))
 	if err != nil {
 		panic(err.Error())
 	}

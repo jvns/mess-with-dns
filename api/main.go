@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 
 	"github.com/miekg/dns"
 )
@@ -53,6 +54,11 @@ func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			fmt.Println("Error parsing record: ", err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
 		}
+		if !strings.Contains(rr.Header().Name, "messwithdns.com") {
+			fmt.Println("Invalid domain: ", rr.Header().Name)
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
 		InsertRecord(handle.db, rr)
 	}
 
@@ -71,7 +77,7 @@ type UnknownRequest struct {
 }
 
 func main() {
-	db := connectDev()
+	db := connect()
 	handler := &handler{db: db}
 	go func() {
 		srv := &dns.Server{Handler: handler, Addr: ":53", Net: "udp"}

@@ -7,6 +7,15 @@ import (
 	"github.com/miekg/dns"
 )
 
+func toJSON(name string, rrType int32, ttl int32) {
+	// create new json object
+	header := make(map[string]interface{})
+	jsonObject := make(map[string]interface{})
+	header["name"] = name
+	header["rrType"] = rrType
+	jsonObject["Hdr"] = header
+}
+
 func ParseRecord(jsonString string) (dns.RR, error) {
 	var unknown UnknownRequest
 	err := json.Unmarshal([]byte(jsonString), &unknown)

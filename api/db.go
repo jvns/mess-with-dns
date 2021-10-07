@@ -19,6 +19,24 @@ func connect() *sql.DB {
 	return db
 }
 
+func DeleteRecord(db *sql.DB, id int) {
+	_, err := db.Exec("DELETE FROM dns_records WHERE id = ?", id)
+	if err != nil {
+		panic(err.Error())
+	}
+}
+
+func UpdateRecord(db *sql.DB, id int, record dns.RR) {
+	jsonString, err := json.Marshal(record)
+	if err != nil {
+		panic(err.Error())
+	}
+	_, err = db.Exec("UPDATE dns_records SET content = ? WHERE id = ?", jsonString, id)
+	if err != nil {
+		panic(err.Error())
+	}
+}
+
 func InsertRecord(db *sql.DB, record dns.RR) {
 	jsonString, err := json.Marshal(record)
 	if err != nil {

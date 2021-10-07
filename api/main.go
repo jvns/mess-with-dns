@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/miekg/dns"
@@ -19,47 +20,103 @@ type RecordRequest struct {
 	Domain string
 }
 
+func createRecord(db *sql.DB, w http.ResponseWriter, r *http.Request) {
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		fmt.Println("Error reading body: ", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+	rr, err := ParseRecord(body)
+	if err != nil {
+		fmt.Println("Error parsing record: ", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+	if !strings.HasSuffix(rr.Header().Name, "messwithdns.com.") {
+		fmt.Println("Invalid domain: ", rr.Header().Name)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	InsertRecord(db, rr)
+}
+
+func deleteRecord(db *sql.DB, id string, w http.ResponseWriter, r *http.Request) {
+	// parse int from id
+	idInt, err := strconv.Atoi(id)
+	if err != nil {
+		fmt.Println("Error parsing id: ", err.Error())
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	DeleteRecord(db, idInt)
+}
+
+func updateRecord(db *sql.DB, id string, w http.ResponseWriter, r *http.Request) {
+	idInt, err := strconv.Atoi(id)
+	if err != nil {
+		fmt.Println("Error parsing id: ", err.Error())
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		fmt.Println("Error reading body: ", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+	rr, err := ParseRecord(body)
+	if err != nil {
+		fmt.Println("Error parsing record: ", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+	if !strings.HasSuffix(rr.Header().Name, "messwithdns.com.") {
+		fmt.Println("Invalid domain: ", rr.Header().Name)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	UpdateRecord(db, idInt, rr)
+}
+
+func getDomains(domain string, w http.ResponseWriter, r *http.Request) {
+	// read body from json request
+	var record RecordRequest
+	err := json.NewDecoder(r.Body).Decode(&record)
+	if err != nil {
+		// return 500
+		fmt.Println("Error decoding json: ", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	records := GetRecordsForName(handle.db, record.Domain)
+	jsonOutput, err := json.Marshal(records)
+	if err != nil {
+		fmt.Println("Error marshalling json: ", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonOutput)
+}
+
 func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Request:", r.URL.Path)
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
 	w.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type")
-	if r.Method == "GET" {
-		// read body from json request
-		var record RecordRequest
-		err := json.NewDecoder(r.Body).Decode(&record)
-		if err != nil {
-			// return 500
-			fmt.Println("Error decoding json: ", err.Error())
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		records := GetRecordsForName(handle.db, record.Domain)
-		jsonOutput, err := json.Marshal(records)
-		if err != nil {
-			fmt.Println("Error marshalling json: ", err.Error())
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(jsonOutput)
-	} else if r.Method == "POST" {
-		body, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			fmt.Println("Error reading body: ", err.Error())
-			w.WriteHeader(http.StatusInternalServerError)
-		}
-		rr, err := ParseRecord(body)
-		if err != nil {
-			fmt.Println("Error parsing record: ", err.Error())
-			w.WriteHeader(http.StatusInternalServerError)
-		}
-		if !strings.HasSuffix(rr.Header().Name, "messwithdns.com.") {
-			fmt.Println("Invalid domain: ", rr.Header().Name)
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
-		InsertRecord(handle.db, rr)
+
+	p := strings.Split(r.URL.Path, "/")[1:]
+	n := len(p)
+	switch {
+	// GET /domains/example.com. : get everything from example.com.
+	case r.Method == "GET" && n == 2 && p[1] == "domains":
+		getDomains(handle.db, p[1], w, r)
+	// POST /records/new: add a new record
+	case r.Method == "POST" && n == 2 && p[1] == "records" && p[2] == "new":
+		createRecord(handle.db, w, r)
+	// DELETE /records/<ID>:
+	case r.Method == "DELETE" && n == 2 && p[1] == "records":
+		deleteRecord(handle.db, p[1], w, r)
+		// POST /records/<ID>: updates a record
+	case r.Method == "POST" && n == 2 && p[1] == "records":
+		updateRecord(handle.db, p[1], w, r)
 	}
 
 }

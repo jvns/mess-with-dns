@@ -75,7 +75,7 @@ func updateRecord(db *sql.DB, id string, w http.ResponseWriter, r *http.Request)
 	UpdateRecord(db, idInt, rr)
 }
 
-func getDomains(domain string, w http.ResponseWriter, r *http.Request) {
+func getDomains(db *sql.DB, domain string, w http.ResponseWriter, r *http.Request) {
 	// read body from json request
 	var record RecordRequest
 	err := json.NewDecoder(r.Body).Decode(&record)
@@ -85,7 +85,7 @@ func getDomains(domain string, w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	records := GetRecordsForName(handle.db, record.Domain)
+	records := GetRecordsForName(db, record.Domain)
 	jsonOutput, err := json.Marshal(records)
 	if err != nil {
 		fmt.Println("Error marshalling json: ", err.Error())
@@ -104,21 +104,23 @@ func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	p := strings.Split(r.URL.Path, "/")[1:]
 	n := len(p)
+	fmt.Println(p)
 	switch {
-	// GET /domains/example.com. : get everything from example.com.
-	case r.Method == "GET" && n == 2 && p[1] == "domains":
-		getDomains(handle.db, p[1], w, r)
-	// POST /records/new: add a new record
-	case r.Method == "POST" && n == 2 && p[1] == "records" && p[2] == "new":
+	// GET /domain/example.com. : get everything from example.com.
+	case r.Method == "GET" && n == 2 && p[0] == "domains":
+		getDomains(handle.db, p[0], w, r)
+	// POST /record/new: add a new record
+	case r.Method == "POST" && n == 2 && p[0] == "record" && p[1] == "new":
 		createRecord(handle.db, w, r)
-	// DELETE /records/<ID>:
-	case r.Method == "DELETE" && n == 2 && p[1] == "records":
+	// DELETE /record/<ID>:
+	case r.Method == "DELETE" && n == 2 && p[0] == "record":
 		deleteRecord(handle.db, p[1], w, r)
-		// POST /records/<ID>: updates a record
-	case r.Method == "POST" && n == 2 && p[1] == "records":
+	// POST /record/<ID>: updates a record
+	case r.Method == "POST" && n == 2 && p[0] == "record":
 		updateRecord(handle.db, p[1], w, r)
+	default:
+		w.WriteHeader(http.StatusNotFound)
 	}
-
 }
 
 func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {

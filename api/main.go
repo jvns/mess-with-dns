@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net"
@@ -47,10 +48,29 @@ func (this *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	w.WriteMsg(&msg)
 }
 
+type UnknownRequest struct {
+	Hdr dns.RR_Header
+}
+
 func main() {
+	jsonString := `{"Hdr":{"Name":"example.com.","Rrtype":15,"Class":1,"Ttl":3600,"Rdlength":0},"Preference":10,"Mx":"example.com."}`
+	x, _ := ParseRecord(jsonString)
+	fmt.Println(x.String())
+
+	return
+
+	rr, _ := dns.NewRR(fmt.Sprintf("example.com. IN MX 10 example.com"))
+	// serialzie to json
+	j, _ := json.Marshal(rr)
+	// convert blah to bytes
+
+	fmt.Println(string(j))
+	fmt.Println(rr.String())
+
 	srv := &dns.Server{Addr: ":" + strconv.Itoa(53), Net: "udp"}
 	srv.Handler = &handler{}
 	if err := srv.ListenAndServe(); err != nil {
 		log.Fatalf("Failed to set udp listener %s\n", err.Error())
 	}
+
 }

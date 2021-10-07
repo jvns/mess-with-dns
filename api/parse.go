@@ -55,6 +55,7 @@ func ParseRecord(jsonString string) (dns.RR, error) {
 		}
 		return &apl, nil
 
+	case dns.TypeCDNSKEY:
 		var cdnskey dns.CDNSKEY
 		err = json.Unmarshal([]byte(jsonString), &cdnskey)
 		if err != nil {

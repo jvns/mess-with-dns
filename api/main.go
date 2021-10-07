@@ -74,13 +74,15 @@ func main() {
 	db := connectDev()
 	handler := &handler{db: db}
 	go func() {
-		srv := &dns.Server{Handler: handler}
+		srv := &dns.Server{Handler: handler, Addr: ":53", Net: "udp"}
 		if err := srv.ListenAndServe(); err != nil {
 			panic(fmt.Sprintf("Failed to set udp listener %s\n", err.Error()))
 		}
+		fmt.Println("Listening on :53")
 	}()
 	err := (&http.Server{Addr: ":8080", Handler: handler}).ListenAndServe()
 	if err != nil {
 		panic(err)
 	}
+	fmt.Println("Listening on :8080")
 }

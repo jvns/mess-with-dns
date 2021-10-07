@@ -7,27 +7,6 @@ import (
 	"github.com/miekg/dns"
 )
 
-func ReadFromDB(name string, rrType int32, ttl int32, content string) (dns.RR, error) {
-	// create new json object
-	header := make(map[string]interface{})
-	jsonObject := make(map[string]interface{})
-	err := json.Unmarshal([]byte(content), &jsonObject)
-	if err != nil {
-		return nil, fmt.Errorf("error parsing json: %s", err)
-	}
-	header["Name"] = name
-	header["Rrtype"] = rrType
-	header["Ttl"] = ttl
-	header["Class"] = dns.ClassINET
-	header["Rdlength"] = 0
-	jsonObject["Hdr"] = header
-	jsonString, err := json.Marshal(jsonObject)
-	if err != nil {
-		return nil, fmt.Errorf("error marshalling json: %s", err)
-	}
-	return ParseRecord(jsonString)
-}
-
 func ParseRecord(jsonString []byte) (dns.RR, error) {
 	var unknown UnknownRequest
 	err := json.Unmarshal([]byte(jsonString), &unknown)

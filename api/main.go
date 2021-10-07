@@ -2,51 +2,67 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
-	"log"
-	"net"
-	"strconv"
+	"io/ioutil"
+	"net/http"
 
 	"github.com/miekg/dns"
 )
 
-var domainsToAddresses map[string]string = map[string]string{
-	"google.com.":          "1.2.3.4",
-	"jameshfisher.com.":    "104.198.14.52",
-	"ns1.messwithdns.com.": "213.188.214.237",
-	"ns2.messwithdns.com.": "213.188.214.254",
-}
-
 type handler struct {
 	db *sql.DB
+}
+
+type RecordRequest struct {
+	Domain string
+}
+
+func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Request:", r.URL.Path)
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type")
+	if r.Method == "GET" {
+		// read body from json request
+		var record RecordRequest
+		err := json.NewDecoder(r.Body).Decode(&record)
+		if err != nil {
+			// return 500
+			fmt.Println("Error decoding json: ", err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		records := GetRecordsForName(handle.db, record.Domain)
+		jsonOutput, err := json.Marshal(records)
+		if err != nil {
+			fmt.Println("Error marshalling json: ", err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(jsonOutput)
+	} else if r.Method == "POST" {
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			fmt.Println("Error reading body: ", err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+		rr, err := ParseRecord(body)
+		if err != nil {
+			fmt.Println("Error parsing record: ", err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+		InsertRecord(handle.db, rr)
+	}
+
 }
 
 func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	msg := dns.Msg{}
 	msg.SetReply(r)
 	fmt.Println("Received request: ", r.Question[0].String())
-	switch r.Question[0].Qtype {
-	case dns.TypeA:
-		msg.Authoritative = true
-		domain := msg.Question[0].Name
-		address, ok := domainsToAddresses[domain]
-		if ok {
-			msg.Answer = append(msg.Answer, &dns.A{
-				Hdr: dns.RR_Header{Name: domain, Rrtype: dns.TypeA, Class: dns.ClassINET, Ttl: 60},
-				A:   net.ParseIP(address),
-			})
-		}
-	case dns.TypeNS:
-		msg.Authoritative = true
-		domain := msg.Question[0].Name
-		address, ok := domainsToAddresses[domain]
-		if ok {
-			msg.Answer = append(msg.Answer, &dns.A{
-				Hdr: dns.RR_Header{Name: domain, Rrtype: dns.TypeA, Class: dns.ClassINET, Ttl: 60},
-				A:   net.ParseIP(address),
-			})
-		}
-	}
+	msg.Answer = GetRecords(handle.db, msg.Question[0].Name, msg.Question[0].Qtype)
 	w.WriteMsg(&msg)
 }
 
@@ -56,12 +72,15 @@ type UnknownRequest struct {
 
 func main() {
 	db := connectDev()
-	srv := &dns.Server{Addr: ":" + strconv.Itoa(53), Net: "udp"}
-	srv.Handler = &handler{
-		db: db,
+	handler := &handler{db: db}
+	go func() {
+		srv := &dns.Server{Handler: handler}
+		if err := srv.ListenAndServe(); err != nil {
+			panic(fmt.Sprintf("Failed to set udp listener %s\n", err.Error()))
+		}
+	}()
+	err := (&http.Server{Addr: ":8080", Handler: handler}).ListenAndServe()
+	if err != nil {
+		panic(err)
 	}
-	if err := srv.ListenAndServe(); err != nil {
-		log.Fatalf("Failed to set udp listener %s\n", err.Error())
-	}
-
 }

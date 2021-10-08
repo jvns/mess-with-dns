@@ -31,7 +31,7 @@ func createRecord(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Error parsing record: ", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 	}
-	if !strings.HasSuffix(rr.Header().Name, "messwithdns.com.") {
+	if !strings.HasSuffix(rr.Header().Name, ".messwithdns.com.") {
 		fmt.Println("Invalid domain: ", rr.Header().Name)
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -67,7 +67,7 @@ func updateRecord(db *sql.DB, id string, w http.ResponseWriter, r *http.Request)
 		fmt.Println("Error parsing record: ", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 	}
-	if !strings.HasSuffix(rr.Header().Name, "messwithdns.com.") {
+	if !strings.HasSuffix(rr.Header().Name, ".messwithdns.com.") {
 		fmt.Println("Invalid domain: ", rr.Header().Name)
 		w.WriteHeader(http.StatusBadRequest)
 		return

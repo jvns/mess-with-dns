@@ -31,7 +31,7 @@ func UpdateRecord(db *sql.DB, id int, record dns.RR) {
 	if err != nil {
 		panic(err.Error())
 	}
-	_, err = db.Exec("UPDATE dns_records SET content = ? WHERE id = ?", jsonString, id)
+	_, err = db.Exec("UPDATE dns_records SET name = ?, rrtype = ?, content = ? WHERE id = ?", record.Header().Name, record.Header().Rrtype, jsonString, id)
 	if err != nil {
 		panic(err.Error())
 	}

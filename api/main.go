@@ -104,7 +104,6 @@ func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	p := strings.Split(r.URL.Path, "/")[1:]
 	n := len(p)
-	fmt.Println(p)
 	switch {
 	// GET /domain/example.com. : get everything from example.com.
 	case r.Method == "GET" && n == 2 && p[0] == "domains":

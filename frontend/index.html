@@ -34,7 +34,7 @@
 </body>
 
 <script id="new-record" type="vue-component">
-    <formulate-form>
+    <formulate-form @submit="createRecord">
         <h2 class="pb-8 font-bold text-3xl">Add record</h2>
         <fieldset>
             <div class="flex">
@@ -58,5 +58,6 @@
         <formulate-input type="submit" label="Submit"></formulate-input>
     </formulate-form>
 </script>
+
 <script src="script.js"></script>
 </html>

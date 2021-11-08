@@ -1,80 +1,56 @@
 <html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        <title> mess with dns </title>
-        <link rel="stylesheet" type="text/css" href="css/tailwind.min.css" />
-        <link rel="stylesheet" type="text/css" href="css/squiggle.css" />
-        <script src="js/vue.min.js"></script>
-        <script src="js/formulate.min.js"></script>
-        <style>
-a { 
-    text-decoration: underline;
-}
-        </style>
-    </head>
 
-    <body class="text-xl">
-        <nav id="nav" class="py-8 squiggle-bottom bg-green-600 text-white" role="navigation">
-            <div class="flex">
-                <div class="m-auto">
-                    <h1 class="text-4xl">
-                        ★ mess with dns ★
-                    </h1>
-                    <div class="text-right mt-2"> a <a class="underline py-2" href="https://wizardzines.com">wizard zines</a> project</div>
-                </div>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title> mess with dns </title>
+    <link rel="stylesheet" type="text/css" href="css/tailwind.min.css" />
+    <link rel="stylesheet" type="text/css" href="css/squiggle.css" />
+    <script src="js/vue.min.js"></script>
+    <script src="js/formulate.min.js"></script>
+    <style>
+        a {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body class="text-xl">
+    <nav id="nav" class="py-8 squiggle-bottom bg-green-600 text-white" role="navigation">
+        <div class="flex">
+            <div class="m-auto">
+                <h1 class="text-4xl">
+                    ★ mess with dns ★
+                </h1>
+                <div class="text-right mt-2"> a <a class="underline py-2" href="https://wizardzines.com">wizard zines</a> project</div>
             </div>
-        </nav>
-<div id="app">
-  <formulate-form>
-    <h2>Register</h2>
-    <fieldset>
-      <legend>Personal Details</legend>
- 
-      <formulate-input
-        name="first"
-        label="First name"
-        help="What is your name?"
-        validation="required"
-        validation_name="First name"
-      ></formulate-input>
-      <formulate-input
-        name="name"
-        label="Last name"
-        help="What is your name?"
-        validation="required"
-        validation_name="Last name"
-      ></formulate-input>
-    </fieldset>
-    <fieldset>
-      <legend>Account details</legend>
-      <formulate-input
-        name="username"
-        label="Username"
-        help="Select a username."
-        validation="required"
-      ></formulate-input>
-      <formulate-input
-        name="password"
-        label="Password"
-        help="Pick a password."
-        validation="required|min:10,length"
-      ></formulate-input>
-      <formulate-input
-        name="password_confirm"
-        label="Password confirm"
-        help="Re-type your password."
-        validation="required|confirm"
-        validation-name="Password confirmation"
-      ></formulate-input>
-    </fieldset>
+        </div>
+    </nav>
+    <div class="flex">
+        <div id="app" class="m-auto w-full pt-16 px-8" style="max-width: 1200px">
+            <formulate-form>
+                <h2 class="pb-8 font-bold text-3xl">Add record</h2>
+                <fieldset>
+                    <div class="flex">
+                        <formulate-input element-class="border border-black rounded mt-2"
+                            name="type"
+                            label="Type"
+                            v-model="type"
+                            type="select"
+                            :options="['A', 'AAAA', 'CNAME', 'MX', 'NS', 'PTR', 'SOA', 'SRV', 'TXT']"
+                          ></formulate-input>
 
-    <formulate-input
-      type="submit"
-      label="Submit"
-    ></formulate-input>
-  </formulate-form>
-</div>
-    </body>
-    <script src="script.js"></script>
+                          <formulate-input
+                            class="ml-4 "
+                            element-class="border border-black rounded-lg mt-2"
+                            v-for="item in schemas[type]"
+                            :key="item.name"
+                            v-bind="item"
+                          ></formulate-input>
+                </fieldset>
+                <formulate-input type="submit" label="Submit"></formulate-input>
+            </formulate-form>
+        </div>
+    </div>
+</body>
+<script src="script.js"></script>
 </html>
-

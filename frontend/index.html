@@ -5,7 +5,7 @@
     <title> mess with dns </title>
     <link rel="stylesheet" type="text/css" href="css/tailwind.min.css" />
     <link rel="stylesheet" type="text/css" href="css/squiggle.css" />
-    <script src="js/vue.min.js"></script>
+    <script src="js/vue.js"></script>
     <script src="js/formulate.min.js"></script>
     <style>
         a {
@@ -27,30 +27,36 @@
     </nav>
     <div class="flex">
         <div id="app" class="m-auto w-full pt-16 px-8" style="max-width: 1200px">
-            <formulate-form>
-                <h2 class="pb-8 font-bold text-3xl">Add record</h2>
-                <fieldset>
-                    <div class="flex">
-                        <formulate-input element-class="border border-black rounded mt-2"
-                            name="type"
-                            label="Type"
-                            v-model="type"
-                            type="select"
-                            :options="['A', 'AAAA', 'CNAME', 'MX', 'NS', 'PTR', 'SOA', 'SRV', 'TXT']"
-                          ></formulate-input>
 
-                          <formulate-input
-                            class="ml-4 "
-                            element-class="border border-black rounded-lg mt-2"
-                            v-for="item in schemas[type]"
-                            :key="item.name"
-                            v-bind="item"
-                          ></formulate-input>
-                </fieldset>
-                <formulate-input type="submit" label="Submit"></formulate-input>
-            </formulate-form>
+            <new-record> </new-record>
         </div>
     </div>
 </body>
+
+<script id="new-record" type="vue-component">
+    <formulate-form>
+        <h2 class="pb-8 font-bold text-3xl">Add record</h2>
+        <fieldset>
+            <div class="flex">
+                <formulate-input element-class="border border-black rounded mt-2"
+                    name="type"
+                    label="Type"
+                    v-model="type"
+                    type="select"
+                    :options="['A', 'AAAA', 'CNAME', 'MX', 'NS', 'PTR', 'SOA', 'SRV', 'TXT']"
+                  ></formulate-input>
+
+                  <formulate-input
+                    class="ml-4 "
+                    element-class="border border-black rounded-lg mt-2"
+                    v-for="item in schemas[type]"
+                    :key="item.name"
+                    v-bind="item"
+                  ></formulate-input>
+              </div>
+        </fieldset>
+        <formulate-input type="submit" label="Submit"></formulate-input>
+    </formulate-form>
+</script>
 <script src="script.js"></script>
 </html>

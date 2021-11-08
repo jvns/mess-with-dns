@@ -1,0 +1,44 @@
+/* squiggle */
+.squiggle-top, .squiggle-bottom {
+  position: relative;
+  /* background-color: inherit; */
+}
+
+.squiggle-top {
+  margin-top: 32px;
+}
+
+.squiggle-bottom {
+  margin-bottom: 32px;
+}
+
+.squiggle-top::before,
+.squiggle-bottom::after {
+  content: " ";
+  position: absolute;
+  width: 100%;
+  left: 0;
+  height: 32px;
+}
+
+hr.squiggle {
+  border: none;
+  height: 32px;
+  background-image: url("/images/squiggle-line.svg");
+}
+
+.squiggle-top::before {
+  bottom: 100%;
+  background: url("./squiggle-top-invert.svg") repeat top center;
+  background-color: inherit;
+  -webkit-mask: url("./squiggle-top-mask.svg") repeat top center;
+  mask: url("./squiggle-top-mask.svg") repeat top center;
+}
+
+.squiggle-bottom::after {
+  top: 100%;
+  background: url("./squiggle-bottom-invert.svg") repeat bottom center;
+  background-color: inherit;
+  -webkit-mask: url("./squiggle-bottom-mask.svg") repeat bottom center;
+  mask: url("./squiggle-bottom-mask.svg") repeat bottom center;
+}

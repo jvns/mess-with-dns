@@ -1,0 +1,45 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title> mess with dns </title>
+        <link rel="stylesheet" type="text/css" href="css/tailwind.min.css" />
+        <link rel="stylesheet" type="text/css" href="css/squiggle.css" />
+        <script src="js/vue.js"></script>
+        <script src="js/formulate.umd.min.js"></script>
+        <style>
+a { 
+    text-decoration: underline;
+}
+        </style>
+    </head>
+
+    <body class="text-xl">
+        <nav id="nav" class="py-8 squiggle-bottom bg-green-600 text-white" role="navigation">
+            <div class="flex">
+                <div class="m-auto">
+                    <h1 class="text-4xl">
+                        ★ mess with dns ★
+                    </h1>
+                    <div class="text-right mt-2"> a <a class="underline py-2" href="https://wizardzines.com">wizard zines</a> project</div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="flex pt-16" id="app">
+            <div class="m-auto w-full" style="max-width: 1200px">
+                {{message}}
+
+<FormulateInput
+  type="email"
+  label="What is your school email address?"
+  validation="bail|required|email|ends_with:.edu"
+  validation-name="School email"
+  placeholder="user@university.edu"
+/>
+            </div>
+        </div>
+
+    </body>
+    <script src="script.js"></script>
+</html>
+

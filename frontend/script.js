@@ -189,7 +189,7 @@ Vue.component('new-record', {
                     "Rdlength": 0,
                 },
             }
-            // copy rest of fields from data
+            // copy rest of fields from form directly
             for (var key in data) {
                 if (key != 'name' && key != 'type' && key != 'ttl') {
                     record[key] = data[key];

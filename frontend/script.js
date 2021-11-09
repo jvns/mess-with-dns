@@ -163,6 +163,7 @@ Vue.component('record', {
     data: function() {
         return {
             schemas: schemas,
+            clicked: false,
         };
     },
 });

@@ -44,6 +44,17 @@
     {{ record.name }}
     {{ record.ttl }}
     {{ record.A }}
+
+    <formulate-form v-model="record">
+    <formulate-input
+    class="ml-4 "
+    element-class="border border-black rounded-lg mt-2"
+    v-for="item in schemas[record.type]"
+    :key="item.name"
+    v-bind="item"
+    ></formulate-input>
+    </formulate-form>
+
     </div>
 </script>
 

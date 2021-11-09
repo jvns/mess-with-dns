@@ -92,11 +92,6 @@ for (const key in rrTypes) {
 
 const schemas = {
     'A': [{
-            'name': 'name',
-            'label': 'Name',
-            'validation': 'required',
-        },
-        {
             'name': 'A',
             'label': 'IPv4 Address',
             'validation': "matches:/[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+\/",
@@ -106,32 +101,19 @@ const schemas = {
         },
     ],
     'AAAA': [{
-            'name': 'name',
-            'label': 'Name',
-            'validation': 'required',
-        },
-        {
             'name': 'AAAA',
             'label': 'IPv6 Address',
             'validation': 'required',
         },
     ],
-    'CNAME': [{
-            'name': 'CNAME',
-            'label': 'Name',
-            'validation': 'required',
-        },
+    'CNAME': [
         {
             'name': 'target',
             'label': 'Target',
             'validation': 'required',
         },
     ],
-    'MX': [{
-            'name': 'name',
-            'label': 'Name',
-            'validation': 'required',
-        },
+    'MX': [
         {
             'name': 'priority',
             'label': 'Priority',
@@ -143,22 +125,14 @@ const schemas = {
             'validation': 'required',
         },
     ],
-    'NS': [{
-            'name': 'name',
-            'label': 'Name',
-            'validation': 'required',
-        },
+    'NS': [
         {
             'name': 'nameserver',
             'label': 'Nameserver',
             'validation': 'required',
         },
     ],
-    'TXT': [{
-            'name': 'name',
-            'label': 'Name',
-            'validation': 'required',
-        },
+    'TXT': [
         {
             'name': 'content',
             'label': 'Content',
@@ -168,10 +142,29 @@ const schemas = {
     ],
 
 };
+// add name and ttl to every schema
+for (const key in schemas) {
+    schemas[key].push({
+        'name': 'ttl',
+        'label': 'TTL',
+        'validation': 'required',
+    });
+    // prepend name
+    schemas[key].unshift({
+        'name': 'name',
+        'label': 'Name',
+        'validation': 'required',
+    });
+}
 
 Vue.component('record', {
     template: '#view-record',
     props: ['record'],
+    data: function() {
+        return {
+            schemas: schemas,
+        };
+    },
 });
 
 Vue.component('new-record', {
@@ -180,7 +173,7 @@ Vue.component('new-record', {
         return {
             schemas: schemas,
             type: 'A',
-        }
+        };
     },
 
     methods: {

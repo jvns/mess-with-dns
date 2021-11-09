@@ -29,9 +29,23 @@
         <div id="app" class="m-auto w-full pt-16 px-8" style="max-width: 1200px">
 
             <new-record> </new-record>
+
+            <div v-if="records">
+                <record v-for="record in records" :key="record.id" :record="record" />
+            </div>
         </div>
     </div>
 </body>
+
+<script id="view-record" type="vue-component">
+<!-- display DNS record -->
+    <div class="flex">
+    {{ record.type }}
+    {{ record.name }}
+    {{ record.ttl }}
+    {{ record.A }}
+    </div>
+</script>
 
 <script id="new-record" type="vue-component">
     <formulate-form @submit="createRecord">

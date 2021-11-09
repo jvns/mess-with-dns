@@ -1,7 +1,5 @@
 Vue.use(VueFormulate)
 
-console.log('Hello World');
-
 const rrTypes = {
     'A': 1,
     'NS': 2,
@@ -84,6 +82,12 @@ const rrTypes = {
     'ANY': 255,
     'URI': 256,
     'CAA': 257,
+};
+
+// reverse rrTypes
+const rrTypesReverse = {};
+for (const key in rrTypes) {
+    rrTypesReverse[rrTypes[key]] = key;
 }
 
 const schemas = {
@@ -165,6 +169,11 @@ const schemas = {
 
 };
 
+Vue.component('record', {
+    template: '#view-record',
+    props: ['record'],
+});
+
 Vue.component('new-record', {
     template: '#new-record',
     data: function() {
@@ -218,5 +227,54 @@ var app = new Vue({
     data: {
         message: 'Hello Vue!',
         schemas: schemas,
-    }
+        domain: undefined,
+        records: undefined,
+    },
+    methods: {
+        getRecords: async function(domain) {
+            const response = await fetch('/domains/' + domain);
+            const json = await response.json();
+            // transform records
+            // id is key, value is record
+            const records = [];
+            for (var key in json) {
+                const record = this.transformRecord(json[key]);
+                // parse key as int
+                record.id = parseInt(key);
+                records.push(record);
+            }
+            return records;
+        },
+        transformRecord: function(record) {
+            // { "Hdr": { "Name": "example.messwithdns.com.", "Rrtype": 1, "Class": 1, "Ttl": 5, "Rdlength": 0 }, "A": "
+            // =>
+            // { ttl: 5, name: "example", type: 'A' }
+            var basic = {
+                ttl: record.Hdr.Ttl,
+                name: record.Hdr.Name.split('.')[0],
+                type: rrTypesReverse[record.Hdr.Rrtype],
+            };
+            // copy rest of fields from record directly
+            for (var key in record) {
+                if (key != 'Hdr') {
+                    basic[key] = record[key];
+                }
+            }
+            return basic;
+        },
+    },
 });
+
+async function updateHash() {
+    var hash = window.location.hash;
+    if (hash.length == 0) {
+        return;
+    }
+    var domain = hash.substring(1);
+    app.domain = domain;
+    app.records = await app.getRecords(domain);
+}
+
+updateHash();
+// update hash on change
+window.onhashchange = updateHash;

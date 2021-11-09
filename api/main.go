@@ -79,15 +79,7 @@ func updateRecord(db *sql.DB, id string, w http.ResponseWriter, r *http.Request)
 
 func getDomains(db *sql.DB, domain string, w http.ResponseWriter, r *http.Request) {
 	// read body from json request
-	var record RecordRequest
-	err := json.NewDecoder(r.Body).Decode(&record)
-	if err != nil {
-		// return 500
-		fmt.Println("Error decoding json: ", err.Error())
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	records := GetRecordsForName(db, record.Domain)
+	records := GetRecordsForName(db, domain + ".messwithdns.com.")
 	jsonOutput, err := json.Marshal(records)
 	if err != nil {
 		fmt.Println("Error marshalling json: ", err.Error())
@@ -107,9 +99,9 @@ func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	p := strings.Split(r.URL.Path, "/")[1:]
 	n := len(p)
 	switch {
-	// GET /domain/example.com. : get everything from example.com.
+	// GET /domain/test : get everything from test.messwithdns.com.
 	case r.Method == "GET" && n == 2 && p[0] == "domains":
-		getDomains(handle.db, p[0], w, r)
+		getDomains(handle.db, p[1], w, r)
 	// POST /record/new: add a new record
 	case r.Method == "POST" && n == 2 && p[0] == "record" && p[1] == "new":
 		createRecord(handle.db, w, r)

@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+    "fmt"
 	"os"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -49,6 +50,7 @@ func InsertRecord(db *sql.DB, record dns.RR) {
 }
 
 func GetRecordsForName(db *sql.DB, name string) []dns.RR {
+    fmt.Println(name)
 	rows, err := db.Query("SELECT content FROM dns_records WHERE name = ?", name)
 	if err != nil {
 		panic(err.Error())

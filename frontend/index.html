@@ -86,17 +86,13 @@
         </tr>
         <tr class="border border-gray-200" v-if="clicked">
             <td colspan="4" class="pl-8">
-                <formulate-form v-model="updated_record" class="mt-2">
+                <formulate-form v-model="updated_record" class="mt-2" @submit="updateRecord">
                     <div class="flex">
                         <formulate-input class="ml-4 "
                             element-class="border border-black rounded-lg mt-2"
                             v-for="item in schemas[record.type]" 
                             :key="item.name" 
                             v-bind="item"></formulate-input>
-                            <!--
-                        -->
-                        <!-- delete, cancel, save buttons-->
-
                     </div>
 
                     <div class="flex text-right mt-4">
@@ -106,9 +102,10 @@
                         <button class="hover:bg-gray-400 bg-gray-200 py-2 px-4 rounded" @click="toggle()">
                             Cancel
                         </button>
-                        <button class="hover:bg-blue-700 ml-4 bg-blue-500 text-white py-2 px-4 rounded" @click="save()">
-                            Save
-                        </button>
+
+                        <formulate-input 
+                        element-class="hover:bg-blue-700 ml-4 bg-blue-500 text-white py-2 px-4 rounded"
+                        type="submit" label="Save"></formulate-input>
                     </div>
             </formulate-form>
             </td>

@@ -147,6 +147,7 @@ for (const key in schemas) {
     schemas[key].push({
         'name': 'ttl',
         'label': 'TTL',
+        'type': 'number',
         'validation': 'required',
     });
 }
@@ -189,6 +190,26 @@ Vue.component('record', {
                 alert('Error deleting record');
             }
         },
+        updateRecord: async function(data) {
+            var url = '/record/' + this.record.id;
+            console.log(data);
+            const record = convertRecord(data);
+            var response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(record),
+            });
+            if (response.ok) {
+                // update record in list
+                var index = app.records.indexOf(this.record);
+                app.records[index] = this.updated_record;
+                this.clicked = false;
+            } else {
+                alert('Error updating record');
+            }
+        },
     },
 });
 
@@ -207,21 +228,7 @@ Vue.component('new-record', {
             // { "type": "A", "name": "example", "A": "93.184.216.34" }
             // =>
             // { "Hdr": { "Name": "example.messwithdns.com.", "Rrtype": 1, "Class": 1, "Ttl": 5, "Rdlength": 0 }, "A": "93.184.216.34" }
-            var record = {
-                "Hdr": {
-                    "Name": data.name + ".messwithdns.com.",
-                    "Rrtype": rrTypes[data.type],
-                    "Class": 1,
-                    "Ttl": data.ttl,
-                    "Rdlength": 0,
-                },
-            }
-            // copy rest of fields from form directly
-            for (var key in data) {
-                if (key != 'name' && key != 'type' && key != 'ttl') {
-                    record[key] = data[key];
-                }
-            }
+            const record = convertRecord(data);
             const response = await fetch('/record/new', {
                 method: 'POST',
                 headers: {
@@ -239,6 +246,30 @@ Vue.component('new-record', {
         },
     }
 });
+
+function convertRecord(record) {
+    // convert to api format
+    // { "type": "A", "name": "example", "A": "93.184.216.34" }
+    // =>
+    // { "Hdr": { "Name": "example.messwithdns.com.", "Rrtype": 1, "Class": 1, "Ttl": 5, "Rdlength": 0 }, "A": "93.184.216.34" }
+    var newRecord = {
+        "Hdr": {
+            "Name": record.name + ".messwithdns.com.",
+            "Rrtype": rrTypes[record.type],
+            "Class": 1,
+            "Ttl": record.ttl,
+            "Rdlength": 0,
+        },
+    }
+    // copy rest of fields from form directly
+    for (var key in record) {
+        if (key != 'name' && key != 'type' && key != 'ttl') {
+            newRecord[key] = record[key];
+        }
+    }
+    return newRecord;
+}
+
 
 var app = new Vue({
     el: '#app',

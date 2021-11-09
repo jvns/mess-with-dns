@@ -25,11 +25,13 @@ func createRecord(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println("Error reading body: ", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
+        return
 	}
 	rr, err := ParseRecord(body)
 	if err != nil {
 		fmt.Println("Error parsing record: ", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
+        return
 	}
 	if !strings.HasSuffix(rr.Header().Name, ".messwithdns.com.") {
 		fmt.Println("Invalid domain: ", rr.Header().Name)
@@ -118,7 +120,8 @@ func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case r.Method == "POST" && n == 2 && p[0] == "record":
 		updateRecord(handle.db, p[1], w, r)
 	default:
-		w.WriteHeader(http.StatusNotFound)
+        // serve static files
+        http.ServeFile(w, r, "./frontend/" + r.URL.Path)
 	}
 }
 
@@ -138,8 +141,8 @@ func main() {
 	db := connect()
 	handler := &handler{db: db}
 	go func() {
-		srv := &dns.Server{Handler: handler, Addr: ":53", Net: "udp"}
-		fmt.Println("Listening on :53")
+		srv := &dns.Server{Handler: handler, Addr: ":5353", Net: "udp"}
+		fmt.Println("Listening on :5353")
 		if err := srv.ListenAndServe(); err != nil {
 			panic(fmt.Sprintf("Failed to set udp listener %s\n", err.Error()))
 		}

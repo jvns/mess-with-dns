@@ -175,14 +175,14 @@ Vue.component('new-record', {
     },
 
     methods: {
-        createRecord: function(data) {
+        createRecord: async function(data) {
             console.log(data);
-            // { "type": "A", "name": "help", "A": "1.2.3.4" }
+            // { "type": "A", "name": "example", "A": "93.184.216.34" }
             // =>
             // { "Hdr": { "Name": "example.messwithdns.com.", "Rrtype": 1, "Class": 1, "Ttl": 5, "Rdlength": 0 }, "A": "93.184.216.34" }
             var record = {
                 "Hdr": {
-                    "Name": data.name,
+                    "Name": data.name + ".messwithdns.com.",
                     "Rrtype": rrTypes[data.type],
                     "Class": 1,
                     "Ttl": data.ttl,
@@ -195,7 +195,20 @@ Vue.component('new-record', {
                     record[key] = data[key];
                 }
             }
-            console.log(record);
+            const response = await fetch('/record/new', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(record)
+            });
+            // check for errors
+            if (response.status != 200) {
+                console.log(response);
+                return;
+            }
+            const json = await response.json();
+            console.log(json);
         },
     }
 });

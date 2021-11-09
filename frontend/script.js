@@ -149,12 +149,6 @@ for (const key in schemas) {
         'label': 'TTL',
         'validation': 'required',
     });
-    // prepend name
-    schemas[key].unshift({
-        'name': 'name',
-        'label': 'Name',
-        'validation': 'required',
-    });
 }
 
 Vue.component('record', {
@@ -164,7 +158,37 @@ Vue.component('record', {
         return {
             schemas: schemas,
             clicked: false,
+            updated_record: {},
         };
+    },
+    methods: {
+        toggle: function() {
+            if (!this.clicked) {
+                this.updated_record = JSON.parse(JSON.stringify(this.record));
+            }
+            this.clicked = !this.clicked;
+        },
+        confirmDelete: function() {
+            if (confirm('Are you sure you want to delete this record?')) {
+                this.deleteRecord();
+            }
+        },
+        deleteRecord: async function() {
+            var url = '/record/' + this.record.id;
+            var response = await fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            if (response.ok) {
+                // remove record from list
+                var index = app.records.indexOf(this.record);
+                app.records.splice(index, 1);
+            } else {
+                alert('Error deleting record');
+            }
+        },
     },
 });
 

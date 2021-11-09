@@ -49,24 +49,25 @@ func InsertRecord(db *sql.DB, record dns.RR) {
 	}
 }
 
-func GetRecordsForName(db *sql.DB, name string) []dns.RR {
+func GetRecordsForName(db *sql.DB, name string) map[int]dns.RR {
     fmt.Println(name)
-	rows, err := db.Query("SELECT content FROM dns_records WHERE name = ?", name)
+	rows, err := db.Query("SELECT id, content FROM dns_records WHERE name = ?", name)
 	if err != nil {
 		panic(err.Error())
 	}
-	var records []dns.RR
+    records := make(map[int]dns.RR)
 	for rows.Next() {
 		var content []byte
-		err = rows.Scan(&content)
-		if err != nil {
-			panic(err.Error())
-		}
-		record, err := ParseRecord(content)
-		if err != nil {
-			panic(err.Error())
-		}
-		records = append(records, record)
+        var id int
+        err = rows.Scan(&id, &content)
+        if err != nil {
+            panic(err.Error())
+        }
+        record, err := ParseRecord(content)
+        if err != nil {
+            panic(err.Error())
+        }
+        records[id] = record
 	}
 	return records
 }

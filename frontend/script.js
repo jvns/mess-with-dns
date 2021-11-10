@@ -215,6 +215,7 @@ Vue.component('record', {
 
 Vue.component('new-record', {
     template: '#new-record',
+    props: ['domain'],
     data: function() {
         return {
             schemas: schemas,
@@ -224,10 +225,12 @@ Vue.component('new-record', {
 
     methods: {
         createRecord: async function(data) {
-            console.log(data);
             // { "type": "A", "name": "example", "A": "93.184.216.34" }
             // =>
             // { "Hdr": { "Name": "example.messwithdns.com.", "Rrtype": 1, "Class": 1, "Ttl": 5, "Rdlength": 0 }, "A": "93.184.216.34" }
+            console.log(this.domain);
+            data.name = this.domain;
+            console.log(data);
             const record = convertRecord(data);
             const response = await fetch('/record/new', {
                 method: 'POST',
@@ -238,11 +241,10 @@ Vue.component('new-record', {
             });
             // check for errors
             if (response.status != 200) {
+                // TODO: handle errors
                 console.log(response);
                 return;
             }
-            const json = await response.json();
-            console.log(json);
         },
     }
 });
@@ -257,7 +259,7 @@ function convertRecord(record) {
             "Name": record.name + ".messwithdns.com.",
             "Rrtype": rrTypes[record.type],
             "Class": 1,
-            "Ttl": record.ttl,
+            "Ttl": parseInt(record.ttl),
             "Rdlength": 0,
         },
     }

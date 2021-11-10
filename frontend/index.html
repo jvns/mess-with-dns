@@ -31,7 +31,7 @@
                 DNS records for {{ domain }}.messwithdns.com
             </h1>
 
-            <new-record> </new-record>
+            <new-record :domain='domain'> </new-record>
 
             <div v-if="records">
                 <table class="w-full">

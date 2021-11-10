@@ -14,7 +14,7 @@
     </style>
 </head>
 
-<body class="text-xl">
+<body>
     <nav id="nav" class="py-8 squiggle-bottom bg-green-600 text-white" role="navigation">
         <div class="flex">
             <div class="m-auto">
@@ -31,8 +31,11 @@
                 DNS records for {{ domain }}.messwithdns.com
             </h1>
 
-            <new-record :domain='domain'> </new-record>
+            <h2 class="font-bold text-xl my-4"> Add a record </h2>
 
+            <new-record :domain='domain' class="pl-16"> </new-record>
+
+            <h2 class="font-bold text-xl my-8"> All DNS records </h2>
             <div v-if="records">
                 <table class="w-full">
                     <tr class="bg-gray-100 border border-gray-300">

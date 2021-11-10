@@ -89,7 +89,7 @@
                 <formulate-form v-model="updated_record" class="mt-2" @submit="updateRecord">
                     <div class="flex">
                         <formulate-input class="ml-4 "
-                            element-class="border border-black rounded-lg mt-2"
+                            element-class="border border-black rounded-lg mt-2 p-1"
                             v-for="item in schemas[record.type]" 
                             :key="item.name" 
                             v-bind="item"></formulate-input>
@@ -130,12 +130,19 @@
 </script>
 
 <script id="new-record" type="vue-component">
-    <formulate-form @submit="createRecord">
+    <formulate-form @submit="createRecord" v-model="data">
         <fieldset>
             <div class="flex">
-                <formulate-input element-class="border border-black rounded mt-2" name="type" label="Type" v-model="type" type="select" :options="['A', 'AAAA', 'CNAME', 'MX', 'NS', 'PTR', 'SOA', 'SRV', 'TXT']"></formulate-input>
+                <formulate-input 
+                element-class="border border-black rounded-lg mt-2 p-1" 
+                name="type" label="Type" 
+                v-model="type" type="select" 
+                :options="['A', 'AAAA', 'CNAME', 'MX', 'NS', 'PTR', 'SOA', 'SRV', 'TXT']"></formulate-input>
 
-                <formulate-input class="ml-4 " element-class="border border-black rounded-lg mt-2" v-for="item in schemas[type]" :key="item.name" v-bind="item"></formulate-input>
+                <formulate-input class="ml-4"
+                element-class="border border-black rounded-lg mt-2 p-1" 
+                v-for="item in schemas[type]"
+                :key="item.name" v-bind="item"></formulate-input>
             </div>
         </fieldset>
         <formulate-input type="submit" label="Submit"></formulate-input>

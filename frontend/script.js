@@ -206,6 +206,7 @@ Vue.component('record', {
                 var index = app.records.indexOf(this.record);
                 app.records[index] = this.updated_record;
                 this.clicked = false;
+                updateHash();
             } else {
                 alert('Error updating record');
             }
@@ -220,6 +221,7 @@ Vue.component('new-record', {
         return {
             schemas: schemas,
             type: 'A',
+            data: undefined,
         };
     },
 
@@ -245,6 +247,9 @@ Vue.component('new-record', {
                 console.log(response);
                 return;
             }
+            updateHash();
+            // clear form but keep type
+            this.data = {type: this.data.type};
         },
     }
 });

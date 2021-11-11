@@ -115,32 +115,143 @@ const schemas = {
     ],
     'MX': [
         {
-            'name': 'priority',
-            'label': 'Priority',
+            'name': 'Preference',
+            'label': 'Preference',
             'validation': 'required',
+            'type': 'number',
         },
         {
-            'name': 'mail_server',
+            'name': 'Mx',
             'label': 'Mail server',
             'validation': 'required',
         },
     ],
     'NS': [
         {
-            'name': 'nameserver',
+            'name': 'Ns',
             'label': 'Nameserver',
             'validation': 'required',
         },
     ],
     'TXT': [
         {
-            'name': 'content',
+            'name': 'Txt',
             'label': 'Content',
             'type': 'textarea',
             'validation': 'required',
         },
     ],
-
+    'SRV': [
+        {
+            'name': 'Priority',
+            'label': 'Priority',
+            'validation': 'required',
+            'type': 'number',
+        },
+        {
+            'name': 'Weight',
+            'label': 'Weight',
+            'validation': 'required',
+            'type': 'number',
+        },
+        {
+            'name': 'Port',
+            'label': 'Port',
+            'validation': 'required',
+            'type': 'number',
+        },
+        {
+            'name': 'Target',
+            'label': 'Target',
+            'validation': 'required',
+        },
+    ],
+    'SOA': [
+        {
+            'name': 'Ns',
+            'label': 'Nameserver',
+            'validation': 'required',
+        },
+        {
+            'name': 'Mbox',
+            'label': 'Email',
+            'validation': 'required',
+        },
+        {
+            'name': 'Serial',
+            'label': 'Serial',
+            'validation': 'required',
+            'type': 'number',
+        },
+        {
+            'name': 'Refresh',
+            'label': 'Refresh',
+            'validation': 'required',
+            'type': 'number',
+        },
+        {
+            'name': 'Retry',
+            'label': 'Retry',
+            'validation': 'required',
+            'type': 'number',
+        },
+        {
+            'name': 'Expire',
+            'label': 'Expire',
+            'validation': 'required',
+            'type': 'number',
+        },
+        {
+            'name': 'Minttl',
+            'label': 'Minimum TTL',
+            'validation': 'required',
+            'type': 'number',
+        },
+    ],
+    'CAA': [
+        {
+            'name': 'Tag',
+            'label': 'Tag',
+            'validation': 'required',
+        },
+        {
+            'name': 'Value',
+            'label': 'Value',
+            'validation': 'required',
+        },
+        {
+            'name': 'Flag',
+            'label': 'Flags',
+            'validation': 'required',
+            'type': 'number',
+        },
+    ],
+    'CERT': [
+        {
+            'name': 'Type',
+            'label': 'Certificate type',
+            'validation': 'required',
+            'type': 'number',
+        },
+        {
+            'name': 'KeyTag',
+            'label': 'Certificate key tag',
+            'validation': 'required',
+            'type': 'number',
+        },
+        {
+            'name': 'Algorithm',
+            'label': 'Certificate algorithm',
+            'validation': 'required',
+            'type': 'number',
+        },
+        {
+            'name': 'Certificate',
+            'label': 'Certificate',
+            'type': 'textarea',
+            'validation': 'required',
+        },
+    ],
 };
 // add name and ttl to every schema
 for (const key in schemas) {
@@ -168,6 +279,17 @@ Vue.component('record', {
                 this.updated_record = JSON.parse(JSON.stringify(this.record));
             }
             this.clicked = !this.clicked;
+        },
+        content: function() {
+            var content = "";
+            for (const key in this.record) {
+                if (key == 'name' || key == 'type' || key == 'ttl' || key == 'id') {
+                    continue;
+                }
+                console.log(key, this.record[key]);
+                content += this.record[key] + " ";
+            }
+            return content;
         },
         confirmDelete: function() {
             if (confirm('Are you sure you want to delete this record?')) {

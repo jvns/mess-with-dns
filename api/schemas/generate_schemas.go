@@ -45,6 +45,13 @@ func main() {
 	// pretty print json
 	fmt.Println("const schemas = " + string(x) + ";")
 
+	rrTypes := make(map[string]uint16)
+	// iterate over map
+	for k, v := range dns.TypeToString {
+		rrTypes[v] = k
+	}
+	x, _ = json.MarshalIndent(rrTypes, "", "  ")
+	fmt.Println("const rrTypes = " + string(x) + ";")
 }
 
 func genSchema(x interface{}, labels map[string]string) []map[string]string {

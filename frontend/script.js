@@ -1,88 +1,283 @@
 Vue.use(VueFormulate)
 
-
+const schemas = {
+  "A": [
+    {
+      "label": "IPv4 Address",
+      "name": "A",
+      "validation": "matches:/[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+/"
+    }
+  ],
+  "AAAA": [
+    {
+      "label": "IPv6 Address",
+      "name": "AAAA",
+      "validation": "matches:/[0-9a-fA-F:]+/"
+    }
+  ],
+  "CAA": [
+    {
+      "label": "Flag",
+      "name": "Flag",
+      "validation": "between:0,255"
+    },
+    {
+      "label": "Tag",
+      "name": "Tag",
+      "validation": "required"
+    },
+    {
+      "label": "CA domain name",
+      "name": "Value",
+      "validation": "required"
+    }
+  ],
+  "CERT": [
+    {
+      "label": "Cert type",
+      "name": "Type",
+      "validation": "between:0,65535"
+    },
+    {
+      "label": "Key tag",
+      "name": "KeyTag",
+      "validation": "between:0,65535"
+    },
+    {
+      "label": "Algorithm",
+      "name": "Algorithm",
+      "validation": "between:0,255"
+    },
+    {
+      "label": "Certificate",
+      "name": "Certificate",
+      "validation": "required"
+    }
+  ],
+  "CNAME": [
+    {
+      "label": "Target",
+      "name": "Target",
+      "validation": "required"
+    }
+  ],
+  "DS": [
+    {
+      "label": "Key tag",
+      "name": "KeyTag",
+      "validation": "between:0,65535"
+    },
+    {
+      "label": "Algorithm",
+      "name": "Algorithm",
+      "validation": "between:0,255"
+    },
+    {
+      "label": "Digest type",
+      "name": "DigestType",
+      "validation": "between:0,255"
+    },
+    {
+      "label": "Digest",
+      "name": "Digest",
+      "validation": "required"
+    }
+  ],
+  "MX": [
+    {
+      "label": "Preference",
+      "name": "Preference",
+      "validation": "between:0,65535"
+    },
+    {
+      "label": "Mail Server",
+      "name": "Mx",
+      "validation": "required"
+    }
+  ],
+  "NS": [
+    {
+      "label": "Nameserver ",
+      "name": "Ns",
+      "validation": "required"
+    }
+  ],
+  "PTR": [
+    {
+      "label": "Pointer",
+      "name": "Ptr",
+      "validation": "required"
+    }
+  ],
+  "SOA": [
+    {
+      "label": "Name Server",
+      "name": "Ns",
+      "validation": "required"
+    },
+    {
+      "label": "Email address",
+      "name": "Mbox",
+      "validation": "required"
+    },
+    {
+      "label": "Serial",
+      "name": "Serial",
+      "validation": "number"
+    },
+    {
+      "label": "Refresh",
+      "name": "Refresh",
+      "validation": "number"
+    },
+    {
+      "label": "Retry",
+      "name": "Retry",
+      "validation": "number"
+    },
+    {
+      "label": "Expire",
+      "name": "Expire",
+      "validation": "number"
+    },
+    {
+      "label": "Minimum TTL",
+      "name": "Minttl",
+      "validation": "number"
+    }
+  ],
+  "SRV": [
+    {
+      "label": "Priority",
+      "name": "Priority",
+      "validation": "between:0,65535"
+    },
+    {
+      "label": "Weight",
+      "name": "Weight",
+      "validation": "between:0,65535"
+    },
+    {
+      "label": "Port",
+      "name": "Port",
+      "validation": "between:0,65535"
+    },
+    {
+      "label": "Target",
+      "name": "Target",
+      "validation": "required"
+    }
+  ],
+  "TXT": [
+    {
+      "label": "Text",
+      "name": "Txt",
+      "validation": "required"
+    }
+  ],
+  "URI": [
+    {
+      "label": "Priority",
+      "name": "Priority",
+      "validation": "between:0,65535"
+    },
+    {
+      "label": "Weight",
+      "name": "Weight",
+      "validation": "between:0,65535"
+    },
+    {
+      "label": "Target",
+      "name": "Target",
+      "validation": "required"
+    }
+  ]
+};
 const rrTypes = {
-    'A': 1,
-    'NS': 2,
-    'MD': 3,
-    'MF': 4,
-    'CNAME': 5,
-    'SOA': 6,
-    'MB': 7,
-    'MG': 8,
-    'MR': 9,
-    'NULL': 10,
-    'WKS': 11,
-    'PTR': 12,
-    'HINFO': 13,
-    'MINFO': 14,
-    'MX': 15,
-    'TXT': 16,
-    'RP': 17,
-    'AFSDB': 18,
-    'X25': 19,
-    'ISDN': 20,
-    'RT': 21,
-    'NSAP': 22,
-    'NSAP-PTR': 23,
-    'SIG': 24,
-    'KEY': 25,
-    'PX': 26,
-    'GPOS': 27,
-    'AAAA': 28,
-    'LOC': 29,
-    'NXT': 30,
-    'EID': 31,
-    'NIMLOC': 32,
-    'SRV': 33,
-    'ATMA': 34,
-    'NAPTR': 35,
-    'KX': 36,
-    'CERT': 37,
-    'A6': 38,
-    'DNAME': 39,
-    'SINK': 40,
-    'OPT': 41,
-    'APL': 42,
-    'DS': 43,
-    'SSHFP': 44,
-    'IPSECKEY': 45,
-    'RRSIG': 46,
-    'NSEC': 47,
-    'DNSKEY': 48,
-    'DHCID': 49,
-    'NSEC3': 50,
-    'NSEC3PARAM': 51,
-    'TLSA': 52,
-    'SMIMEA': 53,
-    'HIP': 55,
-    'NINFO': 56,
-    'RKEY': 57,
-    'TALINK': 58,
-    'CDS': 59,
-    'CDNSKEY': 60,
-    'OPENPGPKEY': 61,
-    'CSYNC': 62,
-    'SPF': 99,
-    'UINFO': 100,
-    'UID': 101,
-    'GID': 102,
-    'UNSPEC': 103,
-    'NID': 104,
-    'L32': 105,
-    'L64': 106,
-    'LP': 107,
-    'EUI48': 108,
-    'EUI64': 109,
-    'TKEY': 249,
-    'TSIG': 250,
-    'IXFR': 251,
-    'AXFR': 252,
-    'MAILB': 253,
-    'MAILA': 254,
-    'ANY': 255,
-    'URI': 256,
-    'CAA': 257,
+  "A": 1,
+  "AAAA": 28,
+  "AFSDB": 18,
+  "ANY": 255,
+  "APL": 42,
+  "ATMA": 34,
+  "AVC": 258,
+  "AXFR": 252,
+  "CAA": 257,
+  "CDNSKEY": 60,
+  "CDS": 59,
+  "CERT": 37,
+  "CNAME": 5,
+  "CSYNC": 62,
+  "DHCID": 49,
+  "DLV": 32769,
+  "DNAME": 39,
+  "DNSKEY": 48,
+  "DS": 43,
+  "EID": 31,
+  "EUI48": 108,
+  "EUI64": 109,
+  "GID": 102,
+  "GPOS": 27,
+  "HINFO": 13,
+  "HIP": 55,
+  "HTTPS": 65,
+  "ISDN": 20,
+  "IXFR": 251,
+  "KEY": 25,
+  "KX": 36,
+  "L32": 105,
+  "L64": 106,
+  "LOC": 29,
+  "LP": 107,
+  "MAILA": 254,
+  "MAILB": 253,
+  "MB": 7,
+  "MD": 3,
+  "MF": 4,
+  "MG": 8,
+  "MINFO": 14,
+  "MR": 9,
+  "MX": 15,
+  "NAPTR": 35,
+  "NID": 104,
+  "NIMLOC": 32,
+  "NINFO": 56,
+  "NS": 2,
+  "NSAP-PTR": 23,
+  "NSEC": 47,
+  "NSEC3": 50,
+  "NSEC3PARAM": 51,
+  "NULL": 10,
+  "NXT": 30,
+  "None": 0,
+  "OPENPGPKEY": 61,
+  "OPT": 41,
+  "PTR": 12,
+  "PX": 26,
+  "RKEY": 57,
+  "RP": 17,
+  "RRSIG": 46,
+  "RT": 21,
+  "Reserved": 65535,
+  "SIG": 24,
+  "SMIMEA": 53,
+  "SOA": 6,
+  "SPF": 99,
+  "SRV": 33,
+  "SSHFP": 44,
+  "SVCB": 64,
+  "TA": 32768,
+  "TALINK": 58,
+  "TKEY": 249,
+  "TLSA": 52,
+  "TSIG": 250,
+  "TXT": 16,
+  "UID": 101,
+  "UINFO": 100,
+  "UNSPEC": 103,
+  "URI": 256,
+  "X25": 19,
+  "ZONEMD": 63
 };
 
 // reverse rrTypes
@@ -180,6 +375,7 @@ Vue.component('new-record', {
             schemas: schemas,
             type: 'A',
             data: undefined,
+            options: Object.keys(schemas),
         };
     },
 

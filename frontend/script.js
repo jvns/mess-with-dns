@@ -60,7 +60,7 @@ const schemas = {
       "label": "Certificate",
       "name": "Certificate",
       "type": "text",
-      "validation": "required"
+      "validation": "matches:/^[a-zA-Z0-9\\+\\/\\=]+$/"
     }
   ],
   "CNAME": [
@@ -68,7 +68,7 @@ const schemas = {
       "label": "Target",
       "name": "Target",
       "type": "text",
-      "validation": "required"
+      "validation": "matches:/^([a-zA-Z0-9-]+\\.)*[a-zA-Z0-9]+\\.[a-zA-Z]+$/"
     }
   ],
   "DS": [
@@ -94,7 +94,7 @@ const schemas = {
       "label": "Digest",
       "name": "Digest",
       "type": "text",
-      "validation": "required"
+      "validation": "matches:/^[a-fA-F0-9]+$/"
     }
   ],
   "MX": [
@@ -108,7 +108,7 @@ const schemas = {
       "label": "Mail Server",
       "name": "Mx",
       "type": "text",
-      "validation": "required"
+      "validation": "matches:/^([a-zA-Z0-9-]+\\.)*[a-zA-Z0-9]+\\.[a-zA-Z]+$/"
     }
   ],
   "NS": [
@@ -116,7 +116,7 @@ const schemas = {
       "label": "Nameserver ",
       "name": "Ns",
       "type": "text",
-      "validation": "required"
+      "validation": "matches:/^([a-zA-Z0-9-]+\\.)*[a-zA-Z0-9]+\\.[a-zA-Z]+$/"
     }
   ],
   "PTR": [
@@ -124,7 +124,7 @@ const schemas = {
       "label": "Pointer",
       "name": "Ptr",
       "type": "text",
-      "validation": "required"
+      "validation": "matches:/^([a-zA-Z0-9-]+\\.)*[a-zA-Z0-9]+\\.[a-zA-Z]+$/"
     }
   ],
   "SOA": [
@@ -132,13 +132,13 @@ const schemas = {
       "label": "Name Server",
       "name": "Ns",
       "type": "text",
-      "validation": "required"
+      "validation": "matches:/^([a-zA-Z0-9-]+\\.)*[a-zA-Z0-9]+\\.[a-zA-Z]+$/"
     },
     {
       "label": "Email address",
       "name": "Mbox",
       "type": "text",
-      "validation": "required"
+      "validation": "matches:/^([a-zA-Z0-9-]+\\.)*[a-zA-Z0-9]+\\.[a-zA-Z]+$/"
     },
     {
       "label": "Serial",
@@ -194,7 +194,7 @@ const schemas = {
       "label": "Target",
       "name": "Target",
       "type": "text",
-      "validation": "required"
+      "validation": "matches:/^([a-zA-Z0-9-]+\\.)*[a-zA-Z0-9]+\\.[a-zA-Z]+$/"
     }
   ],
   "TXT": [

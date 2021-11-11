@@ -75,8 +75,8 @@ func genSchema(x interface{}, labels map[string]string) []map[string]string {
 		} else {
 			schema["label"] = field.Name
 		}
-        schema["type"] = getType(field.Type, field.Name)
-		schema["validation"] = getValidation(field.Type, field.Name)
+		schema["type"] = getType(field.Type, field.Name)
+		schema["validation"] = getValidation(field)
 		//fmt.Println("'validation-messages': {'" + getValidationMessages(field.Type) + "'},")
 		schemas = append(schemas, schema)
 	}
@@ -84,39 +84,51 @@ func genSchema(x interface{}, labels map[string]string) []map[string]string {
 }
 
 func getType(t reflect.Type, field_name string) string {
-    if field_name == "Txt" {
-        return "textarea"
-    }
-    switch t.String() {
-        case "net.IP":
-            return "text"
-        case "string":
-            return "text"
-        case "int":
-            return "number"
-        case "uint":
-            return "number"
-        case "uint16":
-            return "number"
-        case "uint32":
-            return "number"
-        case "uint8":
-            return "number"
-        default:
+	if field_name == "Txt" {
+		return "textarea"
+	}
+	switch t.String() {
+	case "net.IP":
+		return "text"
+	case "string":
+		return "text"
+	case "int":
+		return "number"
+	case "uint":
+		return "number"
+	case "uint16":
+		return "number"
+	case "uint32":
+		return "number"
+	case "uint8":
+		return "number"
+	default:
 		fmt.Println("Error: Unsupported type: " + t.String())
 		os.Exit(1)
-    }
-    return ""
+	}
+	return ""
 }
 
-func getValidation(t reflect.Type, field_name string) string {
+func getValidation(field reflect.StructField) string {
 	// get json schema for the type
+	field_name := field.Name
+	t := field.Type
+
+	tag := field.Tag.Get("dns")
+
+	if tag == "cdomain-name" || tag == "domain-name" {
+		return `matches:/^([a-zA-Z0-9-]+\.)*[a-zA-Z0-9]+\.[a-zA-Z]+$/`
+	} else if tag == "base64" {
+		return `matches:/^[a-zA-Z0-9\+\/\=]+$/`
+	} else if tag == "hex" {
+		return `matches:/^[a-fA-F0-9]+$/`
+	}
 
 	switch t.String() {
 	case "net.IP":
 		// TODO: check if it's an ipv4 address
 		if field_name == "A" {
-			return "matches:/[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+/"
+			return `matches:/[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/`
 		} else if field_name == "AAAA" {
 			return "matches:/[0-9a-fA-F:]+/"
 		}

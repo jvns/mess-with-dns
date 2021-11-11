@@ -37,7 +37,7 @@ func main() {
 	schemas["SOA"] = genSchema(dns.SOA{}, map[string]string{"Minttl": "Minimum TTL", "Ns": "Name Server", "Mbox": "Email address"})
 	schemas["SRV"] = genSchema(dns.SRV{}, map[string]string{"Srv": "Service"})
 	schemas["SRV"] = genSchema(dns.SRV{}, map[string]string{})
-	schemas["TXT"] = genSchema(dns.TXT{}, map[string]string{"Txt": "Text"})
+	schemas["TXT"] = genSchema(dns.TXT{}, map[string]string{"Txt": "Content"})
 	schemas["URI"] = genSchema(dns.URI{}, map[string]string{})
 
 	// serialize schemas to json
@@ -75,11 +75,38 @@ func genSchema(x interface{}, labels map[string]string) []map[string]string {
 		} else {
 			schema["label"] = field.Name
 		}
+        schema["type"] = getType(field.Type, field.Name)
 		schema["validation"] = getValidation(field.Type, field.Name)
 		//fmt.Println("'validation-messages': {'" + getValidationMessages(field.Type) + "'},")
 		schemas = append(schemas, schema)
 	}
 	return schemas
+}
+
+func getType(t reflect.Type, field_name string) string {
+    if field_name == "Txt" {
+        return "textarea"
+    }
+    switch t.String() {
+        case "net.IP":
+            return "text"
+        case "string":
+            return "text"
+        case "int":
+            return "number"
+        case "uint":
+            return "number"
+        case "uint16":
+            return "number"
+        case "uint32":
+            return "number"
+        case "uint8":
+            return "number"
+        default:
+		fmt.Println("Error: Unsupported type: " + t.String())
+		os.Exit(1)
+    }
+    return ""
 }
 
 func getValidation(t reflect.Type, field_name string) string {
@@ -97,9 +124,9 @@ func getValidation(t reflect.Type, field_name string) string {
 		// TODO: check json label
 		return "required"
 	case "uint8":
-		return "between:0,255"
+		return "number|between:0,255"
 	case "uint16":
-		return "between:0,65535"
+		return "number|between:0,65535"
 	case "uint32":
 		return "number"
 	case "[]string":

@@ -135,14 +135,15 @@
 <script id="new-record" type="vue-component">
     <formulate-form @submit="createRecord" v-model="data">
         <fieldset>
-            <div class="flex">
+            <div class="flex flex-wrap">
                 <formulate-input 
+                class='mr-4 mt-4'
                 element-class="border border-black rounded-lg mt-2 p-1" 
                 name="type" label="Type" 
                 v-model="type" type="select" 
                 :options="options"></formulate-input>
 
-                <formulate-input class="ml-4"
+                <formulate-input class="mr-4 mt-4"
                 element-class="border border-black rounded-lg mt-2 p-1" 
                 v-for="item in schemas[type]"
                 :key="item.name" v-bind="item"></formulate-input>

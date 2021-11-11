@@ -5,6 +5,7 @@ const schemas = {
     {
       "label": "IPv4 Address",
       "name": "A",
+      "type": "text",
       "validation": "matches:/[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+/"
     }
   ],
@@ -12,6 +13,7 @@ const schemas = {
     {
       "label": "IPv6 Address",
       "name": "AAAA",
+      "type": "text",
       "validation": "matches:/[0-9a-fA-F:]+/"
     }
   ],
@@ -19,16 +21,19 @@ const schemas = {
     {
       "label": "Flag",
       "name": "Flag",
-      "validation": "between:0,255"
+      "type": "number",
+      "validation": "number|between:0,255"
     },
     {
       "label": "Tag",
       "name": "Tag",
+      "type": "text",
       "validation": "required"
     },
     {
       "label": "CA domain name",
       "name": "Value",
+      "type": "text",
       "validation": "required"
     }
   ],
@@ -36,21 +41,25 @@ const schemas = {
     {
       "label": "Cert type",
       "name": "Type",
-      "validation": "between:0,65535"
+      "type": "number",
+      "validation": "number|between:0,65535"
     },
     {
       "label": "Key tag",
       "name": "KeyTag",
-      "validation": "between:0,65535"
+      "type": "number",
+      "validation": "number|between:0,65535"
     },
     {
       "label": "Algorithm",
       "name": "Algorithm",
-      "validation": "between:0,255"
+      "type": "number",
+      "validation": "number|between:0,255"
     },
     {
       "label": "Certificate",
       "name": "Certificate",
+      "type": "text",
       "validation": "required"
     }
   ],
@@ -58,6 +67,7 @@ const schemas = {
     {
       "label": "Target",
       "name": "Target",
+      "type": "text",
       "validation": "required"
     }
   ],
@@ -65,21 +75,25 @@ const schemas = {
     {
       "label": "Key tag",
       "name": "KeyTag",
-      "validation": "between:0,65535"
+      "type": "number",
+      "validation": "number|between:0,65535"
     },
     {
       "label": "Algorithm",
       "name": "Algorithm",
-      "validation": "between:0,255"
+      "type": "number",
+      "validation": "number|between:0,255"
     },
     {
       "label": "Digest type",
       "name": "DigestType",
-      "validation": "between:0,255"
+      "type": "number",
+      "validation": "number|between:0,255"
     },
     {
       "label": "Digest",
       "name": "Digest",
+      "type": "text",
       "validation": "required"
     }
   ],
@@ -87,11 +101,13 @@ const schemas = {
     {
       "label": "Preference",
       "name": "Preference",
-      "validation": "between:0,65535"
+      "type": "number",
+      "validation": "number|between:0,65535"
     },
     {
       "label": "Mail Server",
       "name": "Mx",
+      "type": "text",
       "validation": "required"
     }
   ],
@@ -99,6 +115,7 @@ const schemas = {
     {
       "label": "Nameserver ",
       "name": "Ns",
+      "type": "text",
       "validation": "required"
     }
   ],
@@ -106,6 +123,7 @@ const schemas = {
     {
       "label": "Pointer",
       "name": "Ptr",
+      "type": "text",
       "validation": "required"
     }
   ],
@@ -113,36 +131,43 @@ const schemas = {
     {
       "label": "Name Server",
       "name": "Ns",
+      "type": "text",
       "validation": "required"
     },
     {
       "label": "Email address",
       "name": "Mbox",
+      "type": "text",
       "validation": "required"
     },
     {
       "label": "Serial",
       "name": "Serial",
+      "type": "number",
       "validation": "number"
     },
     {
       "label": "Refresh",
       "name": "Refresh",
+      "type": "number",
       "validation": "number"
     },
     {
       "label": "Retry",
       "name": "Retry",
+      "type": "number",
       "validation": "number"
     },
     {
       "label": "Expire",
       "name": "Expire",
+      "type": "number",
       "validation": "number"
     },
     {
       "label": "Minimum TTL",
       "name": "Minttl",
+      "type": "number",
       "validation": "number"
     }
   ],
@@ -150,28 +175,33 @@ const schemas = {
     {
       "label": "Priority",
       "name": "Priority",
-      "validation": "between:0,65535"
+      "type": "number",
+      "validation": "number|between:0,65535"
     },
     {
       "label": "Weight",
       "name": "Weight",
-      "validation": "between:0,65535"
+      "type": "number",
+      "validation": "number|between:0,65535"
     },
     {
       "label": "Port",
       "name": "Port",
-      "validation": "between:0,65535"
+      "type": "number",
+      "validation": "number|between:0,65535"
     },
     {
       "label": "Target",
       "name": "Target",
+      "type": "text",
       "validation": "required"
     }
   ],
   "TXT": [
     {
-      "label": "Text",
+      "label": "Content",
       "name": "Txt",
+      "type": "textarea",
       "validation": "required"
     }
   ],
@@ -179,16 +209,19 @@ const schemas = {
     {
       "label": "Priority",
       "name": "Priority",
-      "validation": "between:0,65535"
+      "type": "number",
+      "validation": "number|between:0,65535"
     },
     {
       "label": "Weight",
       "name": "Weight",
-      "validation": "between:0,65535"
+      "type": "number",
+      "validation": "number|between:0,65535"
     },
     {
       "label": "Target",
       "name": "Target",
+      "type": "text",
       "validation": "required"
     }
   ]

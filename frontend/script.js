@@ -286,7 +286,6 @@ Vue.component('record', {
                 if (key == 'name' || key == 'type' || key == 'ttl' || key == 'id') {
                     continue;
                 }
-                console.log(key, this.record[key]);
                 content += this.record[key] + " ";
             }
             return content;
@@ -314,7 +313,6 @@ Vue.component('record', {
         },
         updateRecord: async function(data) {
             var url = '/record/' + this.record.id;
-            console.log(data);
             const record = convertRecord(data);
             var response = await fetch(url, {
                 method: 'POST',
@@ -352,9 +350,7 @@ Vue.component('new-record', {
             // { "type": "A", "name": "example", "A": "93.184.216.34" }
             // =>
             // { "Hdr": { "Name": "example.messwithdns.com.", "Rrtype": 1, "Class": 1, "Ttl": 5, "Rdlength": 0 }, "A": "93.184.216.34" }
-            console.log(this.domain);
             data.name = this.domain;
-            console.log(data);
             const record = convertRecord(data);
             const response = await fetch('/record/new', {
                 method: 'POST',
@@ -393,10 +389,25 @@ function convertRecord(record) {
     // copy rest of fields from form directly
     for (var key in record) {
         if (key != 'name' && key != 'type' && key != 'ttl') {
-            newRecord[key] = record[key];
+            // check if the type is 'number' in the schema
+            const field = getSchemaField(record.type, key);
+            if (field.type == 'number') {
+                newRecord[key] = parseInt(record[key]);
+            } else {
+                newRecord[key] = record[key];
+            }
         }
     }
     return newRecord;
+}
+
+function getSchemaField(type, key) {
+    const fields = schemas[type];
+    for (const field of fields) {
+        if (field.name == key) {
+            return field;
+        }
+    }
 }
 
 

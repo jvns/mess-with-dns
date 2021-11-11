@@ -23,19 +23,23 @@ type RecordRequest struct {
 func createRecord(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		fmt.Println("Error reading body: ", err.Error())
+        fmt.Println("Error reading body: ", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
         return
 	}
 	rr, err := ParseRecord(body)
 	if err != nil {
-		fmt.Println("Error parsing record: ", err.Error())
+        errMsg := fmt.Sprintf("Error parsing record: %s", err.Error())
+        fmt.Println(errMsg)
 		w.WriteHeader(http.StatusInternalServerError)
+        w.Write([]byte(errMsg))
         return
 	}
 	if !strings.HasSuffix(rr.Header().Name, ".messwithdns.com.") {
-		fmt.Println("Invalid domain: ", rr.Header().Name)
+        errMsg := fmt.Sprintf("Invalid domain: %s", rr.Header().Name)
+        fmt.Println(errMsg)
 		w.WriteHeader(http.StatusBadRequest)
+        w.Write([]byte(errMsg))
 		return
 	}
 	InsertRecord(db, rr)

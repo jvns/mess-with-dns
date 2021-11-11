@@ -409,7 +409,14 @@ Vue.component('new-record', {
             type: 'A',
             data: undefined,
             options: Object.keys(schemas),
+            error: undefined,
         };
+    },
+    created: function() {
+        // clear error when type is changed
+        this.$watch('type', function() {
+            this.error = undefined;
+        });
     },
 
     methods: {
@@ -428,10 +435,10 @@ Vue.component('new-record', {
             });
             // check for errors
             if (response.status != 200) {
-                // TODO: handle errors
-                console.log(response);
+                this.error = await response.text();
                 return;
             }
+            this.error = undefined;
             updateHash();
             // clear form but keep type
             this.data = {type: this.data.type};

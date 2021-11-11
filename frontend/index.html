@@ -11,6 +11,9 @@
         a {
             text-decoration: underline;
         }
+        .formulate-input-error {
+            color: red;
+        }
     </style>
 </head>
 
@@ -72,7 +75,7 @@
                 {{ record.ttl }}
             </td>
             <td class="text-right"> 
-                <button class="hover:text-blue-700 text-blue-500 font-bold py-2 px-4 rounded">
+                <button class="hover:text-green-700 text-green-500 font-bold py-2 px-4 rounded">
                     Edit
                     <span v-if="clicked">
                         <svg style="transform: rotate(90deg);" fill="currentColor" class="inline w-4" aria-label="caret-right" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
@@ -107,7 +110,7 @@
                         </button>
 
                         <formulate-input 
-                        element-class="hover:bg-blue-700 ml-4 bg-blue-500 text-white py-2 px-4 rounded"
+                        element-class="hover:bg-green-700 ml-4 bg-green-500 text-white py-2 px-4 rounded"
                         type="submit" label="Save"></formulate-input>
                     </div>
             </formulate-form>
@@ -149,7 +152,15 @@
                 :key="item.name" v-bind="item"></formulate-input>
             </div>
         </fieldset>
-        <formulate-input type="submit" label="Submit"></formulate-input>
+        <div style="color: red" v-if="error" class="pt-2">
+            {{error}}
+        </div>
+        <div class="flex">
+        <formulate-input 
+        outer-class="mr-auto mt-4"
+        element-class="hover:bg-green-700  bg-green-500 text-white py-2 px-4 rounded"
+        type="submit" label="Create"></formulate-input>
+        </div>
     </formulate-form>
 </script>
 

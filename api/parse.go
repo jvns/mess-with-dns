@@ -11,7 +11,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 	var unknown UnknownRequest
 	err := json.Unmarshal([]byte(jsonString), &unknown)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+		return nil, err
 	}
 
 	switch unknown.Hdr.Rrtype {
@@ -19,7 +19,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var a dns.A
 		err = json.Unmarshal([]byte(jsonString), &a)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &a, nil
 
@@ -27,7 +27,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var aaaa dns.AAAA
 		err = json.Unmarshal([]byte(jsonString), &aaaa)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &aaaa, nil
 
@@ -35,7 +35,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var afsdb dns.AFSDB
 		err = json.Unmarshal([]byte(jsonString), &afsdb)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &afsdb, nil
 
@@ -43,7 +43,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var any dns.ANY
 		err = json.Unmarshal([]byte(jsonString), &any)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &any, nil
 
@@ -51,15 +51,23 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var apl dns.APL
 		err = json.Unmarshal([]byte(jsonString), &apl)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &apl, nil
+
+    case dns.TypeCAA:
+        var caa dns.CAA
+        err = json.Unmarshal([]byte(jsonString), &caa)
+        if err != nil {
+            return nil, err
+        }
+        return &caa, nil
 
 	case dns.TypeCDNSKEY:
 		var cdnskey dns.CDNSKEY
 		err = json.Unmarshal([]byte(jsonString), &cdnskey)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &cdnskey, nil
 
@@ -67,7 +75,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var cds dns.CDS
 		err = json.Unmarshal([]byte(jsonString), &cds)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &cds, nil
 
@@ -75,7 +83,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var cert dns.CERT
 		err = json.Unmarshal([]byte(jsonString), &cert)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &cert, nil
 
@@ -83,7 +91,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var cname dns.CNAME
 		err = json.Unmarshal([]byte(jsonString), &cname)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &cname, nil
 
@@ -91,7 +99,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var csync dns.CSYNC
 		err = json.Unmarshal([]byte(jsonString), &csync)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &csync, nil
 
@@ -99,7 +107,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var dhcid dns.DHCID
 		err = json.Unmarshal([]byte(jsonString), &dhcid)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &dhcid, nil
 
@@ -107,7 +115,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var dlv dns.DLV
 		err = json.Unmarshal([]byte(jsonString), &dlv)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &dlv, nil
 
@@ -115,7 +123,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var dname dns.DNAME
 		err = json.Unmarshal([]byte(jsonString), &dname)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &dname, nil
 
@@ -123,7 +131,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var dnskey dns.DNSKEY
 		err = json.Unmarshal([]byte(jsonString), &dnskey)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &dnskey, nil
 
@@ -131,7 +139,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var ds dns.DS
 		err = json.Unmarshal([]byte(jsonString), &ds)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &ds, nil
 
@@ -139,7 +147,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var eid dns.EID
 		err = json.Unmarshal([]byte(jsonString), &eid)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &eid, nil
 
@@ -147,7 +155,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var eui48 dns.EUI48
 		err = json.Unmarshal([]byte(jsonString), &eui48)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &eui48, nil
 
@@ -155,7 +163,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var eui64 dns.EUI64
 		err = json.Unmarshal([]byte(jsonString), &eui64)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &eui64, nil
 
@@ -163,7 +171,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var gid dns.GID
 		err = json.Unmarshal([]byte(jsonString), &gid)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &gid, nil
 
@@ -171,7 +179,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var gpos dns.GPOS
 		err = json.Unmarshal([]byte(jsonString), &gpos)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &gpos, nil
 
@@ -179,7 +187,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var hinfo dns.HINFO
 		err = json.Unmarshal([]byte(jsonString), &hinfo)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &hinfo, nil
 
@@ -187,7 +195,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var hip dns.HIP
 		err = json.Unmarshal([]byte(jsonString), &hip)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &hip, nil
 
@@ -195,7 +203,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var https dns.HTTPS
 		err = json.Unmarshal([]byte(jsonString), &https)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &https, nil
 
@@ -203,7 +211,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var key dns.KEY
 		err = json.Unmarshal([]byte(jsonString), &key)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &key, nil
 
@@ -211,7 +219,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var kx dns.KX
 		err = json.Unmarshal([]byte(jsonString), &kx)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &kx, nil
 
@@ -219,7 +227,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var l32 dns.L32
 		err = json.Unmarshal([]byte(jsonString), &l32)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &l32, nil
 
@@ -227,7 +235,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var l64 dns.L64
 		err = json.Unmarshal([]byte(jsonString), &l64)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &l64, nil
 
@@ -235,7 +243,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var loc dns.LOC
 		err = json.Unmarshal([]byte(jsonString), &loc)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &loc, nil
 
@@ -243,7 +251,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var lp dns.LP
 		err = json.Unmarshal([]byte(jsonString), &lp)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &lp, nil
 
@@ -251,7 +259,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var mb dns.MB
 		err = json.Unmarshal([]byte(jsonString), &mb)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &mb, nil
 
@@ -259,7 +267,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var md dns.MD
 		err = json.Unmarshal([]byte(jsonString), &md)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &md, nil
 
@@ -267,7 +275,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var mf dns.MF
 		err = json.Unmarshal([]byte(jsonString), &mf)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &mf, nil
 
@@ -275,7 +283,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var mg dns.MG
 		err = json.Unmarshal([]byte(jsonString), &mg)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &mg, nil
 
@@ -283,7 +291,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var minfo dns.MINFO
 		err = json.Unmarshal([]byte(jsonString), &minfo)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &minfo, nil
 
@@ -291,7 +299,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var mr dns.MR
 		err = json.Unmarshal([]byte(jsonString), &mr)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &mr, nil
 
@@ -299,7 +307,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var mx dns.MX
 		err = json.Unmarshal([]byte(jsonString), &mx)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &mx, nil
 
@@ -307,7 +315,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var naptr dns.NAPTR
 		err = json.Unmarshal([]byte(jsonString), &naptr)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &naptr, nil
 
@@ -315,7 +323,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var nid dns.NID
 		err = json.Unmarshal([]byte(jsonString), &nid)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &nid, nil
 
@@ -323,7 +331,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var nimloc dns.NIMLOC
 		err = json.Unmarshal([]byte(jsonString), &nimloc)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &nimloc, nil
 
@@ -331,7 +339,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var ninfo dns.NINFO
 		err = json.Unmarshal([]byte(jsonString), &ninfo)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &ninfo, nil
 
@@ -339,7 +347,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var ns dns.NS
 		err = json.Unmarshal([]byte(jsonString), &ns)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &ns, nil
 
@@ -347,7 +355,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var nsec dns.NSEC
 		err = json.Unmarshal([]byte(jsonString), &nsec)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &nsec, nil
 
@@ -355,7 +363,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var nsec3 dns.NSEC3
 		err = json.Unmarshal([]byte(jsonString), &nsec3)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &nsec3, nil
 
@@ -363,7 +371,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var nsec3param dns.NSEC3PARAM
 		err = json.Unmarshal([]byte(jsonString), &nsec3param)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &nsec3param, nil
 
@@ -371,7 +379,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var null dns.NULL
 		err = json.Unmarshal([]byte(jsonString), &null)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &null, nil
 
@@ -379,7 +387,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var openpgpkey dns.OPENPGPKEY
 		err = json.Unmarshal([]byte(jsonString), &openpgpkey)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &openpgpkey, nil
 
@@ -387,7 +395,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var opt dns.OPT
 		err = json.Unmarshal([]byte(jsonString), &opt)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &opt, nil
 
@@ -395,7 +403,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var ptr dns.PTR
 		err = json.Unmarshal([]byte(jsonString), &ptr)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &ptr, nil
 
@@ -403,7 +411,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var px dns.PX
 		err = json.Unmarshal([]byte(jsonString), &px)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &px, nil
 
@@ -411,7 +419,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var rkey dns.RKEY
 		err = json.Unmarshal([]byte(jsonString), &rkey)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &rkey, nil
 
@@ -419,7 +427,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var rp dns.RP
 		err = json.Unmarshal([]byte(jsonString), &rp)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &rp, nil
 
@@ -427,7 +435,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var rrsig dns.RRSIG
 		err = json.Unmarshal([]byte(jsonString), &rrsig)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &rrsig, nil
 
@@ -435,7 +443,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var rt dns.RT
 		err = json.Unmarshal([]byte(jsonString), &rt)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &rt, nil
 
@@ -443,7 +451,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var sig dns.SIG
 		err = json.Unmarshal([]byte(jsonString), &sig)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &sig, nil
 
@@ -451,7 +459,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var smimea dns.SMIMEA
 		err = json.Unmarshal([]byte(jsonString), &smimea)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &smimea, nil
 
@@ -459,7 +467,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var soa dns.SOA
 		err = json.Unmarshal([]byte(jsonString), &soa)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &soa, nil
 
@@ -467,7 +475,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var spf dns.SPF
 		err = json.Unmarshal([]byte(jsonString), &spf)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &spf, nil
 
@@ -475,7 +483,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var srv dns.SRV
 		err = json.Unmarshal([]byte(jsonString), &srv)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &srv, nil
 
@@ -483,7 +491,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var sshfp dns.SSHFP
 		err = json.Unmarshal([]byte(jsonString), &sshfp)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &sshfp, nil
 
@@ -491,7 +499,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var svcb dns.SVCB
 		err = json.Unmarshal([]byte(jsonString), &svcb)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &svcb, nil
 
@@ -499,7 +507,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var ta dns.TA
 		err = json.Unmarshal([]byte(jsonString), &ta)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &ta, nil
 
@@ -507,7 +515,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var talink dns.TALINK
 		err = json.Unmarshal([]byte(jsonString), &talink)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &talink, nil
 
@@ -515,7 +523,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var tkey dns.TKEY
 		err = json.Unmarshal([]byte(jsonString), &tkey)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &tkey, nil
 
@@ -523,7 +531,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var tlsa dns.TLSA
 		err = json.Unmarshal([]byte(jsonString), &tlsa)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &tlsa, nil
 
@@ -531,7 +539,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var tsig dns.TSIG
 		err = json.Unmarshal([]byte(jsonString), &tsig)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &tsig, nil
 
@@ -539,7 +547,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var txt dns.TXT
 		err = json.Unmarshal([]byte(jsonString), &txt)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &txt, nil
 
@@ -547,7 +555,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var uid dns.UID
 		err = json.Unmarshal([]byte(jsonString), &uid)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &uid, nil
 
@@ -555,7 +563,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var uinfo dns.UINFO
 		err = json.Unmarshal([]byte(jsonString), &uinfo)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &uinfo, nil
 
@@ -563,7 +571,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var uri dns.URI
 		err = json.Unmarshal([]byte(jsonString), &uri)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &uri, nil
 
@@ -571,7 +579,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var x25 dns.X25
 		err = json.Unmarshal([]byte(jsonString), &x25)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &x25, nil
 
@@ -579,7 +587,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var zonemd dns.ZONEMD
 		err = json.Unmarshal([]byte(jsonString), &zonemd)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &zonemd, nil
 
@@ -587,7 +595,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 		var nsapptr dns.NSAPPTR
 		err = json.Unmarshal([]byte(jsonString), &nsapptr)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse json: %s", err.Error())
+			return nil, err
 		}
 		return &nsapptr, nil
 	}

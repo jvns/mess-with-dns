@@ -27,13 +27,23 @@ func main() {
 
 	schemas["A"] = genSchema(dns.A{}, map[string]string{"A": "IPv4 Address"})
 	schemas["AAAA"] = genSchema(dns.AAAA{}, map[string]string{"AAAA": "IPv6 Address"})
+	schemas["CAA"] = genSchema(dns.CAA{}, map[string]string{"Value": "CA domain name"})
+	schemas["CERT"] = genSchema(dns.CERT{}, map[string]string{"Type": "Cert type", "KeyTag": "Key tag"})
+	schemas["CNAME"] = genSchema(dns.CNAME{}, map[string]string{"Cname": "Canonical Name"})
+	schemas["DS"] = genSchema(dns.DS{}, map[string]string{"KeyTag": "Key tag", "Algorithm": "Algorithm", "DigestType": "Digest type"})
 	schemas["MX"] = genSchema(dns.MX{}, map[string]string{"Mx": "Mail Server"})
-	schemas["NS"] = genSchema(dns.NS{}, map[string]string{"Ns": "Name Server"})
+	schemas["NS"] = genSchema(dns.NS{}, map[string]string{"Ns": "Nameserver "})
 	schemas["PTR"] = genSchema(dns.PTR{}, map[string]string{"Ptr": "Pointer"})
+	schemas["SOA"] = genSchema(dns.SOA{}, map[string]string{"Minttl": "Minimum TTL", "Ns": "Name Server", "Mbox": "Email address"})
+	schemas["SRV"] = genSchema(dns.SRV{}, map[string]string{"Srv": "Service"})
+	schemas["SRV"] = genSchema(dns.SRV{}, map[string]string{})
+	schemas["TXT"] = genSchema(dns.TXT{}, map[string]string{"Txt": "Text"})
+	schemas["URI"] = genSchema(dns.URI{}, map[string]string{})
+
 	// serialize schemas to json
 	x, _ := json.MarshalIndent(schemas, "", "  ")
 	// pretty print json
-	fmt.Println(string(x))
+	fmt.Println("const schemas = " + string(x) + ";")
 
 }
 
@@ -58,30 +68,35 @@ func genSchema(x interface{}, labels map[string]string) []map[string]string {
 		} else {
 			schema["label"] = field.Name
 		}
-		schema["validation"] = getValidation(field.Type)
+		schema["validation"] = getValidation(field.Type, field.Name)
 		//fmt.Println("'validation-messages': {'" + getValidationMessages(field.Type) + "'},")
 		schemas = append(schemas, schema)
 	}
 	return schemas
 }
 
-func getValidation(t reflect.Type) string {
+func getValidation(t reflect.Type, field_name string) string {
 	// get json schema for the type
 
 	switch t.String() {
 	case "net.IP":
 		// TODO: check if it's an ipv4 address
-		return "matches:/[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+\\/"
+		if field_name == "A" {
+			return "matches:/[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+/"
+		} else if field_name == "AAAA" {
+			return "matches:/[0-9a-fA-F:]+/"
+		}
 	case "string":
-		// check json label
-
-		return "number"
+		// TODO: check json label
+		return "required"
 	case "uint8":
 		return "between:0,255"
 	case "uint16":
 		return "between:0,65535"
 	case "uint32":
-		return "between:0,4294967295"
+		return "number"
+	case "[]string":
+		return "required" // for TXT record
 	default:
 		// exit program with error
 		fmt.Println("Error: Unsupported type: " + t.String())

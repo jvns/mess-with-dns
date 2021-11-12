@@ -30,33 +30,65 @@
     </nav>
     <div class="flex">
         <div id="app" class="m-auto w-full pt-16 px-8" style="max-width: 1200px">
-            <h1 class="font-bold text-3xl text-center mb-8">
-                DNS records for {{ domain }}.messwithdns.com
-            </h1>
+            <div v-if="domain && domain != ''">
+                <h1 class="font-bold text-3xl text-center mb-8">
+                    DNS records for {{ domain }}.messwithdns.com
+                </h1>
 
-            <h2 class="font-bold text-xl my-4"> Add a record </h2>
+                <h2 class="font-bold text-xl my-4"> Add a record </h2>
 
-            <new-record :domain='domain' class="pl-16"> </new-record>
+                <new-record :domain='domain' class="pl-16"> </new-record>
 
-            <h2 class="font-bold text-xl my-8"> All DNS records </h2>
-            <div v-if="records">
-                <table class="w-full">
-                    <tr class="bg-gray-100 border border-gray-300">
-                        <th class="text-left px-4 py-2">
-                            Type
-                        </th>
-                        <th class="text-left">
-                            Content
-                        </th>
-                        <th class="text-left">
-                            TTL
-                        </th>
-                        <th class="text-left">
-                            &nbsp;
-                        </th>
-                    </tr>
-                    <tbody is="record" v-for="record in records" :key="record.id" :record="record" />
-                </table>
+                <h2 class="font-bold text-xl my-8"> All DNS records </h2>
+                <div v-if="records && records.length > 0">
+                    <table class="w-full">
+                        <tr class="bg-gray-100 border border-gray-300">
+                            <th class="text-left px-4 py-2">
+                                Type
+                            </th>
+                            <th class="text-left">
+                                Content
+                            </th>
+                            <th class="text-left">
+                                TTL
+                            </th>
+                            <th class="text-left">
+                                &nbsp;
+                            </th>
+                        </tr>
+                        <tbody is="record" v-for="record in records" :key="record.id" :record="record" />
+                    </table>
+                </div>
+                <div v-else>
+                    <p class="text-center">
+                        No records yet! You can add one!
+                    </p>
+                </div>
+            </div>
+            <div v-else>
+                <h1 class="font-bold text-3xl text-center mb-8">
+                    Welcome to mess with dns!
+                </h1>
+                <p>
+
+                </p>
+                <div class="flex justify-center">
+                    <button type="button" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-xl" @click="randomSubdomain">
+                        Get a random subdomain
+                    </button>
+                </div>
+                <!-- existing subdomain -->
+                <p class="text-center my-8 text-xl"> or go to an existing subdomain: </p>
+                <div class="flex justify-center">
+                    <formulate-form @submit="setDomain" class="flex">
+                        <formulate-input name="domain" type="text" placeholder="fruity-banana" 
+                            element-class="border border-green-700 rounded-lg p-1 h-full text-xl"
+                            required > </formulate-input>
+
+                        <formulate-input 
+                            type="submit" value="Go" 
+                            class="ml-4 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-xl"></formulate-input>
+                    </formulate-form>
             </div>
         </div>
     </div>

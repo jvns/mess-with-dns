@@ -488,10 +488,18 @@ function getSchemaField(type, key) {
 var app = new Vue({
     el: '#app',
     data: {
-        message: 'Hello Vue!',
         schemas: schemas,
         domain: undefined,
         records: undefined,
+        words: undefined,
+    },
+    created: function() {
+        // load words.json
+        fetch('/words.json')
+            .then(response => response.json())
+            .then(json => {
+                app.words = json;
+            });
     },
     methods: {
         getRecords: async function(domain) {
@@ -525,12 +533,28 @@ var app = new Vue({
             }
             return basic;
         },
+        setDomain: function(data) {
+            this.domain = data.domain;
+            window.location.hash = app.domain;
+            updateHash()
+        },
+        randomSubdomain: function() {
+            // predicate - object
+            // return random word from words.json
+            const predicates = this.words.predicates;
+            const objects = this.words.objects;
+            const predicate = predicates[Math.floor(Math.random() * predicates.length)];
+            const object = objects[Math.floor(Math.random() * objects.length)];
+            const domain = predicate + '-' + object;
+            this.setDomain({domain: domain});
+        },
     },
 });
 
 async function updateHash() {
     var hash = window.location.hash;
     if (hash.length == 0) {
+        app.domain = undefined;
         return;
     }
     var domain = hash.substring(1);

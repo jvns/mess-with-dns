@@ -462,7 +462,7 @@ function convertRecord(record) {
     }
     // copy rest of fields from form directly
     for (var key in record) {
-        if (key == 'Target') {
+        if (key == 'Target' || key == 'Mx' || key == 'Ns') {
             // make sure it's a FQDN
             if (!record[key].endsWith('.')) {
                 record[key] += '.';

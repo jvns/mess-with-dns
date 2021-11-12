@@ -13,6 +13,10 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 	if err != nil {
 		return nil, err
 	}
+    // check for fully qualified domain name
+    if !dns.IsFqdn(unknown.Hdr.Name) {
+        return nil, fmt.Errorf("domain name must be fully qualified: %s", unknown.Hdr.Name)
+    }
 
 	switch unknown.Hdr.Rrtype {
 	case dns.TypeA:

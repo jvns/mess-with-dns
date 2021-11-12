@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+    "os"
 	"strconv"
 	"strings"
 
@@ -136,9 +137,14 @@ type UnknownRequest struct {
 func main() {
 	db := connect()
 	handler := &handler{db: db}
+    // udp port command line argument
+    port := ":53"
+    if len(os.Args) > 1 {
+        port = ":" + os.Args[1]
+    }
+    fmt.Println("Listening for UDP on port", port)
 	go func() {
-		srv := &dns.Server{Handler: handler, Addr: ":5353", Net: "udp"}
-		fmt.Println("Listening on :5353")
+		srv := &dns.Server{Handler: handler, Addr: port, Net: "udp"}
 		if err := srv.ListenAndServe(); err != nil {
 			panic(fmt.Sprintf("Failed to set udp listener %s\n", err.Error()))
 		}

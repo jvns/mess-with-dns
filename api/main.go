@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-    "os"
+	"os"
 	"strconv"
 	"strings"
 
@@ -24,23 +24,23 @@ type RecordRequest struct {
 func createRecord(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-        fmt.Println("Error reading body: ", err.Error())
+		fmt.Println("Error reading body: ", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
-        return
+		return
 	}
 	rr, err := ParseRecord(body)
 	if err != nil {
-        errMsg := fmt.Sprintf("Error parsing record: %s", err.Error())
-        fmt.Println(errMsg)
+		errMsg := fmt.Sprintf("Error parsing record: %s", err.Error())
+		fmt.Println(errMsg)
 		w.WriteHeader(http.StatusInternalServerError)
-        w.Write([]byte(errMsg))
-        return
+		w.Write([]byte(errMsg))
+		return
 	}
 	if !strings.HasSuffix(rr.Header().Name, ".messwithdns.com.") {
-        errMsg := fmt.Sprintf("Invalid domain: %s", rr.Header().Name)
-        fmt.Println(errMsg)
+		errMsg := fmt.Sprintf("Invalid domain: %s", rr.Header().Name)
+		fmt.Println(errMsg)
 		w.WriteHeader(http.StatusBadRequest)
-        w.Write([]byte(errMsg))
+		w.Write([]byte(errMsg))
 		return
 	}
 	InsertRecord(db, rr)
@@ -84,7 +84,7 @@ func updateRecord(db *sql.DB, id string, w http.ResponseWriter, r *http.Request)
 
 func getDomains(db *sql.DB, domain string, w http.ResponseWriter, r *http.Request) {
 	// read body from json request
-	records := GetRecordsForName(db, domain + ".messwithdns.com.")
+	records := GetRecordsForName(db, domain+".messwithdns.com.")
 	jsonOutput, err := json.Marshal(records)
 	if err != nil {
 		fmt.Println("Error marshalling json: ", err.Error())
@@ -117,8 +117,8 @@ func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case r.Method == "POST" && n == 2 && p[0] == "record":
 		updateRecord(handle.db, p[1], w, r)
 	default:
-        // serve static files
-        http.ServeFile(w, r, "./frontend/" + r.URL.Path)
+		// serve static files
+		http.ServeFile(w, r, "./frontend/"+r.URL.Path)
 	}
 }
 
@@ -128,6 +128,12 @@ func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	fmt.Println("Received request: ", r.Question[0].String())
 	msg.Answer = GetRecords(handle.db, msg.Question[0].Name, msg.Question[0].Qtype)
 	w.WriteMsg(&msg)
+	// print response
+	if len(msg.Answer) > 0 {
+		fmt.Println("Response: ", msg.Answer[0].String())
+	} else {
+		fmt.Println("Response: No records found")
+	}
 }
 
 type UnknownRequest struct {
@@ -137,12 +143,12 @@ type UnknownRequest struct {
 func main() {
 	db := connect()
 	handler := &handler{db: db}
-    // udp port command line argument
-    port := ":53"
-    if len(os.Args) > 1 {
-        port = ":" + os.Args[1]
-    }
-    fmt.Println("Listening for UDP on port", port)
+	// udp port command line argument
+	port := ":53"
+	if len(os.Args) > 1 {
+		port = ":" + os.Args[1]
+	}
+	fmt.Println("Listening for UDP on port", port)
 	go func() {
 		srv := &dns.Server{Handler: handler, Addr: port, Net: "udp"}
 		if err := srv.ListenAndServe(); err != nil {

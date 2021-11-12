@@ -7,6 +7,8 @@ RUN go build
 
 FROM ubuntu:20.04
 
+WORKDIR /app
+COPY ./frontend /app/frontend
 RUN apt-get update
 RUN apt-get install -y ca-certificates
 RUN update-ca-certificates

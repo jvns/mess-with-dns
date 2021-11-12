@@ -546,6 +546,10 @@ var app = new Vue({
             const predicate = predicates[Math.floor(Math.random() * predicates.length)];
             const object = objects[Math.floor(Math.random() * objects.length)];
             const domain = predicate + '-' + object;
+            return domain;
+        },
+        goToRandom: function() {
+            const domain = this.randomSubdomain();
             this.setDomain({domain: domain});
         },
     },

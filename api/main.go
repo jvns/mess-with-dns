@@ -125,9 +125,14 @@ func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	msg := dns.Msg{}
 	msg.SetReply(r)
+	msg.Authoritative = true
 	fmt.Println("Received request: ", r.Question[0].String())
 	msg.Answer = GetRecords(handle.db, msg.Question[0].Name, msg.Question[0].Qtype)
-	w.WriteMsg(&msg)
+	err := w.WriteMsg(&msg)
+	if err != nil {
+		fmt.Println("Error writing response: ", err.Error())
+		return
+	}
 	// print response
 	if len(msg.Answer) > 0 {
 		fmt.Println("Response: ", msg.Answer[0].String())

@@ -84,10 +84,11 @@
                     worrying about breaking your domain :)
                 </p>
                 <div class="flex justify-center">
-                    <button type="button" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-xl" 
-                                          @click="goToRandom">
+                    <a class="no-underline bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-xl" 
+                       :href="'/#' + randomSubdomain()"
+                       >
                         Get a random subdomain
-                    </button>
+                    </a>
                 </div>
                 <!-- existing subdomain -->
                 <p class="text-center my-8 text-xl"> or go to an existing subdomain: </p>

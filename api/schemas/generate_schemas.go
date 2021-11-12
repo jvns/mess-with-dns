@@ -117,7 +117,7 @@ func getValidation(field reflect.StructField) string {
 	tag := field.Tag.Get("dns")
 
 	if tag == "cdomain-name" || tag == "domain-name" {
-		return `matches:/^([a-zA-Z0-9-]+\.)*[a-zA-Z0-9]+\.[a-zA-Z]+$/`
+		return `matches:/^([a-zA-Z0-9-]+\.)*[a-zA-Z0-9]+\.[a-zA-Z]+\.?$/`
 	} else if tag == "base64" {
 		return `matches:/^[a-zA-Z0-9\+\/\=]+$/`
 	} else if tag == "hex" {

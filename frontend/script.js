@@ -68,7 +68,7 @@ const schemas = {
       "label": "Target",
       "name": "Target",
       "type": "text",
-      "validation": "matches:/^([a-zA-Z0-9-]+\\.)*[a-zA-Z0-9]+\\.[a-zA-Z]+$/"
+      "validation": "matches:/^([a-zA-Z0-9-]+\\.)*[a-zA-Z0-9]+\\.[a-zA-Z]+\\.?$/"
     }
   ],
   "DS": [
@@ -108,7 +108,7 @@ const schemas = {
       "label": "Mail Server",
       "name": "Mx",
       "type": "text",
-      "validation": "matches:/^([a-zA-Z0-9-]+\\.)*[a-zA-Z0-9]+\\.[a-zA-Z]+$/"
+      "validation": "matches:/^([a-zA-Z0-9-]+\\.)*[a-zA-Z0-9]+\\.[a-zA-Z]+\\.?$/"
     }
   ],
   "NS": [
@@ -116,7 +116,7 @@ const schemas = {
       "label": "Nameserver ",
       "name": "Ns",
       "type": "text",
-      "validation": "matches:/^([a-zA-Z0-9-]+\\.)*[a-zA-Z0-9]+\\.[a-zA-Z]+$/"
+      "validation": "matches:/^([a-zA-Z0-9-]+\\.)*[a-zA-Z0-9]+\\.[a-zA-Z]+\\.?$/"
     }
   ],
   "PTR": [
@@ -124,7 +124,7 @@ const schemas = {
       "label": "Pointer",
       "name": "Ptr",
       "type": "text",
-      "validation": "matches:/^([a-zA-Z0-9-]+\\.)*[a-zA-Z0-9]+\\.[a-zA-Z]+$/"
+      "validation": "matches:/^([a-zA-Z0-9-]+\\.)*[a-zA-Z0-9]+\\.[a-zA-Z]+\\.?$/"
     }
   ],
   "SOA": [
@@ -132,13 +132,13 @@ const schemas = {
       "label": "Name Server",
       "name": "Ns",
       "type": "text",
-      "validation": "matches:/^([a-zA-Z0-9-]+\\.)*[a-zA-Z0-9]+\\.[a-zA-Z]+$/"
+      "validation": "matches:/^([a-zA-Z0-9-]+\\.)*[a-zA-Z0-9]+\\.[a-zA-Z]+\\.?$/"
     },
     {
       "label": "Email address",
       "name": "Mbox",
       "type": "text",
-      "validation": "matches:/^([a-zA-Z0-9-]+\\.)*[a-zA-Z0-9]+\\.[a-zA-Z]+$/"
+      "validation": "matches:/^([a-zA-Z0-9-]+\\.)*[a-zA-Z0-9]+\\.[a-zA-Z]+\\.?$/"
     },
     {
       "label": "Serial",
@@ -194,7 +194,7 @@ const schemas = {
       "label": "Target",
       "name": "Target",
       "type": "text",
-      "validation": "matches:/^([a-zA-Z0-9-]+\\.)*[a-zA-Z0-9]+\\.[a-zA-Z]+$/"
+      "validation": "matches:/^([a-zA-Z0-9-]+\\.)*[a-zA-Z0-9]+\\.[a-zA-Z]+\\.?$/"
     }
   ],
   "TXT": [

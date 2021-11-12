@@ -8,15 +8,26 @@ import (
 )
 
 func ParseRecord(jsonString []byte) (dns.RR, error) {
+    rr, err := parseRecord(jsonString)
+    if err != nil {
+        return nil, err
+    }
+    // make sure we have a valid RR
+    // this prevents problems like invalid FQDNs in a record's fields
+    msg := make([]byte, dns.Len(rr))
+    _, err = dns.PackRR(rr, msg, 0, nil, false)
+    if err != nil {
+        return nil, fmt.Errorf("Invalid RR: %s", err)
+    }
+    return rr, nil
+}
+
+func parseRecord(jsonString []byte) (dns.RR, error) {
 	var unknown UnknownRequest
 	err := json.Unmarshal([]byte(jsonString), &unknown)
 	if err != nil {
 		return nil, err
 	}
-    // check for fully qualified domain name
-    if !dns.IsFqdn(unknown.Hdr.Name) {
-        return nil, fmt.Errorf("domain name must be fully qualified: %s", unknown.Hdr.Name)
-    }
 
 	switch unknown.Hdr.Rrtype {
 	case dns.TypeA:

@@ -14,6 +14,14 @@
         .formulate-input-error {
             color: red;
         }
+        li {
+            margin: .5em 0;
+            list-style-type: decimal;
+            /* numbers */
+        }
+        ol {
+            margin-left: 1em;
+        }
     </style>
 </head>
 
@@ -29,7 +37,7 @@
         </div>
     </nav>
     <div class="flex">
-        <div id="app" class="m-auto w-full pt-16 px-8" style="max-width: 1200px">
+        <div id="app" class="m-auto w-full pt-16 px-8 mb-24" style="max-width: 1200px">
             <div v-if="domain && domain != ''">
                 <h1 class="font-bold text-3xl text-center mb-8">
                     DNS records for {{ domain }}.messwithdns.com
@@ -90,6 +98,106 @@
                             type="submit" value="Go" 
                             class="ml-4 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-xl"></formulate-input>
                     </formulate-form>
+                </div>
+
+                <h2 class="font-bold text-2xl text-left mb-8 mt-16">
+                    Experiments you can try
+                </h1>
+
+                <details class="my-4 border border-green-700 p-6">
+                    <summary>
+                <h3 class="font-bold text-xl text-left mb-8 my-8 inline">
+                    1. Visit a domain before creating its record
+                </h3>
+                    </summary>
+
+                <p class="my-4">
+                    If you visit a domain before setting your DNS records for
+                    that domain, it still won't work for some time after
+                    setting the record! 
+                    Here's an experiment you can do to see
+                    that happen yourself: 
+                </p>
+                <ol>
+                    <li>
+                        Go to <code><span class="text-green-700">your-domain</span>.messwithdns.com</code> in your browser
+                    </li>
+                    <li>
+                        Create a CNAME record pointing <code><span class="text-green-700">your-domain</span>.messwithdns.com</code> at <code>example.com</code>, like this:
+                        <img src="/images/cname-screenshot.png" class="block border  border-dashed border-green-700 mb-4 mt-2">
+                    </li>
+                    <li>
+                        Go to <code><span class="text-green-700">your-domain</span>.messwithdns.com</code> in your browser again. You should get a "server not found" error or something.
+                    </li>
+                </ol>
+
+                <p class="my-4">
+                    <details>
+                        <summary>
+                            <span class="text-green-700">
+                                (click here to see the explanation)
+                            </span>
+                        </summary>
+                        <p>
+                            This is because of something called "negative DNS caching" -- DNS servers will cache the <strong>absence</strong> of a record.
+                        </p>
+                    </details>
+                </p>
+                </details>
+
+                <details class="my-4 border border-green-700 p-6">
+                    <summary>
+                <h3 class="font-bold text-xl text-left mb-8 my-8 inline">
+                    2. Test the difference between setting a short TTL and a long TTL
+                </h3>
+                    </summary>
+                <ol>
+                    <li>
+                        Create a CNAME record pointing <code><span
+                                class="text-green-700">your-domain</span>.messwithdns.com</code>
+                        at <code>example.com</code>. 
+
+                        Use a long TTL like 300000 seconds.
+                        <!-- TODO: change screenshots -->
+                        <img src="/images/cname-screenshot-5.png" class="block border border-dashed border-green-700 mb-4 mt-2">
+                    </li>
+                    <li>
+                        Go to <code><span
+                                class="text-green-700">your-domain</span>.messwithdns.com</code>
+                        in your browser.
+                    </li>
+                    <li>
+                        Change the CNAME record to point at <code>metafilter.com</code> instead.
+                        <img src="/images/cname-screenshot-metafilter.png" class="block border border-dashed border-green-700 mb-4 mt-2">
+                    </li>
+                    <li>
+                        Go to <code><span
+                                class="text-green-700">your-domain</span>.messwithdns.com</code>
+                        in your browser again. You should see
+                        the same site as before -- no change!
+                        This is because your old DNS record is
+                        still cached.
+                    </li>
+                    <li>
+                        Using a <strong>different random subdomain</strong>, repeat
+                        the same experiment with a short TTL.
+                        This time, the change works! (Also, you can test what happens if you use the same subdomain!)
+                    </li>
+                </ol>
+
+<p class="my-4">
+                    <details>
+                        <summary>
+                            <span class="text-green-700">
+                                (click here to see the explanation)
+                            </span>
+                        </summary>
+                        <p>
+                        TODO: add explanation
+                        </p>
+                    </details>
+                </p>
+                </details>
             </div>
         </div>
     </div>

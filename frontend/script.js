@@ -462,6 +462,12 @@ function convertRecord(record) {
     }
     // copy rest of fields from form directly
     for (var key in record) {
+        if (key == 'Target') {
+            // make sure it's a FQDN
+            if (!record[key].endsWith('.')) {
+                record[key] += '.';
+            }
+        }
         if (key != 'name' && key != 'type' && key != 'ttl') {
             // check if the type is 'number' in the schema
             const field = getSchemaField(record.type, key);

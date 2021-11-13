@@ -5,22 +5,11 @@ import * as schemas from './schemas.json';
 import * as rrTypes from './rrTypes.json';
 
 Vue.use(VueFormulate)
-console.log(schemas);
 
 // reverse rrTypes
 const rrTypesReverse = {};
 for (const key in rrTypes) {
     rrTypesReverse[rrTypes[key]] = key;
-}
-
-// add name and ttl to every schema
-for (const key in schemas) {
-    schemas[key].push({
-        'name': 'ttl',
-        'label': 'TTL',
-        'type': 'number',
-        'validation': 'required',
-    });
 }
 
 Vue.component('record', {
@@ -193,14 +182,6 @@ var app = new Vue({
         records: undefined,
         words: undefined,
     },
-    created: function() {
-        // load words.json
-        fetch('/words.json')
-            .then(response => response.json())
-            .then(json => {
-                app.words = json;
-            });
-    },
     methods: {
         getRecords: async function(domain) {
             const response = await fetch('/domains/' + domain);
@@ -241,8 +222,8 @@ var app = new Vue({
         randomSubdomain: function() {
             // predicate - object
             // return random word from words.json
-            const predicates = this.words.predicates;
-            const objects = this.words.objects;
+            const predicates = words.predicates;
+            const objects = words.objects;
             const predicate = predicates[Math.floor(Math.random() * predicates.length)];
             const object = objects[Math.floor(Math.random() * objects.length)];
             const domain = predicate + '-' + object;

@@ -5,6 +5,12 @@
       "name": "A",
       "type": "text",
       "validation": "matches:/[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+/"
+    },
+    {
+      "label": "TTL",
+      "name": "ttl",
+      "type": "number",
+      "validation": "required"
     }
   ],
   "AAAA": [
@@ -13,6 +19,12 @@
       "name": "AAAA",
       "type": "text",
       "validation": "matches:/[0-9a-fA-F:]+/"
+    },
+    {
+      "label": "TTL",
+      "name": "ttl",
+      "type": "number",
+      "validation": "required"
     }
   ],
   "CAA": [
@@ -32,6 +44,12 @@
       "label": "CA domain name",
       "name": "Value",
       "type": "text",
+      "validation": "required"
+    },
+    {
+      "label": "TTL",
+      "name": "ttl",
+      "type": "number",
       "validation": "required"
     }
   ],
@@ -59,6 +77,12 @@
       "name": "Certificate",
       "type": "text",
       "validation": "matches:/^[a-zA-Z0-9\\+\\/\\=]+$/"
+    },
+    {
+      "label": "TTL",
+      "name": "ttl",
+      "type": "number",
+      "validation": "required"
     }
   ],
   "CNAME": [
@@ -67,6 +91,12 @@
       "name": "Target",
       "type": "text",
       "validation": "matches:/^([a-zA-Z0-9-]+\\.)*[a-zA-Z0-9]+\\.[a-zA-Z]+\\.?$/"
+    },
+    {
+      "label": "TTL",
+      "name": "ttl",
+      "type": "number",
+      "validation": "required"
     }
   ],
   "DS": [
@@ -93,6 +123,12 @@
       "name": "Digest",
       "type": "text",
       "validation": "matches:/^[a-fA-F0-9]+$/"
+    },
+    {
+      "label": "TTL",
+      "name": "ttl",
+      "type": "number",
+      "validation": "required"
     }
   ],
   "MX": [
@@ -107,6 +143,12 @@
       "name": "Mx",
       "type": "text",
       "validation": "matches:/^([a-zA-Z0-9-]+\\.)*[a-zA-Z0-9]+\\.[a-zA-Z]+\\.?$/"
+    },
+    {
+      "label": "TTL",
+      "name": "ttl",
+      "type": "number",
+      "validation": "required"
     }
   ],
   "NS": [
@@ -115,6 +157,12 @@
       "name": "Ns",
       "type": "text",
       "validation": "matches:/^([a-zA-Z0-9-]+\\.)*[a-zA-Z0-9]+\\.[a-zA-Z]+\\.?$/"
+    },
+    {
+      "label": "TTL",
+      "name": "ttl",
+      "type": "number",
+      "validation": "required"
     }
   ],
   "PTR": [
@@ -123,6 +171,12 @@
       "name": "Ptr",
       "type": "text",
       "validation": "matches:/^([a-zA-Z0-9-]+\\.)*[a-zA-Z0-9]+\\.[a-zA-Z]+\\.?$/"
+    },
+    {
+      "label": "TTL",
+      "name": "ttl",
+      "type": "number",
+      "validation": "required"
     }
   ],
   "SOA": [
@@ -167,6 +221,12 @@
       "name": "Minttl",
       "type": "number",
       "validation": "number"
+    },
+    {
+      "label": "TTL",
+      "name": "ttl",
+      "type": "number",
+      "validation": "required"
     }
   ],
   "SRV": [
@@ -193,6 +253,12 @@
       "name": "Target",
       "type": "text",
       "validation": "matches:/^([a-zA-Z0-9-]+\\.)*[a-zA-Z0-9]+\\.[a-zA-Z]+\\.?$/"
+    },
+    {
+      "label": "TTL",
+      "name": "ttl",
+      "type": "number",
+      "validation": "required"
     }
   ],
   "TXT": [
@@ -200,6 +266,12 @@
       "label": "Content",
       "name": "Txt",
       "type": "textarea",
+      "validation": "required"
+    },
+    {
+      "label": "TTL",
+      "name": "ttl",
+      "type": "number",
       "validation": "required"
     }
   ],
@@ -220,6 +292,12 @@
       "label": "Target",
       "name": "Target",
       "type": "text",
+      "validation": "required"
+    },
+    {
+      "label": "TTL",
+      "name": "ttl",
+      "type": "number",
       "validation": "required"
     }
   ]

@@ -40,10 +40,25 @@ func main() {
 	schemas["TXT"] = genSchema(dns.TXT{}, map[string]string{"Txt": "Content"})
 	schemas["URI"] = genSchema(dns.URI{}, map[string]string{})
 
+	// add ttl field to each schema
+	for k, schema := range schemas {
+		schema = append(schema, map[string]string{
+			"name":       "ttl",
+			"label":      "TTL",
+			"type":       "number",
+			"validation": "required",
+		})
+        schemas[k] = schema
+	}
+
 	// serialize schemas to json
 	x, _ := json.MarshalIndent(schemas, "", "  ")
-	// pretty print json
-	fmt.Println("const schemas = " + string(x) + ";")
+    file, err := os.Create("../frontend/schemas.json")
+    if err != nil {
+        fmt.Println(err)
+        os.Exit(1)
+    }
+    file.Write(x)
 
 	rrTypes := make(map[string]uint16)
 	// iterate over map
@@ -51,7 +66,12 @@ func main() {
 		rrTypes[v] = k
 	}
 	x, _ = json.MarshalIndent(rrTypes, "", "  ")
-	fmt.Println("const rrTypes = " + string(x) + ";")
+    file, err = os.Create("../frontend/rrTypes.json")
+    if err != nil {
+        fmt.Println(err)
+        os.Exit(1)
+    }
+    file.Write(x)
 }
 
 func genSchema(x interface{}, labels map[string]string) []map[string]string {

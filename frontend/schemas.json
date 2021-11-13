@@ -1,0 +1,226 @@
+{
+  "A": [
+    {
+      "label": "IPv4 Address",
+      "name": "A",
+      "type": "text",
+      "validation": "matches:/[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+/"
+    }
+  ],
+  "AAAA": [
+    {
+      "label": "IPv6 Address",
+      "name": "AAAA",
+      "type": "text",
+      "validation": "matches:/[0-9a-fA-F:]+/"
+    }
+  ],
+  "CAA": [
+    {
+      "label": "Flag",
+      "name": "Flag",
+      "type": "number",
+      "validation": "number|between:0,255"
+    },
+    {
+      "label": "Tag",
+      "name": "Tag",
+      "type": "text",
+      "validation": "required"
+    },
+    {
+      "label": "CA domain name",
+      "name": "Value",
+      "type": "text",
+      "validation": "required"
+    }
+  ],
+  "CERT": [
+    {
+      "label": "Cert type",
+      "name": "Type",
+      "type": "number",
+      "validation": "number|between:0,65535"
+    },
+    {
+      "label": "Key tag",
+      "name": "KeyTag",
+      "type": "number",
+      "validation": "number|between:0,65535"
+    },
+    {
+      "label": "Algorithm",
+      "name": "Algorithm",
+      "type": "number",
+      "validation": "number|between:0,255"
+    },
+    {
+      "label": "Certificate",
+      "name": "Certificate",
+      "type": "text",
+      "validation": "matches:/^[a-zA-Z0-9\\+\\/\\=]+$/"
+    }
+  ],
+  "CNAME": [
+    {
+      "label": "Target",
+      "name": "Target",
+      "type": "text",
+      "validation": "matches:/^([a-zA-Z0-9-]+\\.)*[a-zA-Z0-9]+\\.[a-zA-Z]+\\.?$/"
+    }
+  ],
+  "DS": [
+    {
+      "label": "Key tag",
+      "name": "KeyTag",
+      "type": "number",
+      "validation": "number|between:0,65535"
+    },
+    {
+      "label": "Algorithm",
+      "name": "Algorithm",
+      "type": "number",
+      "validation": "number|between:0,255"
+    },
+    {
+      "label": "Digest type",
+      "name": "DigestType",
+      "type": "number",
+      "validation": "number|between:0,255"
+    },
+    {
+      "label": "Digest",
+      "name": "Digest",
+      "type": "text",
+      "validation": "matches:/^[a-fA-F0-9]+$/"
+    }
+  ],
+  "MX": [
+    {
+      "label": "Preference",
+      "name": "Preference",
+      "type": "number",
+      "validation": "number|between:0,65535"
+    },
+    {
+      "label": "Mail Server",
+      "name": "Mx",
+      "type": "text",
+      "validation": "matches:/^([a-zA-Z0-9-]+\\.)*[a-zA-Z0-9]+\\.[a-zA-Z]+\\.?$/"
+    }
+  ],
+  "NS": [
+    {
+      "label": "Nameserver ",
+      "name": "Ns",
+      "type": "text",
+      "validation": "matches:/^([a-zA-Z0-9-]+\\.)*[a-zA-Z0-9]+\\.[a-zA-Z]+\\.?$/"
+    }
+  ],
+  "PTR": [
+    {
+      "label": "Pointer",
+      "name": "Ptr",
+      "type": "text",
+      "validation": "matches:/^([a-zA-Z0-9-]+\\.)*[a-zA-Z0-9]+\\.[a-zA-Z]+\\.?$/"
+    }
+  ],
+  "SOA": [
+    {
+      "label": "Name Server",
+      "name": "Ns",
+      "type": "text",
+      "validation": "matches:/^([a-zA-Z0-9-]+\\.)*[a-zA-Z0-9]+\\.[a-zA-Z]+\\.?$/"
+    },
+    {
+      "label": "Email address",
+      "name": "Mbox",
+      "type": "text",
+      "validation": "matches:/^([a-zA-Z0-9-]+\\.)*[a-zA-Z0-9]+\\.[a-zA-Z]+\\.?$/"
+    },
+    {
+      "label": "Serial",
+      "name": "Serial",
+      "type": "number",
+      "validation": "number"
+    },
+    {
+      "label": "Refresh",
+      "name": "Refresh",
+      "type": "number",
+      "validation": "number"
+    },
+    {
+      "label": "Retry",
+      "name": "Retry",
+      "type": "number",
+      "validation": "number"
+    },
+    {
+      "label": "Expire",
+      "name": "Expire",
+      "type": "number",
+      "validation": "number"
+    },
+    {
+      "label": "Minimum TTL",
+      "name": "Minttl",
+      "type": "number",
+      "validation": "number"
+    }
+  ],
+  "SRV": [
+    {
+      "label": "Priority",
+      "name": "Priority",
+      "type": "number",
+      "validation": "number|between:0,65535"
+    },
+    {
+      "label": "Weight",
+      "name": "Weight",
+      "type": "number",
+      "validation": "number|between:0,65535"
+    },
+    {
+      "label": "Port",
+      "name": "Port",
+      "type": "number",
+      "validation": "number|between:0,65535"
+    },
+    {
+      "label": "Target",
+      "name": "Target",
+      "type": "text",
+      "validation": "matches:/^([a-zA-Z0-9-]+\\.)*[a-zA-Z0-9]+\\.[a-zA-Z]+\\.?$/"
+    }
+  ],
+  "TXT": [
+    {
+      "label": "Content",
+      "name": "Txt",
+      "type": "textarea",
+      "validation": "required"
+    }
+  ],
+  "URI": [
+    {
+      "label": "Priority",
+      "name": "Priority",
+      "type": "number",
+      "validation": "number|between:0,65535"
+    },
+    {
+      "label": "Weight",
+      "name": "Weight",
+      "type": "number",
+      "validation": "number|between:0,65535"
+    },
+    {
+      "label": "Target",
+      "name": "Target",
+      "type": "text",
+      "validation": "required"
+    }
+  ]
+}

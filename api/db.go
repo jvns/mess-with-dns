@@ -92,5 +92,3 @@ func GetRecords(db *sql.DB, name string, rrtype uint16) []dns.RR {
 	}
 	return records
 }
-
-

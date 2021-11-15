@@ -30,7 +30,33 @@ test('subdomain page snapshot', async ({ page }) => {
   });
 
   await page.goto('http://localhost:8080');
-  await page.click('#randomSubdomain', {timeout: 1000});
+  await page.click('#randomSubdomain');
 
   expect(await page.screenshot()).toMatchSnapshot('random-subdomain.png');
+});
+
+test('add and delete A record', async ({ page }) => {
+    const browserContext = page.context();
+    await browserContext.addInitScript({
+        path: 'preload.js'
+    });
+
+    await page.goto('http://localhost:8080/#brain-juice');
+
+    await page.waitForSelector('.formulate-input-element--submit--label')
+
+    await page.click('#formulate-global-3')
+    await page.click('#formulate-global-4')
+    await page.type('#formulate-global-4', '1.2.3.4')
+    await page.type('#formulate-global-5', '30')
+    await page.click('#formulate-global-6 > .formulate-input-element--submit--label')
+    await page.waitForSelector('.edit')
+    await page.click('.edit')
+
+    expect(await page.screenshot()).toMatchSnapshot('add-a-record-edit.png');
+
+    await page.waitForSelector('.delete')
+    await page.click('.delete')
+    await page.on('dialog', dialog => dialog.accept());
+    expect(await page.screenshot()).toMatchSnapshot('add-a-record-deleted.png');
 });

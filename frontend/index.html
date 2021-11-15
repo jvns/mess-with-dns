@@ -363,7 +363,7 @@ Create an A record for <code><span class="text-green-700">your-domain</span>.mes
                 {{ record.ttl }}
             </td>
             <td class="text-right"> 
-                <button class="hover:text-green-700 text-green-500 font-bold py-2 px-4 rounded">
+                <button class="edit hover:text-green-700 text-green-500 font-bold py-2 px-4 rounded">
                     Edit
                     <span v-if="clicked">
                         <svg style="transform: rotate(90deg);" fill="currentColor" class="inline w-4" aria-label="caret-right" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
@@ -390,7 +390,7 @@ Create an A record for <code><span class="text-green-700">your-domain</span>.mes
                     </div>
 
                     <div class="flex text-right mt-4">
-                        <button class="hover:bg-gray-400 mr-auto bg-gray-200 py-2 px-4 rounded" @click="confirmDelete()">
+                        <button class="delete hover:bg-gray-400 mr-auto bg-gray-200 py-2 px-4 rounded" @click="confirmDelete()">
                             Delete
                         </button>
                         <button class="hover:bg-gray-400 bg-gray-200 py-2 px-4 rounded" @click="toggle()">
@@ -408,7 +408,7 @@ Create an A record for <code><span class="text-green-700">your-domain</span>.mes
 </script>
 
 <script id="new-record" type="vue-component">
-    <formulate-form @submit="createRecord" v-model="data">
+    <formulate-form name='new-record' @submit="createRecord" v-model="data">
         <fieldset>
             <div class="flex flex-wrap">
                 <formulate-input 

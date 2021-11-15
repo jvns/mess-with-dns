@@ -124,7 +124,9 @@ Vue.component('new-record', {
             this.error = undefined;
             updateHash();
             // clear form but keep type
-            this.data = {type: this.data.type};
+            const type = this.data.type;
+            this.$formulate.reset('new-record')
+            this.data = {type: type};
         },
     }
 });
@@ -250,3 +252,4 @@ async function updateHash() {
 updateHash();
 // update hash on change
 window.onhashchange = updateHash;
+

@@ -73,7 +73,7 @@ func GetRecordsForName(db *sql.DB, name string) map[int]dns.RR {
 }
 
 func GetRecords(db *sql.DB, name string, rrtype uint16) []dns.RR {
-	rows, err := db.Query("SELECT content FROM dns_records WHERE name = ? AND rrtype = ?", name, rrtype)
+	rows, err := db.Query("SELECT content FROM dns_records WHERE name = ? AND rrtype = ? OR rrtype = 'CNAME'", name, rrtype)
 	if err != nil {
 		panic(err.Error())
 	}

@@ -125,6 +125,7 @@ Vue.component('new-record', {
             updateHash();
             // clear form but keep type
             const type = this.data.type;
+            document.activeElement.blur();
             this.$formulate.reset('new-record')
             this.data = {type: type};
         },

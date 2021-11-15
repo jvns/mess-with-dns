@@ -2,5 +2,8 @@
   "dependencies": {
     "@braid/vue-formulate": "^2.5.2",
     "vue": "^2.6.14"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.16.3"
   }
 }

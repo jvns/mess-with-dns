@@ -60,3 +60,16 @@ test('add and delete A record', async ({ page }) => {
     await page.on('dialog', dialog => dialog.accept());
     expect(await page.screenshot()).toMatchSnapshot('add-a-record-deleted.png');
 });
+
+test('add CNAME record', async ({ page }) => {
+    const browserContext = page.context();
+    await browserContext.addInitScript({
+        path: 'preload.js'
+    });
+    await page.goto('http://localhost:8080/#brain-juice');
+    await page.waitForSelector('.formulate-input-element--submit--label')
+    await page.selectOption('#formulate-global-3', 'CNAME')
+    await page.type('#formulate-global-7', 'example.com')
+    await page.type('#formulate-global-5', '30')
+    expect(await page.screenshot()).toMatchSnapshot('add-cname-record-edit.png');
+});

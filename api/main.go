@@ -31,11 +31,11 @@ var soa = dns.SOA{
 	},
 	Ns:      "ns1.messwithdns.com.",
 	Mbox:    "julia.wizardzines.com.",
-	Serial:  3,
+	Serial:  4,
 	Refresh: 3600,
 	Retry:   3600,
 	Expire:  7300,
-	Minttl:  5, // MINIMUM is a lower bound on the TTL field for all RRs in a zone
+	Minttl:  3600, // MINIMUM is a lower bound on the TTL field for all RRs in a zone
 }
 
 func createRecord(db *sql.DB, w http.ResponseWriter, r *http.Request) {

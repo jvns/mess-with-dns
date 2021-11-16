@@ -191,7 +191,7 @@ func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 		msg.Answer = GetRecords(handle.db, r.Question[0].Name, r.Question[0].Qtype)
 	}
 	// add SOA record
-	msg.Extra = []dns.RR{
+	msg.Ns = []dns.RR{
 		&soa,
 	}
 	err := w.WriteMsg(&msg)

@@ -139,7 +139,7 @@ func specialHandler(name string, qtype uint16) []dns.RR {
 				Refresh: 3600,
 				Retry:   3600,
 				Expire:  7300,
-				Minttl:  3600,
+				Minttl:  5,
 			},
 		}
 	}

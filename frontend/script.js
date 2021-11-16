@@ -176,6 +176,10 @@ function getSchemaField(type, key) {
     }
 }
 
+Vue.component('domain-link', {
+    template: '#domain-link',
+    props: ['domain'],
+});
 
 var app = new Vue({
     el: '#app',
@@ -200,6 +204,9 @@ var app = new Vue({
                 records.push(record);
             }
             return records;
+        },
+        currDomain: function() {
+            return this.domain || 'your-domain';
         },
         transformRecord: function(record) {
             // { "Hdr": { "Name": "example.messwithdns.com.", "Rrtype": 1, "Class": 1, "Ttl": 5, "Rdlength": 0 }, "A": "
@@ -239,6 +246,7 @@ var app = new Vue({
         },
     },
 });
+
 
 async function updateHash() {
     var hash = window.location.hash;

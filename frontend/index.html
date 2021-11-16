@@ -66,15 +66,20 @@
                     </p>
                     <ol>
                         <li>
-                            Go to <code><span class="text-green-700">your-domain</span>.messwithdns.com</code>
-                            in your browser
+                            Go to <domain-link :domain='domain'> </domain-link>
+                            in your browser. You should get an error like "Server Not Found".
                         </li>
                         <li>
-                            Create a CNAME record pointing <code><span class="text-green-700">your-domain</span>.messwithdns.com</code> at <code>orange-ip.fly.dev</code>, like this:
+                            Create a CNAME record pointing <domain-link :domain='domain'> </domain-link>
+                            at <code>orange-ip.fly.dev</code>, like this:
                             <img src="/images/cname-screenshot.png" class="block border  border-dashed border-green-700 mb-4 mt-2">
                         </li>
                         <li>
-                            Go to <code><span class="text-green-700">your-domain</span>.messwithdns.com</code> in your browser again. You should get a "server not found" error or something.
+                            Go to <domain-link :domain='domain'> </domain-link> in your browser again. You should get the same "Server Not Found" error as before.
+                        </li>
+                        <li>
+                            Repeat this with a 
+                            <a :href="'/#' + randomSubdomain()"> different domain</a>, but <span class="font-bold">don't</span> visit the domain first.
                         </li>
                     </ol>
 
@@ -103,7 +108,7 @@
                     </summary>
                     <ol>
                         <li>
-                            Create a CNAME record pointing <code><span class="text-green-700">your-domain</span>.messwithdns.com</code>
+                            Create a CNAME record pointing <domain-link :domain='domain'> </domain-link>
                             at <code>orange-ip.fly.dev</code>.
 
                             Use a long TTL like 300000 seconds.
@@ -111,7 +116,7 @@
                             <img src="/images/cname-screenshot-5.png" class="block border border-dashed border-green-700 mb-4 mt-2">
                         </li>
                         <li>
-                            Go to <code><span class="text-green-700">your-domain</span>.messwithdns.com</code>
+                            Go to <domain-link :domain='domain'> </domain-link>
                             in your browser.
                         </li>
                         <li>
@@ -119,7 +124,7 @@
                             <img src="/images/cname-screenshot-metafilter.png" class="block border border-dashed border-green-700 mb-4 mt-2">
                         </li>
                         <li>
-                            Go to <code><span class="text-green-700">your-domain</span>.messwithdns.com</code>
+                            Go to <domain-link :domain='domain'> </domain-link>
                             in your browser again. You should see
                             the same orange site -- no change!
                             This is because your old DNS record is
@@ -212,23 +217,24 @@
                         <p>
                         <ol>
                             <li>
-                                Create an A record for <code><span class="text-green-700">your-domain</span>.messwithdns.com</code> at <code>example.com</code>, like this:
+
+                                Create an A record for <domain-link :domain='domain'> </domain-link> at <code>example.com</code>, like this:
                                 <img src="/images/cname-screenshot.png" class="block border  border-dashed border-green-700 mb-4 mt-2">
                             </li>
                             <li>
                                 In your terminal, run
-                                <pre>$ dig +trace your-domain.messwithdns.com</pre> to get the authoritative nameserver. The answer should be
+                                <pre>$ dig +trace {{currDomain()}}.messwithdns.com</pre> to get the authoritative nameserver. The answer should be
                                 <pre>ns1.messwithdns.com.</pre>
                             </li>
                             <li>
                                 Run:
-                                <pre>$ dig @ns1.messwithdns.com your-domain.messwithdns.com</pre>
+                                <pre>$ dig @ns1.messwithdns.com {{currDomain()}}.messwithdns.com</pre>
                                 to get the A record for your domain
 
                             </li>
                             <li>
                                 Make some changes to your A record, run
-                                <pre> dig @ns1.messwithdns.com your-domain.messwithdns.com </pre> again, and notice the changes are always immediately reflected even if there's a very big TTL!
+                                <pre> dig @ns1.messwithdns.com {{currDomain()}}.messwithdns.com </pre> again, and notice the changes are always immediately reflected even if there's a very big TTL!
                             </li>
                         </ol>
                         </p>
@@ -416,6 +422,17 @@
     </tbody>
 </script>
 
+<script id="domain-link" type="vue-component">
+    <code>
+        <a v-if="domain && domain.length > 0" :href="'http://' + domain + '.messwithdns.com'"><span class="text-green-700">{{ domain }}</span>.messwithdns.com</a>
+        <span v-else>
+            <span class="text-green-700">your-domain</span>.messwithdns.com
+        </span>
+    </code>
+</a>
+
+
+</script>
 <script id="new-record" type="vue-component">
     <formulate-form name='new-record' @submit="createRecord" v-model="data">
         <fieldset>

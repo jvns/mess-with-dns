@@ -189,10 +189,13 @@
                     <summary>
                         <h3 class="font-bold text-xl text-left mb-8 my-8 inline">
                             4. Set two conflicting A records
-                        </h3>
                             <div style="top: -.8em; right: 2em;" class="px-1 absolute bg-white text-right text-green-700 text-sm">
                                 A records
                             </div>
+                        </h3>
+                    </summary>
+
+                    What if you set two A records on a domain that refer to totally different sites? Let's find out!
                             <ul>
                                 <li> Set an A record pointing <domain-link :domain='domain'> </domain-link> at 
                                     213.188.218.160 with a TTL of 5 seconds.
@@ -201,11 +204,29 @@
                                     213.188.209.192 with a TTL of 5 seconds.
                                 </li>
                                 <li>
-                                    Visit <domain-link :domain='domain'> </domain-link> in your browser.  Then a few seconds later, force reload the page.
+                                    In your terminal, run 
+                                    <pre>$ curl http://{{currDomain()}}.messwithdns.com</pre>
+                                    10 times.
+                                    The results I get when doing this are:
+<pre>
+$ curl http://{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
+    &lt;title&gt;orange&lt;/title&gt;
+$ curl http://{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
+    &lt;title&gt;purple&lt;/title&gt;
+$ curl http://{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
+    &lt;title&gt;orange&lt;/title&gt;
+$ curl http://{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
+    &lt;title&gt;purple&lt;/title&gt;
+$ curl http://{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
+    &lt;title&gt;orange&lt;/title&gt;
+$ curl http://{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
+    &lt;title&gt;purple&lt;/title&gt;
+$ curl http://{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
+    &lt;title&gt;orange&lt;/title&gt;
+$ curl http://{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
+    &lt;title&gt;purple&lt;/title&gt;
+</pre>
                                 </li>
-                        </h3>
-                    </summary>
-                    What if you set two A records on a domain that refer to totally different sites? Let's find out!
                 </details>
                 <h2 class="font-bold text-2xl text-left mb-8 mt-16">
                     Experiments with useful things you might actually want to do:

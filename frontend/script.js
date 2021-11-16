@@ -184,6 +184,7 @@ var app = new Vue({
         domain: undefined,
         records: undefined,
         words: undefined,
+        sidebar: true,
     },
     methods: {
         getRecords: async function(domain) {

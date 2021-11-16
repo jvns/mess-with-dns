@@ -23,7 +23,7 @@
     </style>
 </head>
 
-<body>
+<body class="relative">
     <nav id="nav" class="py-8 squiggle-bottom bg-green-600 text-white" role="navigation">
         <div class="flex">
             <div class="m-auto">
@@ -34,72 +34,13 @@
             </div>
         </div>
     </nav>
-    <div class="flex">
-        <div id="app" class="m-auto w-full pt-16 px-8 mb-24" style="max-width: 1200px">
-            <div v-if="domain && domain != ''">
-                <h1 class="font-bold text-3xl text-center mb-8">
-                    DNS records for {{ domain }}.messwithdns.com
-                </h1>
 
-                <h2 class="font-bold text-xl my-4"> Add a record </h2>
 
-                <new-record :domain='domain' class="pl-16"> </new-record>
 
-                <h2 class="font-bold text-xl my-8"> All DNS records </h2>
-                <div v-if="records && records.length > 0">
-                    <table class="w-full">
-                        <tr class="bg-gray-100 border border-gray-300">
-                            <th class="text-left px-4 py-2">
-                                Type
-                            </th>
-                            <th class="text-left">
-                                Content
-                            </th>
-                            <th class="text-left">
-                                TTL
-                            </th>
-                            <th class="text-left">
-                                &nbsp;
-                            </th>
-                        </tr>
-                        <tbody is="record" v-for="record in records" :key="record.id" :record="record" />
-                    </table>
-                </div>
-                <div v-else>
-                    <p class="text-center">
-                        No records yet! You can add one!
-                    </p>
-                </div>
-            </div>
-            <div v-else style="max-width: 500px" class="m-auto">
-                <h1 class="font-bold text-3xl text-center mb-8">
-                    Welcome to mess with dns!
-                </h1>
-                <p class="my-8 text-xl">
-                    This is a site where you can do weird DNS
-                    experiments without any risk -- you
-                    can use my domain to do them instead of
-                    worrying about breaking your domain :)
-                </p>
+    <div class="flex" id="app" >
+        <div id="sidebar" class="px-16 border-r-2 border-green-700 fixed overflow-scroll left-0 bg-white" style="height: 80vh">
+            <div id="experiments"  style="max-width: 400px" v-if="sidebar">
                 <div class="flex justify-center">
-                    <a id="randomSubdomain" class="no-underline bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-xl" 
-                       :href="'/#' + randomSubdomain()"
-                       >
-                        Get a random subdomain
-                    </a>
-                </div>
-                <!-- existing subdomain -->
-                <p class="text-center my-8 text-xl"> or go to an existing subdomain: </p>
-                <div class="flex justify-center">
-                    <formulate-form @submit="setDomain" class="flex">
-                        <formulate-input name="domain" type="text" :placeholder="randomSubdomain()" 
-                            element-class="border border-green-700 rounded-lg p-1 h-full text-xl"
-                            required > </formulate-input>
-
-                        <formulate-input 
-                            type="submit" value="Go" 
-                            class="ml-4 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-xl"></formulate-input>
-                    </formulate-form>
                 </div>
 
                 <h2 class="font-bold text-2xl text-left mb-8 mt-16">
@@ -108,38 +49,36 @@
 
                 <details class="relative my-4 border border-green-700 p-6">
                     <summary>
-                <h3 class="font-bold text-xl text-left mb-8 my-8 inline">
-                    1. Visit a domain before creating its record
-                    <div style="top: -.8em; right: 2em;"
-                        class="px-1 absolute bg-white text-right text-green-700 text-sm">
-                         caching 
-                    </div>
-                </h3>
+                        <h3 class="font-bold text-xl text-left mb-8 my-8 inline">
+                            1. Visit a domain before creating its record
+                            <div style="top: -.8em; right: 2em;" class="px-1 absolute bg-white text-right text-green-700 text-sm">
+                                caching
+                            </div>
+                        </h3>
                     </summary>
 
-                <p class="my-4">
-                    If you visit a domain before setting your DNS records for
-                    that domain, it still won't work for some time after
-                    setting the record! 
-                    Here's an experiment you can do to see
-                    that happen yourself: 
-                </p>
-                <ol>
-                    <li>
-                        Go to <code><span
-                                class="text-green-700">your-domain</span>.messwithdns.com</code>
-                        in your browser
-                    </li>
-                    <li>
-                        Create a CNAME record pointing <code><span class="text-green-700">your-domain</span>.messwithdns.com</code> at <code>orange-ip.fly.dev</code>, like this:
-                        <img src="/images/cname-screenshot.png" class="block border  border-dashed border-green-700 mb-4 mt-2">
-                    </li>
-                    <li>
-                        Go to <code><span class="text-green-700">your-domain</span>.messwithdns.com</code> in your browser again. You should get a "server not found" error or something.
-                    </li>
-                </ol>
+                    <p class="my-4">
+                        If you visit a domain before setting your DNS records for
+                        that domain, it still won't work for some time after
+                        setting the record!
+                        Here's an experiment you can do to see
+                        that happen yourself:
+                    </p>
+                    <ol>
+                        <li>
+                            Go to <code><span class="text-green-700">your-domain</span>.messwithdns.com</code>
+                            in your browser
+                        </li>
+                        <li>
+                            Create a CNAME record pointing <code><span class="text-green-700">your-domain</span>.messwithdns.com</code> at <code>orange-ip.fly.dev</code>, like this:
+                            <img src="/images/cname-screenshot.png" class="block border  border-dashed border-green-700 mb-4 mt-2">
+                        </li>
+                        <li>
+                            Go to <code><span class="text-green-700">your-domain</span>.messwithdns.com</code> in your browser again. You should get a "server not found" error or something.
+                        </li>
+                    </ol>
 
-                <p class="my-4">
+                    <p class="my-4">
                     <details>
                         <summary>
                             <span class="text-green-700">
@@ -150,54 +89,50 @@
                             This is because of something called "negative DNS caching" -- DNS servers will cache the <strong>absence</strong> of a record.
                         </p>
                     </details>
-                </p>
+                    </p>
                 </details>
 
                 <details class="relative my-8 border border-green-700 p-6">
                     <summary>
-                <h3 class="font-bold text-xl text-left mb-8 my-8 inline">
-                    2. Test the difference between setting a short TTL and a long TTL
-<div style="top: -.8em; right: 2em;"
-                        class="px-1 absolute bg-white text-right text-green-700 text-sm">
-                         caching 
-                    </div>
-                </h3>
+                        <h3 class="font-bold text-xl text-left mb-8 my-8 inline">
+                            2. Test the difference between setting a short TTL and a long TTL
+                            <div style="top: -.8em; right: 2em;" class="px-1 absolute bg-white text-right text-green-700 text-sm">
+                                caching
+                            </div>
+                        </h3>
                     </summary>
-                <ol>
-                    <li>
-                        Create a CNAME record pointing <code><span
-                                class="text-green-700">your-domain</span>.messwithdns.com</code>
-                        at <code>example.com</code>. 
+                    <ol>
+                        <li>
+                            Create a CNAME record pointing <code><span class="text-green-700">your-domain</span>.messwithdns.com</code>
+                            at <code>orange-ip.fly.dev</code>.
 
-                        Use a long TTL like 300000 seconds.
-                        <!-- TODO: change screenshots -->
-                        <img src="/images/cname-screenshot-5.png" class="block border border-dashed border-green-700 mb-4 mt-2">
-                    </li>
-                    <li>
-                        Go to <code><span
-                                class="text-green-700">your-domain</span>.messwithdns.com</code>
-                        in your browser.
-                    </li>
-                    <li>
-                        Change the CNAME record to point at <code>metafilter.com</code> instead.
-                        <img src="/images/cname-screenshot-metafilter.png" class="block border border-dashed border-green-700 mb-4 mt-2">
-                    </li>
-                    <li>
-                        Go to <code><span
-                                class="text-green-700">your-domain</span>.messwithdns.com</code>
-                        in your browser again. You should see
-                        the same site as before -- no change!
-                        This is because your old DNS record is
-                        still cached.
-                    </li>
-                    <li>
-                        Using a <strong>different random subdomain</strong>, repeat
-                        the same experiment with a short TTL.
-                        This time, the change works! (Also, you can test what happens if you use the same subdomain!)
-                    </li>
-                </ol>
+                            Use a long TTL like 300000 seconds.
+                            <!-- TODO: change screenshots -->
+                            <img src="/images/cname-screenshot-5.png" class="block border border-dashed border-green-700 mb-4 mt-2">
+                        </li>
+                        <li>
+                            Go to <code><span class="text-green-700">your-domain</span>.messwithdns.com</code>
+                            in your browser.
+                        </li>
+                        <li>
+                            Change the CNAME record to point at <code>purple-ip.fly.dev</code> instead.
+                            <img src="/images/cname-screenshot-metafilter.png" class="block border border-dashed border-green-700 mb-4 mt-2">
+                        </li>
+                        <li>
+                            Go to <code><span class="text-green-700">your-domain</span>.messwithdns.com</code>
+                            in your browser again. You should see
+                            the same site as before -- no change!
+                            This is because your old DNS record is
+                            still cached.
+                        </li>
+                        <li>
+                            Using a <strong>different random subdomain</strong>, repeat
+                            the same experiment with a short TTL.
+                            This time, the change works! (Also, you can test what happens if you use the same subdomain!)
+                        </li>
+                    </ol>
 
-<p class="my-4">
+                    <p class="my-4">
                     <details>
                         <summary>
                             <span class="text-green-700">
@@ -205,148 +140,218 @@
                             </span>
                         </summary>
                         <p>
-                        TODO: add explanation
+                            TODO: add explanation
                         </p>
                     </details>
-                </p>
+                    </p>
                 </details>
 
-<details class="relative my-8 border border-green-700 p-6">
-    <summary>
-        <h3 class="font-bold text-xl text-left mb-8 my-8 inline">
-            3. Convince 3 different DNS servers that your subdomain has 3 different IPs
-<div style="top: -.8em; right: 2em;"
-                        class="px-1 absolute bg-white text-right text-green-700 text-sm">
-                         caching
-                    </div>
-                </h3>
-        </h3>
+                <details class="relative my-8 border border-green-700 p-6">
+                    <summary>
+                        <h3 class="font-bold text-xl text-left mb-8 my-8 inline">
+                            3. Convince 3 different DNS servers that your subdomain has 3 different IPs
+                            <div style="top: -.8em; right: 2em;" class="px-1 absolute bg-white text-right text-green-700 text-sm">
+                                caching
+                            </div>
+                        </h3>
+                        </h3>
 
-        <p>
-        Let's create some confusion and chaos! This is usually a bad thing, but let's do it on purpose so that you can see how it could happen accidentally.
-        Here your goal is to convince 
-        </p>
-        <ul>
-            <li>
-        Google's DNS server that your subdomain has one IP (10.11.12.13), 
-            </li>
-            <li>
-        Cloudflare's DNS server that your subdomain has another IP (20.21.22.23), 
-            </li>
-            <li>
-        Quad9's DNS server that your subdomain has a third IP (30.31.32.33), 
-            </li>
-        </ul>
+                        <p>
+                            Let's create some confusion and chaos! This is usually a bad thing, but let's do it on purpose so that you can see how it could happen accidentally.
+                            Here your goal is to convince
+                        </p>
+                        <ul>
+                            <li>
+                                Google's DNS server that your subdomain has one IP (10.11.12.13),
+                            </li>
+                            <li>
+                                Cloudflare's DNS server that your subdomain has another IP (20.21.22.23),
+                            </li>
+                            <li>
+                                Quad9's DNS server that your subdomain has a third IP (30.31.32.33),
+                            </li>
+                        </ul>
 
-        and have them all believe these conflicting things at the same time
-    </summary>
-</details>
+                        and have them all believe these conflicting things at the same time
+                    </summary>
+                </details>
 
-<details class="relative my-8 border border-green-700 p-6">
-    <summary>
-        <h3 class="font-bold text-xl text-left mb-8 my-8 inline">
-            4. Set two conflicting A records
-<div style="top: -.8em; right: 2em;"
-                        class="px-1 absolute bg-white text-right text-green-700 text-sm">
-                         A records
-                    </div>
-        </h3>
-    </summary>
-    What if you set two A records on a domain that refer to totally different sites? Let's find out!
-</details>
-<h2 class="font-bold text-2xl text-left mb-8 mt-16">
+                <details class="relative my-8 border border-green-700 p-6">
+                    <summary>
+                        <h3 class="font-bold text-xl text-left mb-8 my-8 inline">
+                            4. Set two conflicting A records
+                            <div style="top: -.8em; right: 2em;" class="px-1 absolute bg-white text-right text-green-700 text-sm">
+                                A records
+                            </div>
+                        </h3>
+                    </summary>
+                    What if you set two A records on a domain that refer to totally different sites? Let's find out!
+                </details>
+                <h2 class="font-bold text-2xl text-left mb-8 mt-16">
                     Experiments with useful things you might actually want to do:
                 </h2>
-<details class="relative my-8 border border-green-700 p-6">
-    <summary>
-        <h3 class="font-bold text-xl text-left mb-8 my-8 inline">
-            3. Query the source of truth
-<div style="top: -.8em; right: 2em;"
-                        class="px-1 absolute bg-white text-right text-green-700 text-sm">
-                         authoritative nameserver
+                <details class="relative my-8 border border-green-700 p-6">
+                    <summary>
+                        <h3 class="font-bold text-xl text-left mb-8 my-8 inline">
+                            3. Query the source of truth
+                            <div style="top: -.8em; right: 2em;" class="px-1 absolute bg-white text-right text-green-700 text-sm">
+                                authoritative nameserver
+                            </div>
+                        </h3>
+                        </h3>
+
+                        <p>
+                            In the previous experiments, we were looking at how
+                            DNS names are cached. But you can always query the
+                            source of truth for a domain: the <strong> authoritative nameserver </strong>.
+                        </p>
+
+
+                        <p>
+                        <ol>
+                            <li>
+                                Create an A record for <code><span class="text-green-700">your-domain</span>.messwithdns.com</code> at <code>example.com</code>, like this:
+                                <img src="/images/cname-screenshot.png" class="block border  border-dashed border-green-700 mb-4 mt-2">
+                            </li>
+                            <li>
+                                In your terminal, run
+                                <pre>$ dig +trace your-domain.messwithdns.com</pre> to get the authoritative nameserver. The answer should be
+                                <pre>ns1.messwithdns.com.</pre>
+                            </li>
+                            <li>
+                                Run:
+                                <pre>$ dig @ns1.messwithdns.com your-domain.messwithdns.com</pre>
+                                to get the A record for your domain
+
+                            </li>
+                            <li>
+                                Make some changes to your A record, run
+                                <pre> dig @ns1.messwithdns.com your-domain.messwithdns.com </pre> again, and notice the changes are always immediately reflected even if there's a very big TTL!
+                            </li>
+                        </ol>
+                        </p>
+
+
+
+                    </summary>
+                </details>
+                <details class="relative my-8 border border-green-700 p-6">
+                    <summary>
+                        <h3 class="font-bold text-xl text-left mb-8 my-8 inline">
+                            3. Get a Let's Encrypt certificate
+                            <div style="top: -.8em; right: 2em;" class="px-1 absolute bg-white text-right text-green-700 text-sm">
+                                TXT records
+                            </div>
+                        </h3>
+                        </h3>
+                    </summary>
+                </details>
+
+                <details class="relative my-8 border border-green-700 p-6">
+                    <summary>
+                        <h3 class="font-bold text-xl text-left mb-8 my-8 inline">
+                            4. Receive an email
+                            <div style="top: -.8em; right: 2em;" class="px-1 absolute bg-white text-right text-green-700 text-sm">
+                                MX records
+                            </div>
+                        </h3>
+                    </summary>
+                </details>
+                <details class="relative my-8 border border-green-700 p-6">
+                    <summary>
+                        <h3 class="font-bold text-xl text-left mb-8 my-8 inline">
+                            5. Send an email (and pass the SPF check)
+                            <div style="top: -.8em; right: 2em;" class="px-1 absolute bg-white text-right text-green-700 text-sm">
+                                TXT records (SPF)
+                            </div>
+                        </h3>
+                    </summary>
+                </details>
+                <details class="relative my-8 border border-green-700 p-6">
+                    <summary>
+                        <h3 class="font-bold text-xl text-left mb-8 my-8 inline">
+                            5. Set up Netlify
+                            <div style="top: -.8em; right: 2em;" class="px-1 absolute bg-white text-right text-green-700 text-sm">
+                                CNAME records
+                            </div>
+                        </h3>
+                    </summary>
+                </details>
+            </div>
+            <div v-else>
+                <!-- option to open sidebar -->
+                <div class="flex justify-center">
+                    <button class="font-bold py-2 px-4 rounded" @click="sidebar = true">
+                        Show experiments 🡆
+                    </button>
+                </div>
+            </div>
+
+        </div>
+        <!-- end of experiments -->
+        <div class="m-auto">
+            <div class="m-auto w-full pt-16 px-8 mb-24">
+                <div v-if="domain && domain != ''">
+                    <h1 class="font-bold text-3xl text-center mb-8">
+                        DNS records for {{ domain }}.messwithdns.com
+                    </h1>
+
+                    <h2 class="font-bold text-xl my-4"> Add a record </h2>
+
+                    <new-record :domain='domain' class="pl-16"> </new-record>
+
+                    <h2 class="font-bold text-xl my-8"> All DNS records </h2>
+                    <div v-if="records && records.length > 0">
+                        <table class="w-full">
+                            <tr class="bg-gray-100 border border-gray-300">
+                                <th class="text-left px-4 py-2">
+                                    Type
+                                </th>
+                                <th class="text-left">
+                                    Content
+                                </th>
+                                <th class="text-left">
+                                    TTL
+                                </th>
+                                <th class="text-left">
+                                    &nbsp;
+                                </th>
+                            </tr>
+                            <tbody is="record" v-for="record in records" :key="record.id" :record="record" />
+                        </table>
                     </div>
-                </h3>
-        </h3>
-
-        <p>
-        In the previous experiments, we were looking at how
-        DNS names are cached. But you can always query the
-        source of truth for a domain: the <strong> authoritative nameserver </strong>.
-        </p>
-
-
-        <p>
-        <ol>
-            <li> 
-Create an A record for <code><span class="text-green-700">your-domain</span>.messwithdns.com</code> at <code>example.com</code>, like this:
-<img src="/images/cname-screenshot.png" class="block border  border-dashed border-green-700 mb-4 mt-2">
-</li>
-<li>
-    In your terminal, run <pre>$ dig +trace your-domain.messwithdns.com</pre> to get the authoritative nameserver. The answer should be <pre>ns1.messwithdns.com.</pre>
-</li>
-<li>
-    Run:
-    <pre>$ dig @ns1.messwithdns.com your-domain.messwithdns.com</pre>
-    to get the A record for your domain
-
-</li>
-<li>
-    Make some changes to your A record, run <pre> dig @ns1.messwithdns.com your-domain.messwithdns.com </pre> again, and notice the changes are always immediately reflected even if there's a very big TTL!
-</li>
-        </ol>
-        </p>
-
-
-
-    </summary>
-</details>
-<details class="relative my-8 border border-green-700 p-6">
-    <summary>
-        <h3 class="font-bold text-xl text-left mb-8 my-8 inline">
-            3. Get a Let's Encrypt certificate
-<div style="top: -.8em; right: 2em;"
-                        class="px-1 absolute bg-white text-right text-green-700 text-sm">
-                         TXT records 
+                    <div v-else>
+                        <p class="text-center">
+                            No records yet! You can add one!
+                        </p>
                     </div>
-                </h3>
-        </h3>
-    </summary>
-</details>
+                </div>
+                <div v-else style="max-width: 500px" class="m-auto">
+                    <h1 class="font-bold text-3xl text-center mb-8">
+                        Welcome to mess with dns!
+                    </h1>
+                    <p class="my-8 text-xl">
+                        This is a site where you can do weird DNS
+                        experiments without any risk -- you
+                        can use my domain to do them instead of
+                        worrying about breaking your domain :)
+                    </p>
+                    <div class="flex justify-center">
+                        <a id="randomSubdomain" class="no-underline bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-xl" :href="'/#' + randomSubdomain()">
+                            Get a random subdomain
+                        </a>
+                    </div>
+                    <!-- existing subdomain -->
+                    <p class="text-center my-8 text-xl"> or go to an existing subdomain: </p>
+                    <div class="flex justify-center">
+                        <formulate-form @submit="setDomain" class="flex">
+                            <formulate-input name="domain" type="text" :placeholder="randomSubdomain()" element-class="border border-green-700 rounded-lg p-1 h-full text-xl" required> </formulate-input>
 
-<details class="relative my-8 border border-green-700 p-6">
-    <summary>
-        <h3 class="font-bold text-xl text-left mb-8 my-8 inline">
-            4. Receive an email
-<div style="top: -.8em; right: 2em;"
-                        class="px-1 absolute bg-white text-right text-green-700 text-sm">
-                         MX records 
+                            <formulate-input type="submit" value="Go" class="ml-4 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-xl"></formulate-input>
+                        </formulate-form>
                     </div>
-        </h3>
-    </summary>
-</details>
-<details class="relative my-8 border border-green-700 p-6">
-    <summary>
-        <h3 class="font-bold text-xl text-left mb-8 my-8 inline">
-            5. Send an email (and pass the SPF check)
-<div style="top: -.8em; right: 2em;"
-                        class="px-1 absolute bg-white text-right text-green-700 text-sm">
-                         TXT records (SPF)
-                    </div>
-        </h3>
-    </summary>
-</details>
-<details class="relative my-8 border border-green-700 p-6">
-    <summary>
-        <h3 class="font-bold text-xl text-left mb-8 my-8 inline">
-            5. Set up Netlify
-<div style="top: -.8em; right: 2em;"
-                        class="px-1 absolute bg-white text-right text-green-700 text-sm">
-                         CNAME records
-                    </div>
-        </h3>
-    </summary>
-</details>
 
+                </div>
             </div>
         </div>
     </div>

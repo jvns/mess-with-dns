@@ -1,7 +1,10 @@
 FROM golang:1.17 AS go
 
-ADD ./api /app
+ADD ./api/go.mod /app/go.mod
+ADD ./api/go.sum /app/go.sum
 WORKDIR /app
+RUN go mod download
+ADD ./api /app
 RUN go get
 RUN go build
 

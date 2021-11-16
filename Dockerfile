@@ -5,7 +5,6 @@ ADD ./api/go.sum /app/go.sum
 WORKDIR /app
 RUN go mod download
 ADD ./api /app
-RUN go get
 RUN go build
 
 FROM node:16.9.1 AS node

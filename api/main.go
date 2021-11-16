@@ -135,11 +135,11 @@ func specialHandler(name string, qtype uint16) []dns.RR {
 				},
                 Ns:      "ns1.messwithdns.com.",
                 Mbox:    "julia.wizardzines.com.",
-				Serial:  2,
+				Serial:  3,
 				Refresh: 3600,
 				Retry:   3600,
 				Expire:  7300,
-				Minttl:  5,
+				Minttl:  5, // MINIMUM is a lower bound on the TTL field for all RRs in a zone
 			},
 		}
 	}

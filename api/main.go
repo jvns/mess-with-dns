@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"os"
 	"strconv"
@@ -122,12 +123,52 @@ func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func specialHandler(name string, qtype uint16) []dns.RR {
+	if name == "messwithdns.com." && qtype == dns.TypeSOA {
+		return []dns.RR{
+			&dns.SOA{
+				Hdr: dns.RR_Header{
+					Name:   name,
+					Rrtype: dns.TypeSOA,
+					Class:  dns.ClassINET,
+					Ttl:    0,
+				},
+				Serial:  1,
+				Refresh: 3600,
+				Retry:   600,
+				Expire:  86400,
+				Minttl:  0,
+			},
+		}
+	}
+	if (name == "ns1.messwithdns.com." || name == "ns2.messwithdns.com.") && qtype == dns.TypeA {
+		return []dns.RR{
+			&dns.A{
+				Hdr: dns.RR_Header{
+					Name:   name,
+					Rrtype: dns.TypeA,
+					Class:  dns.ClassINET,
+					Ttl:    0,
+				},
+				A: net.ParseIP("213.188.214.254"),
+			},
+		}
+	}
+
+	return nil
+}
+
 func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	msg := dns.Msg{}
 	msg.SetReply(r)
 	msg.Authoritative = true
 	fmt.Println("Received request: ", r.Question[0].String())
-	msg.Answer = GetRecords(handle.db, msg.Question[0].Name, msg.Question[0].Qtype)
+	specialRecords := specialHandler(r.Question[0].Name, r.Question[0].Qtype)
+	if len(specialRecords) > 0 {
+		msg.Answer = specialRecords
+	} else {
+		msg.Answer = GetRecords(handle.db, r.Question[0].Name, r.Question[0].Qtype)
+	}
 	err := w.WriteMsg(&msg)
 	if err != nil {
 		fmt.Println("Error writing response: ", err.Error())

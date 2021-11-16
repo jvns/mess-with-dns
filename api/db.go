@@ -3,7 +3,7 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
-    "fmt"
+	"fmt"
 	"os"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -50,30 +50,30 @@ func InsertRecord(db *sql.DB, record dns.RR) {
 }
 
 func GetRecordsForName(db *sql.DB, name string) map[int]dns.RR {
-    fmt.Println(name)
+	fmt.Println(name)
 	rows, err := db.Query("SELECT id, content FROM dns_records WHERE name = ?", name)
 	if err != nil {
 		panic(err.Error())
 	}
-    records := make(map[int]dns.RR)
+	records := make(map[int]dns.RR)
 	for rows.Next() {
 		var content []byte
-        var id int
-        err = rows.Scan(&id, &content)
-        if err != nil {
-            panic(err.Error())
-        }
-        record, err := ParseRecord(content)
-        if err != nil {
-            panic(err.Error())
-        }
-        records[id] = record
+		var id int
+		err = rows.Scan(&id, &content)
+		if err != nil {
+			panic(err.Error())
+		}
+		record, err := ParseRecord(content)
+		if err != nil {
+			panic(err.Error())
+		}
+		records[id] = record
 	}
 	return records
 }
 
 func GetRecords(db *sql.DB, name string, rrtype uint16) []dns.RR {
-    // return cname records if they exist
+	// return cname records if they exist
 	rows, err := db.Query("SELECT content FROM dns_records WHERE name = ? AND (rrtype = ? OR rrtype = 5)", name, rrtype)
 	if err != nil {
 		panic(err.Error())

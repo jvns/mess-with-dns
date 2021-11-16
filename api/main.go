@@ -22,6 +22,22 @@ type RecordRequest struct {
 	Domain string
 }
 
+var soa = dns.SOA{
+	Hdr: dns.RR_Header{
+		Name:   "messwithdns.com.",
+		Rrtype: dns.TypeSOA,
+		Class:  dns.ClassINET,
+		Ttl:    0, /* RFC 1035 says soa records always should have a ttl of 0 */
+	},
+	Ns:      "ns1.messwithdns.com.",
+	Mbox:    "julia.wizardzines.com.",
+	Serial:  3,
+	Refresh: 3600,
+	Retry:   3600,
+	Expire:  7300,
+	Minttl:  5, // MINIMUM is a lower bound on the TTL field for all RRs in a zone
+}
+
 func createRecord(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -126,28 +142,14 @@ func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func specialHandler(name string, qtype uint16) []dns.RR {
 	if name == "messwithdns.com." && qtype == dns.TypeSOA {
 		return []dns.RR{
-			&dns.SOA{
-				Hdr: dns.RR_Header{
-					Name:   name,
-					Rrtype: dns.TypeSOA,
-					Class:  dns.ClassINET,
-					Ttl:    0, /* RFC 1035 says soa records always should have a ttl of 0 */
-				},
-                Ns:      "ns1.messwithdns.com.",
-                Mbox:    "julia.wizardzines.com.",
-				Serial:  3,
-				Refresh: 3600,
-				Retry:   3600,
-				Expire:  7300,
-				Minttl:  5, // MINIMUM is a lower bound on the TTL field for all RRs in a zone
-			},
+			&soa,
 		}
 	}
-    nameservers := []string{
-        "213.188.214.254",
-        "213.188.214.237",
-    }
-	if name == "ns1.messwithdns.com."  && qtype == dns.TypeA {
+	nameservers := []string{
+		"213.188.214.254",
+		"213.188.214.237",
+	}
+	if name == "ns1.messwithdns.com." && qtype == dns.TypeA {
 		return []dns.RR{
 			&dns.A{
 				Hdr: dns.RR_Header{
@@ -160,19 +162,19 @@ func specialHandler(name string, qtype uint16) []dns.RR {
 			},
 		}
 	}
-    if name == "ns2.messwithdns.com."  && qtype == dns.TypeA {
-        return []dns.RR{
-            &dns.A{
-                Hdr: dns.RR_Header{
-                    Name:   name,
-                    Rrtype: dns.TypeA,
-                    Class:  dns.ClassINET,
-                    Ttl:    3600,
-                },
-                A: net.ParseIP(nameservers[1]),
-            },
-        }
-    }
+	if name == "ns2.messwithdns.com." && qtype == dns.TypeA {
+		return []dns.RR{
+			&dns.A{
+				Hdr: dns.RR_Header{
+					Name:   name,
+					Rrtype: dns.TypeA,
+					Class:  dns.ClassINET,
+					Ttl:    3600,
+				},
+				A: net.ParseIP(nameservers[1]),
+			},
+		}
+	}
 
 	return nil
 }
@@ -187,6 +189,10 @@ func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 		msg.Answer = specialRecords
 	} else {
 		msg.Answer = GetRecords(handle.db, r.Question[0].Name, r.Question[0].Qtype)
+	}
+	// add SOA record
+	msg.Extra = []dns.RR{
+		&soa,
 	}
 	err := w.WriteMsg(&msg)
 	if err != nil {

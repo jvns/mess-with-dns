@@ -16,7 +16,7 @@ ADD ./frontend/package.json /app/package.json
 WORKDIR /app
 RUN npm install
 ADD ./frontend/ /app/
-RUN esbuild script.js  --bundle --minify --outfile=bundle.js
+RUN esbuild script.js  --bundle --sourcemap --minify --outfile=bundle.js
 
 FROM ubuntu:20.04
 
@@ -29,6 +29,7 @@ COPY --from=go /app/mess-with-dns /usr/bin/mess-with-dns
 WORKDIR /app
 COPY ./frontend /app/frontend
 COPY --from=node /app/bundle.js /app/frontend/bundle.js
+COPY --from=node /app/bundle.js.map /app/frontend/bundle.js.map
 
 USER root
 CMD ["/usr/bin/mess-with-dns"]

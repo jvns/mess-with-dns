@@ -79,7 +79,8 @@
                         </li>
                         <li>
                             Repeat this with a 
-                            <a :href="'/#' + randomSubdomain()"> different domain</a>, but <span class="font-bold">don't</span> visit the domain first.
+                            <a :href="'/#' + randomSubdomain()"> different random subdomain</a>,
+                            but <span class="font-bold">don't</span> visit the domain first.
                         </li>
                     </ol>
 
@@ -131,7 +132,8 @@
                             still cached.
                         </li>
                         <li>
-                            Using a <strong>different random subdomain</strong>, repeat
+                            Using a 
+                            <a :href="'/#' + randomSubdomain()"> different random subdomain</a>, repeat
                             the same experiment with a short TTL. You might
                             need to do a force reload (Ctrl+Shift+R or similar)
                             after changing the DNS record to point at the purple site.
@@ -187,9 +189,20 @@
                     <summary>
                         <h3 class="font-bold text-xl text-left mb-8 my-8 inline">
                             4. Set two conflicting A records
+                        </h3>
                             <div style="top: -.8em; right: 2em;" class="px-1 absolute bg-white text-right text-green-700 text-sm">
                                 A records
                             </div>
+                            <ul>
+                                <li> Set an A record pointing <domain-link :domain='domain'> </domain-link> at 
+                                    213.188.218.160 with a TTL of 5 seconds.
+                                </li>
+                                <li> Set another A record pointing <domain-link :domain='domain'> </domain-link> at 
+                                    213.188.209.192 with a TTL of 5 seconds.
+                                </li>
+                                <li>
+                                    Visit <domain-link :domain='domain'> </domain-link> in your browser.  Then a few seconds later, force reload the page.
+                                </li>
                         </h3>
                     </summary>
                     What if you set two A records on a domain that refer to totally different sites? Let's find out!

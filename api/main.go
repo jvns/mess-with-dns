@@ -141,7 +141,11 @@ func specialHandler(name string, qtype uint16) []dns.RR {
 			},
 		}
 	}
-	if (name == "ns1.messwithdns.com." || name == "ns2.messwithdns.com.") && qtype == dns.TypeA {
+    nameservers := []string{
+        "213.188.214.254",
+        "213.188.214.237",
+    }
+	if name == "ns1.messwithdns.com."  && qtype == dns.TypeA {
 		return []dns.RR{
 			&dns.A{
 				Hdr: dns.RR_Header{
@@ -150,10 +154,23 @@ func specialHandler(name string, qtype uint16) []dns.RR {
 					Class:  dns.ClassINET,
 					Ttl:    0,
 				},
-				A: net.ParseIP("213.188.214.254"),
+				A: net.ParseIP(nameservers[0]),
 			},
 		}
 	}
+    if name == "ns2.messwithdns.com."  && qtype == dns.TypeA {
+        return []dns.RR{
+            &dns.A{
+                Hdr: dns.RR_Header{
+                    Name:   name,
+                    Rrtype: dns.TypeA,
+                    Class:  dns.ClassINET,
+                    Ttl:    0,
+                },
+                A: net.ParseIP(nameservers[1]),
+            },
+        }
+    }
 
 	return nil
 }

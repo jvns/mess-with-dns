@@ -157,7 +157,7 @@ function convertRecord(record) {
         if (key != 'name' && key != 'type' && key != 'ttl') {
             // check if the type is 'number' in the schema
             const field = getSchemaField(record.type, key);
-            if (field.type == 'number') {
+            if (field && field.type == 'number') {
                 newRecord[key] = parseInt(record[key]);
             } else {
                 newRecord[key] = record[key];

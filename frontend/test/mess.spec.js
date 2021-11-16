@@ -73,3 +73,25 @@ test('add CNAME record', async ({ page }) => {
     await page.type('#formulate-global-5', '30')
     expect(await page.screenshot()).toMatchSnapshot('add-cname-record-edit.png');
 });
+
+test('test saving record', async ({ page }) => {
+    const browserContext = page.context();
+    await browserContext.addInitScript({
+        path: 'preload.js'
+    });
+    await page.goto('http://localhost:8080/#cord-wrinkle')
+
+    await page.waitForSelector('#formulate-global-4')
+    await page.type('#formulate-global-4', '1.2.3.4')
+    await page.type('#formulate-global-5', '30')
+    await page.click('#formulate-global-6 > .formulate-input-element--submit--label')
+
+    await page.waitForSelector('.edit')
+    await page.click('.edit')
+
+    await page.waitForSelector('#formulate-global-8')
+    await page.type('#formulate-global-8', '40')
+
+    await page.click('.save')
+    expect(await page.screenshot()).toMatchSnapshot('save-record.png');
+});

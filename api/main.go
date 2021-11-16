@@ -131,7 +131,7 @@ func specialHandler(name string, qtype uint16) []dns.RR {
 					Name:   name,
 					Rrtype: dns.TypeSOA,
 					Class:  dns.ClassINET,
-					Ttl:    3600,
+					Ttl:    0, /* RFC 1035 says soa records always should have a ttl of 0 */
 				},
                 Ns:      "ns1.messwithdns.com.",
                 Mbox:    "julia.wizardzines.com.",

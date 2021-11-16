@@ -28,7 +28,7 @@
         <div class="flex">
             <div class="m-auto">
                 <h1 class="text-4xl">
-                    ★ mess with dns ★
+                    <a href="/" class="no-underline">★ mess with dns ★</a>
                 </h1>
                 <div class="text-right mt-2"> a <a class="underline py-2" href="https://wizardzines.com">wizard zines</a> project</div>
             </div>
@@ -44,13 +44,44 @@
                 </div>
 
                 <h2 class="font-bold text-2xl text-left mb-8 mt-16">
-                    Experiments where we break things for fun and learning:
+                    Weird experiments
                 </h2>
+                <p>
+                 In these 5 experiments, we break things for fun and learning!
+                </p>
 
+
+                <details class="relative my-8 border border-green-700 p-6">
+                    <summary>
+                        <h3 class="font-bold text-xl text-left mb-8 my-8 inline">
+                            1. Point to an IP that doesn't recognize your domain
+                            <div style="top: -.8em; right: 2em;" class="px-1 absolute bg-white text-right text-green-700 text-sm">
+                                A records
+                            </div>
+                        </h3>
+                    </summary>
+                            <ul>
+                                <li> Find the IP address for <code>example.com</code>. You can do this by running <code> dig example.com</code> in your terminal. Or you can just pretend you did it, the IP is <code>93.184.216.34</code> :). </li>
+                                <li> Set an A record pointing <domain-link :domain='domain'> </domain-link> at that IP (<code>93.184.216.34</code>). You can use any TTL you want. </li>
+                                <li> Go to <domain-link :domain='domain'> </domain-link> in your browser. You should get a 404 not found error. </li>
+                            </ul>
+<p class="my-4">
+                    <details>
+                        <summary>
+                            <span class="text-green-700">
+                                (click here to see the explanation)
+                            </span>
+                        </summary>
+                        <p>
+                        TODO
+                        </p>
+                    </details>
+                    </p>
+                </details>
                 <details class="relative my-4 border border-green-700 p-6">
                     <summary>
                         <h3 class="font-bold text-xl text-left mb-8 my-8 inline">
-                            1. Visit a domain before creating its record
+                            2. Visit a domain before creating its record
                             <div style="top: -.8em; right: 2em;" class="px-1 absolute bg-white text-right text-green-700 text-sm">
                                 caching
                             </div>
@@ -101,7 +132,7 @@
                 <details class="relative my-8 border border-green-700 p-6">
                     <summary>
                         <h3 class="font-bold text-xl text-left mb-8 my-8 inline">
-                            2. Test the difference between setting a short TTL and a long TTL
+                            3. Test the difference between setting a short TTL and a long TTL
                             <div style="top: -.8em; right: 2em;" class="px-1 absolute bg-white text-right text-green-700 text-sm">
                                 caching
                             </div>
@@ -158,12 +189,12 @@
                 <details class="relative my-8 border border-green-700 p-6">
                     <summary>
                         <h3 class="font-bold text-xl text-left mb-8 my-8 inline">
-                            3. Convince 3 different DNS servers that your subdomain has 3 different IPs
+                            4. Convince 3 different DNS servers that your subdomain has 3 different IPs
                             <div style="top: -.8em; right: 2em;" class="px-1 absolute bg-white text-right text-green-700 text-sm">
                                 caching
                             </div>
                         </h3>
-                        </h3>
+                    </summary>
 
                         <p>
                             Let's create some confusion and chaos! This is usually a bad thing, but let's do it on purpose so that you can see how it could happen accidentally.
@@ -182,13 +213,12 @@
                         </ul>
 
                         and have them all believe these conflicting things at the same time
-                    </summary>
                 </details>
 
                 <details class="relative my-8 border border-green-700 p-6">
                     <summary>
                         <h3 class="font-bold text-xl text-left mb-8 my-8 inline">
-                            4. Set two conflicting A records
+                            5. Set two conflicting A records
                             <div style="top: -.8em; right: 2em;" class="px-1 absolute bg-white text-right text-green-700 text-sm">
                                 A records
                             </div>
@@ -228,9 +258,14 @@ $ curl http://{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
 </pre>
                                 </li>
                 </details>
+
+
                 <h2 class="font-bold text-2xl text-left mb-8 mt-16">
-                    Experiments with useful things you might actually want to do:
+                    Useful experiments
                 </h2>
+                <p>
+                These rest of the experiments are things that you actually might want to do in real life.
+                </p>
                 <details class="relative my-8 border border-green-700 p-6">
                     <summary>
                         <h3 class="font-bold text-xl text-left mb-8 my-8 inline">

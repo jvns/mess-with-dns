@@ -20,6 +20,14 @@
         ol, ul {
             margin-left: 1em;
         }
+        pre {
+            /* don't show scrollbar unless needed */
+            overflow: auto;
+            padding: .5em;
+            margin: .5em 0;
+            background-color: #d9f2d9;
+            font-size: .8em;
+        }
     </style>
 </head>
 
@@ -269,12 +277,12 @@ $ curl http://{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
                 <details class="relative my-8 border border-green-700 p-6">
                     <summary>
                         <h3 class="font-bold text-xl text-left mb-8 my-8 inline">
-                            3. Query the source of truth
+                            1. Query the source of truth
                             <div style="top: -.8em; right: 2em;" class="px-1 absolute bg-white text-right text-green-700 text-sm">
                                 authoritative nameserver
                             </div>
                         </h3>
-                        </h3>
+                        </summary>
 
                         <p>
                             In the previous experiments, we were looking at how
@@ -310,12 +318,11 @@ $ curl http://{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
 
 
 
-                    </summary>
                 </details>
                 <details class="relative my-8 border border-green-700 p-6">
                     <summary>
                         <h3 class="font-bold text-xl text-left mb-8 my-8 inline">
-                            3. Get a Let's Encrypt certificate
+                            2. Get a Let's Encrypt certificate
                             <div style="top: -.8em; right: 2em;" class="px-1 absolute bg-white text-right text-green-700 text-sm">
                                 TXT records
                             </div>
@@ -327,9 +334,19 @@ $ curl http://{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
                 <details class="relative my-8 border border-green-700 p-6">
                     <summary>
                         <h3 class="font-bold text-xl text-left mb-8 my-8 inline">
-                            4. Receive an email
+                            3. Receive an email
                             <div style="top: -.8em; right: 2em;" class="px-1 absolute bg-white text-right text-green-700 text-sm">
                                 MX records
+                            </div>
+                        </h3>
+                    </summary>
+                </details>
+                <details class="relative my-8 border border-green-700 p-6">
+                    <summary>
+                        <h3 class="font-bold text-xl text-left mb-8 my-8 inline">
+                            4. Set up Netlify or GitHub Pages
+                            <div style="top: -.8em; right: 2em;" class="px-1 absolute bg-white text-right text-green-700 text-sm">
+                                CNAME records
                             </div>
                         </h3>
                     </summary>
@@ -340,16 +357,6 @@ $ curl http://{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
                             5. Send an email (and pass the SPF check)
                             <div style="top: -.8em; right: 2em;" class="px-1 absolute bg-white text-right text-green-700 text-sm">
                                 TXT records (SPF)
-                            </div>
-                        </h3>
-                    </summary>
-                </details>
-                <details class="relative my-8 border border-green-700 p-6">
-                    <summary>
-                        <h3 class="font-bold text-xl text-left mb-8 my-8 inline">
-                            5. Set up Netlify
-                            <div style="top: -.8em; right: 2em;" class="px-1 absolute bg-white text-right text-green-700 text-sm">
-                                CNAME records
                             </div>
                         </h3>
                     </summary>

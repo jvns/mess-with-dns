@@ -16,7 +16,7 @@
         .box {
             margin: auto;
             padding: 1em;
-            max-width: 10em;
+            max-width: 15em;
             background: white;
             opacity: 0.2;
             text-align: center;
@@ -26,6 +26,15 @@
             font-weight: normal;
             margin: 0;
             padding: 0 0 0.5em 0;
+        }
+
+        details {
+            padding: .5em 0;
+            text-align: left;
+        }
+
+        details summary {
+            text-align: center;
         }
     </style>
 </head>
@@ -54,9 +63,18 @@
 					c3.536,5.798,8.736,8.737,15.455,8.737h0.001c0.696,0,1.415-0.032,2.149-0.097C50.377,14.817,46.255,3,31.438,3
 					C31.196,3,30.953,3.003,30.708,3.01z" />
         </svg>
-        <p>
-        this is a test page for <a href="https://mess-with-dns.wizardzines.com">mess with dns </a>
-        </p>
+        <details>
+            <summary>
+                what's this?
+            </summary>
+            <p>
+                This is a dedicated IP address (213.188.218.160) that always serves
+                this drawing of an orange no matter what Host header is set / which domain is being requested.
+            </p>
+            <p>
+                It was made to be used with <a href="https://mess-with-dns.wizardzines.com">mess with dns</a>
+            </p>
+        </details>
     </div>
 </body>
 

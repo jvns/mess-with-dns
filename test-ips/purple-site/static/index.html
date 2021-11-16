@@ -4,10 +4,9 @@
     <meta charset="utf-8">
     <title>purple</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <style>
         body {
-            background-color: rebeccapurple;
+            background-color: orange;
             display: flex;
             height: calc(100vh - 1em);
             width: 100vw
@@ -16,7 +15,7 @@
         .box {
             margin: auto;
             padding: 1em;
-            max-width: 10em;
+            max-width: 15em;
             background: white;
             opacity: 0.2;
             text-align: center;
@@ -26,6 +25,15 @@
             font-weight: normal;
             margin: 0;
             padding: 0 0 0.5em 0;
+        }
+
+        details {
+            padding: .5em 0;
+            text-align: left;
+        }
+
+        details summary {
+            text-align: center;
         }
     </style>
 </head>
@@ -110,10 +118,18 @@
 					c6.521,0,11.826-5.305,11.826-11.825S66.235,55.717,59.714,55.717z" />
         </svg>
 
-        <p>
-        this is a test page for <a href="https://mess-with-dns.wizardzines.com">mess with dns </a>
-        </p>
-
+        <details>
+            <summary>
+                what's this?
+            </summary>
+            <p>
+                This is a dedicated IP address (213.188.209.192) that always serves
+                this drawing of an orange no matter what Host header is set / which domain is being requested.
+            </p>
+            <p>
+                It was made to be used with <a href="https://mess-with-dns.wizardzines.com">mess with dns</a>
+            </p>
+        </details>
     </div>
 </body>
 

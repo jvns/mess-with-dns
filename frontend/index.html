@@ -121,13 +121,15 @@
                         <li>
                             Go to <code><span class="text-green-700">your-domain</span>.messwithdns.com</code>
                             in your browser again. You should see
-                            the same site as before -- no change!
+                            the same orange site -- no change!
                             This is because your old DNS record is
                             still cached.
                         </li>
                         <li>
                             Using a <strong>different random subdomain</strong>, repeat
-                            the same experiment with a short TTL.
+                            the same experiment with a short TTL. You might
+                            need to do a force reload (Ctrl+Shift+R or similar)
+                            after changing the DNS record to point at the purple site.
                             This time, the change works! (Also, you can test what happens if you use the same subdomain!)
                         </li>
                     </ol>

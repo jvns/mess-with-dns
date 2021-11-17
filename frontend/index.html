@@ -51,15 +51,15 @@
         </div>
         <div id="main" class="bg-white p-8 md:w-1/2 lg:w-1/3 w-full">
                 <div v-if="domain && domain != ''">
-                    <h1 class="font-bold text-3xl text-center mb-8">
-                        DNS records for {{ domain }}.messwithdns.com
+                    <h1 class="text-2xl mb-8">
+                        Your subdomain is: <br><span class="font-bold text-green-700">{{ domain }}.messwithdns.com</span>
                     </h1>
 
-                    <h2 class="font-bold text-xl my-4"> Add a record </h2>
+                    <h2 class="font-bold text-xl mt-4"> Add a record </h2>
 
-                    <new-record :domain='domain' class="pl-16"> </new-record>
+                    <new-record :domain='domain'> </new-record>
 
-                    <h2 class="font-bold text-xl my-8"> All DNS records </h2>
+                    <h2 class="font-bold text-xl mb-4 mt-12"> All DNS records </h2>
                     <div v-if="records && records.length > 0">
                         <table class="w-full">
                             <tr class="bg-gray-100 border border-gray-300">
@@ -80,7 +80,7 @@
                         </table>
                     </div>
                     <div v-else>
-                        <p class="text-center">
+                        <p>
                             No records yet! You can add one!
                         </p>
                     </div>
@@ -129,9 +129,6 @@
         <div id="sidebar" class="p-8 md:w-1/2 lg:w-1/3 md:overflow-scroll left-0 bg-white"
             style="height: 80vh">
             <div id="experiments" v-if="sidebar">
-                <div class="flex justify-center">
-                </div>
-
                 <h1 class="font-bold  text-2xl text-left mb-4">
                     Experiments
                 </h1>
@@ -526,19 +523,25 @@ $ curl http://{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
 
 </script>
 <script id="new-record" type="vue-component">
-    <formulate-form name='new-record' @submit="createRecord" v-model="data">
+    <formulate-form name='new-record' 
+    @submit="createRecord" v-model="data">
         <fieldset>
             <div class="flex flex-wrap">
                 <formulate-input 
                 class='mr-4 mt-4'
                 element-class="border border-black rounded-lg mt-2 p-1" 
                 name="type" label="Type" 
+                error-behavior="submit"
                 v-model="type" type="select" 
                 :options="options"></formulate-input>
 
                 <formulate-input class="mr-4 mt-4"
                 element-class="border border-black rounded-lg mt-2 p-1" 
                 v-for="item in schemas[type]"
+                class="w-32"
+
+                error-behavior="submit"
+                outer-class="w-32"
                 :key="item.name" v-bind="item"></formulate-input>
             </div>
         </fieldset>

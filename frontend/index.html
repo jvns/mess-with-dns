@@ -45,23 +45,107 @@
 
 
 
-    <div class="flex" id="app" >
-        <div id="sidebar" class="px-16 border-r-2 border-green-700 fixed overflow-scroll left-0 bg-white" style="height: 80vh">
-            <div id="experiments"  style="max-width: 400px" v-if="sidebar">
+    <div class="flex flex-wrap justify-start md:justify-end bg-white squiggle-top" id="app" >
+        <!-- end of experiments -->
+        <div class="lg:w-1/3">
+        </div>
+        <div id="main" class="bg-white p-8 md:w-1/2 lg:w-1/3 w-full">
+                <div v-if="domain && domain != ''">
+                    <h1 class="font-bold text-3xl text-center mb-8">
+                        DNS records for {{ domain }}.messwithdns.com
+                    </h1>
+
+                    <h2 class="font-bold text-xl my-4"> Add a record </h2>
+
+                    <new-record :domain='domain' class="pl-16"> </new-record>
+
+                    <h2 class="font-bold text-xl my-8"> All DNS records </h2>
+                    <div v-if="records && records.length > 0">
+                        <table class="w-full">
+                            <tr class="bg-gray-100 border border-gray-300">
+                                <th class="text-left px-4 py-2">
+                                    Type
+                                </th>
+                                <th class="text-left">
+                                    Content
+                                </th>
+                                <th class="text-left">
+                                    TTL
+                                </th>
+                                <th class="text-left">
+                                    &nbsp;
+                                </th>
+                            </tr>
+                            <tbody is="record" v-for="record in records" :key="record.id" :record="record" />
+                        </table>
+                    </div>
+                    <div v-else>
+                        <p class="text-center">
+                            No records yet! You can add one!
+                        </p>
+                    </div>
+                </div>
+                <div v-else>
+                    <h1 class="font-bold text-3xl text-left mb-8">
+                        Welcome to mess with dns!
+                    </h1>
+                    <p class="my-8 text-xl">
+                        This is a site where you can do weird DNS
+                        experiments without any risk -- you
+                        can use my domain to do them instead of
+                        worrying about breaking your domain :)
+                    </p>
+                    <div class="">
+                        <a id="randomSubdomain" class="no-underline bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-xl" :href="'/#' + randomSubdomain()">
+                            Get a random subdomain
+                        </a>
+                    </div>
+                    <!-- existing subdomain -->
+                    <p class="mt-12 mb-2 text-xl"> 
+                    Or go to an existing subdomain:
+                    </p>
+                    <div>
+                        <formulate-form @submit="setDomain" class="flex flex-wrap">
+                            <formulate-input name="domain"
+                                             type="text"
+                                         :placeholder="randomSubdomain()"
+                               outer-class="mt-4"
+                                         element-class="border
+                                     border-green-700 rounded-lg p-1
+                                     h-full text-xl mr-4" required>
+                            </formulate-input>
+                            <formulate-input type="submit" value="Go"
+                               outer-class="mt-4"
+                                class="bg-green-600
+                                hover:bg-green-700 text-white font-bold
+                            py-2 px-4 rounded-lg
+                            text-xl"></formulate-input>
+                        </formulate-form>
+                    </div>
+
+            </div>
+        </div>
+
+        <div id="sidebar" class="p-8 md:w-1/2 lg:w-1/3 md:overflow-scroll left-0 bg-white"
+            style="height: 80vh">
+            <div id="experiments" v-if="sidebar">
                 <div class="flex justify-center">
                 </div>
 
-                <h2 class="font-bold text-2xl text-left mb-8 mt-16">
-                    Weird experiments
-                </h2>
+                <h1 class="font-bold  text-2xl text-left mb-4">
+                    Experiments
+                </h1>
+                <hr class="my-4">
+
                 <p>
-                 In these 5 experiments, we break things for fun and learning!
+                <span class="font-bold">Weird experiments:</span> In these 5 experiments, we break things for fun and learning!
                 </p>
 
 
-                <details class="relative my-8 border border-green-700 p-6">
+                <details class="relative mb-8 mt-4 border
+                    border-green-700 p-4">
                     <summary>
-                        <h3 class="font-bold text-xl text-left mb-8 my-8 inline">
+                        <h3 class="text-left font-bold mb-8 my-8 inline">
                             1. Point to an IP that doesn't recognize your domain
                             <div style="top: -.8em; right: 2em;" class="px-1 absolute bg-white text-right text-green-700 text-sm">
                                 A records
@@ -86,9 +170,9 @@
                     </details>
                     </p>
                 </details>
-                <details class="relative my-4 border border-green-700 p-6">
+                <details class="relative my-4 border border-green-700 p-4">
                     <summary>
-                        <h3 class="font-bold text-xl text-left mb-8 my-8 inline">
+                        <h3 class="font-bold text-left mb-8 my-8 inline">
                             2. Visit a domain before creating its record
                             <div style="top: -.8em; right: 2em;" class="px-1 absolute bg-white text-right text-green-700 text-sm">
                                 caching
@@ -137,9 +221,9 @@
                     </p>
                 </details>
 
-                <details class="relative my-8 border border-green-700 p-6">
+                <details class="relative my-8 border border-green-700 p-4">
                     <summary>
-                        <h3 class="font-bold text-xl text-left mb-8 my-8 inline">
+                        <h3 class="font-bold text-left mb-8 my-8 inline">
                             3. Test the difference between setting a short TTL and a long TTL
                             <div style="top: -.8em; right: 2em;" class="px-1 absolute bg-white text-right text-green-700 text-sm">
                                 caching
@@ -194,9 +278,9 @@
                     </p>
                 </details>
 
-                <details class="relative my-8 border border-green-700 p-6">
+                <details class="relative my-8 border border-green-700 p-4">
                     <summary>
-                        <h3 class="font-bold text-xl text-left mb-8 my-8 inline">
+                        <h3 class="font-bold text-left mb-8 my-8 inline">
                             4. Convince 3 different DNS servers that your subdomain has 3 different IPs
                             <div style="top: -.8em; right: 2em;" class="px-1 absolute bg-white text-right text-green-700 text-sm">
                                 caching
@@ -223,9 +307,9 @@
                         and have them all believe these conflicting things at the same time
                 </details>
 
-                <details class="relative my-8 border border-green-700 p-6">
+                <details class="relative my-8 border border-green-700 p-4">
                     <summary>
-                        <h3 class="font-bold text-xl text-left mb-8 my-8 inline">
+                        <h3 class="font-bold text-left mb-8 my-8 inline">
                             5. Set two conflicting A records
                             <div style="top: -.8em; right: 2em;" class="px-1 absolute bg-white text-right text-green-700 text-sm">
                                 A records
@@ -268,11 +352,9 @@ $ curl http://{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
                 </details>
 
 
-                <h2 class="font-bold text-2xl text-left mb-8 mt-16">
-                    Useful experiments
-                </h2>
+                <hr class="my-4">
                 <p>
-                These rest of the experiments are things that you actually might want to do in real life.
+                <span class="font-bold">Useful experiments</span>: The rest of the experiments are things that you actually might want to do in real life.
                 </p>
                 <details class="relative my-8 border border-green-700 p-6">
                     <summary>
@@ -371,72 +453,6 @@ $ curl http://{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
                 </div>
             </div>
 
-        </div>
-        <!-- end of experiments -->
-        <div class="m-auto">
-            <div class="m-auto w-full pt-16 px-8 mb-24">
-                <div v-if="domain && domain != ''">
-                    <h1 class="font-bold text-3xl text-center mb-8">
-                        DNS records for {{ domain }}.messwithdns.com
-                    </h1>
-
-                    <h2 class="font-bold text-xl my-4"> Add a record </h2>
-
-                    <new-record :domain='domain' class="pl-16"> </new-record>
-
-                    <h2 class="font-bold text-xl my-8"> All DNS records </h2>
-                    <div v-if="records && records.length > 0">
-                        <table class="w-full">
-                            <tr class="bg-gray-100 border border-gray-300">
-                                <th class="text-left px-4 py-2">
-                                    Type
-                                </th>
-                                <th class="text-left">
-                                    Content
-                                </th>
-                                <th class="text-left">
-                                    TTL
-                                </th>
-                                <th class="text-left">
-                                    &nbsp;
-                                </th>
-                            </tr>
-                            <tbody is="record" v-for="record in records" :key="record.id" :record="record" />
-                        </table>
-                    </div>
-                    <div v-else>
-                        <p class="text-center">
-                            No records yet! You can add one!
-                        </p>
-                    </div>
-                </div>
-                <div v-else style="max-width: 500px" class="m-auto">
-                    <h1 class="font-bold text-3xl text-center mb-8">
-                        Welcome to mess with dns!
-                    </h1>
-                    <p class="my-8 text-xl">
-                        This is a site where you can do weird DNS
-                        experiments without any risk -- you
-                        can use my domain to do them instead of
-                        worrying about breaking your domain :)
-                    </p>
-                    <div class="flex justify-center">
-                        <a id="randomSubdomain" class="no-underline bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-xl" :href="'/#' + randomSubdomain()">
-                            Get a random subdomain
-                        </a>
-                    </div>
-                    <!-- existing subdomain -->
-                    <p class="text-center my-8 text-xl"> or go to an existing subdomain: </p>
-                    <div class="flex justify-center">
-                        <formulate-form @submit="setDomain" class="flex">
-                            <formulate-input name="domain" type="text" :placeholder="randomSubdomain()" element-class="border border-green-700 rounded-lg p-1 h-full text-xl" required> </formulate-input>
-
-                            <formulate-input type="submit" value="Go" class="ml-4 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-xl"></formulate-input>
-                        </formulate-form>
-                    </div>
-
-                </div>
-            </div>
         </div>
     </div>
 </body>

@@ -29,7 +29,7 @@ func getSOA(db * sql.DB) *dns.SOA {
             Name:   "messwithdns.com.",
             Rrtype: dns.TypeSOA,
             Class:  dns.ClassINET,
-            Ttl:    0, /* RFC 1035 says soa records always should have a ttl of 0 */
+            Ttl:    300, /* RFC 1035 says soa records always should have a ttl of 0 but cloudflare doesn't seem to do that*/
         },
         Ns:      "ns1.messwithdns.com.",
         Mbox:    "julia.wizardzines.com.",

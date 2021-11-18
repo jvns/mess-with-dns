@@ -91,7 +91,8 @@ Vue.component('new-record', {
             schemas: schemas,
             type: 'A',
             data: undefined,
-            options: Object.keys(schemas),
+            // don't include 'default' in keys
+            options: Object.keys(schemas).filter(key => key != 'default'),
             error: undefined,
         };
     },

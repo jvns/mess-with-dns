@@ -33,6 +33,26 @@
             background-color: #d9f2d9;
             font-size: .8em;
         }
+
+        .formulate-input input {
+            width: 100%;
+        }
+
+        .formulate-input textarea {
+            width: 100%;
+        }
+
+        /* Chrome, Safari, Edge, Opera */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Firefox */
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
     </style>
 </head>
 
@@ -51,7 +71,6 @@
 
 
     <div class="flex flex-wrap justify-start md:justify-end bg-white squiggle-top" id="app">
-        <!-- end of experiments -->
         <div class="lg:w-1/3">
         </div>
         <div id="main" class="bg-white p-8 md:w-1/2 lg:w-1/3 w-full">
@@ -516,25 +535,24 @@ $ curl http://{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
 
 </script>
 <script id="new-record" type="vue-component">
-    <formulate-form name='new-record' 
-    @submit="createRecord" v-model="data">
+    <formulate-form name='new-record' @submit="createRecord" v-model="data">
         <fieldset>
             <div class="flex flex-wrap">
                 <formulate-input 
-                    class='mr-4 mt-4'
+                    class='mr-4'
+                    outer-class="mt-4"
                     element-class="border border-black rounded-lg mt-2 p-1" 
                     name="type" label="Type" 
                     error-behavior="submit"
                     v-model="type" type="select" 
                     :options="options"></formulate-input>
 
-                <formulate-input class="mr-4 mt-4"
+                <formulate-input
                     element-class="border border-black rounded-lg mt-2 p-1" 
+                    class="mr-4"
                     v-for="item in schemas[type]"
-                    class="w-32"
-
+                    v-bind:outer-class="((item.name == 'ttl' && 'w-16') || 'w-36') + ' formulate-input mt-4'"
                     error-behavior="submit"
-                    outer-class="w-32"
                     :key="item.name" v-bind="item"></formulate-input>
             </div>
         </fieldset>
@@ -543,9 +561,9 @@ $ curl http://{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
         </div>
         <div class="flex">
         <formulate-input 
-        outer-class="mr-auto mt-4"
-        element-class="hover:bg-green-700  bg-green-500 text-white py-2 px-4 rounded"
-        type="submit" label="Create"></formulate-input>
+            outer-class="mr-auto mt-4"
+            element-class="hover:bg-green-700  bg-green-500 text-white py-2 px-4 rounded"
+            type="submit" label="Create"></formulate-input>
         </div>
     </formulate-form>
 </script>

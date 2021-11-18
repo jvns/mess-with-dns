@@ -9,17 +9,22 @@
         a {
             text-decoration: underline;
         }
+
         .formulate-input-error {
             color: red;
         }
+
         li {
             margin: .5em 0;
             list-style-type: decimal;
             /* numbers */
         }
-        ol, ul {
+
+        ol,
+        ul {
             margin-left: 1em;
         }
+
         pre {
             /* don't show scrollbar unless needed */
             overflow: auto;
@@ -45,89 +50,82 @@
 
 
 
-    <div class="flex flex-wrap justify-start md:justify-end bg-white squiggle-top" id="app" >
+    <div class="flex flex-wrap justify-start md:justify-end bg-white squiggle-top" id="app">
         <!-- end of experiments -->
         <div class="lg:w-1/3">
         </div>
         <div id="main" class="bg-white p-8 md:w-1/2 lg:w-1/3 w-full">
-                <div v-if="domain && domain != ''">
-                    <h1 class="text-2xl mb-8">
-                        Your subdomain is: <br><span class="font-bold text-green-700">{{ domain }}.messwithdns.com</span>
-                    </h1>
+            <div v-if="domain && domain != ''">
+                <h1 class="text-2xl mb-8">
+                    Your subdomain is: <br><span class="font-bold text-green-700">{{ domain }}.messwithdns.com</span>
+                </h1>
 
-                    <h2 class="font-bold text-xl mt-4"> Add a record </h2>
+                <h2 class="font-bold text-xl mt-4"> Add a record </h2>
 
-                    <new-record :domain='domain'> </new-record>
+                <new-record :domain='domain'> </new-record>
 
-                    <h2 class="font-bold text-xl mb-4 mt-12"> All DNS records </h2>
-                    <div v-if="records && records.length > 0">
-                        <table class="w-full">
-                            <tr class="bg-gray-100 border border-gray-300">
-                                <th class="text-left px-4 py-2">
-                                    Type
-                                </th>
-                                <th class="text-left">
-                                    Content
-                                </th>
-                                <th class="text-left">
-                                    TTL
-                                </th>
-                                <th class="text-left">
-                                    &nbsp;
-                                </th>
-                            </tr>
-                            <tbody is="record" v-for="record in records" :key="record.id" :record="record" />
-                        </table>
-                    </div>
-                    <div v-else>
-                        <p>
-                            No records yet! You can add one!
-                        </p>
-                    </div>
+                <h2 class="font-bold text-xl mb-4 mt-12"> All DNS records </h2>
+                <div v-if="records && records.length > 0">
+                    <table class="w-full">
+                        <tr class="bg-gray-100 border border-gray-300">
+                            <th class="text-left px-4 py-2">
+                                Type
+                            </th>
+                            <th class="text-left">
+                                Content
+                            </th>
+                            <th class="text-left">
+                                TTL
+                            </th>
+                            <th class="text-left">
+                                &nbsp;
+                            </th>
+                        </tr>
+                        <tbody is="record" v-for="record in records" :key="record.id" :record="record" />
+                    </table>
                 </div>
                 <div v-else>
-                    <h1 class="font-bold text-3xl text-left mb-8">
-                        Welcome to mess with dns!
-                    </h1>
-                    <p class="my-8 text-xl">
-                        This is a site where you can do weird DNS
-                        experiments without any risk -- you
-                        can use my domain to do them instead of
-                        worrying about breaking your domain :)
+                    <p>
+                        No records yet! You can add one!
                     </p>
-                    <div class="">
-                        <a id="randomSubdomain" class="no-underline bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-xl" :href="'/#' + randomSubdomain()">
-                            Get a random subdomain
-                        </a>
-                    </div>
-                    <!-- existing subdomain -->
-                    <p class="mt-12 mb-2 text-xl"> 
+                </div>
+            </div>
+            <div v-else>
+                <h1 class="font-bold text-3xl text-left mb-8">
+                    Welcome to mess with dns!
+                </h1>
+                <p class="my-8 text-xl">
+                    This is a site where you can do weird DNS
+                    experiments without any risk -- you
+                    can use my domain to do them instead of
+                    worrying about breaking your domain :)
+                </p>
+                <div class="">
+                    <a id="randomSubdomain" class="no-underline bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-xl" :href="'/#' + randomSubdomain()">
+                        Get a random subdomain
+                    </a>
+                </div>
+                <!-- existing subdomain -->
+                <p class="mt-12 mb-2 text-xl">
                     Or go to an existing subdomain:
-                    </p>
-                    <div>
-                        <formulate-form @submit="setDomain" class="flex flex-wrap">
-                            <formulate-input name="domain"
-                                             type="text"
-                                         :placeholder="randomSubdomain()"
-                               outer-class="mt-4"
-                                         element-class="border
+                </p>
+                <div>
+                    <formulate-form @submit="setDomain" class="flex flex-wrap">
+                        <formulate-input name="domain" type="text" :placeholder="randomSubdomain()" outer-class="mt-4" element-class="border
                                      border-green-700 rounded-lg p-1
                                      h-full text-xl mr-4" required>
-                            </formulate-input>
-                            <formulate-input type="submit" value="Go"
-                               outer-class="mt-4"
-                                class="bg-green-600
+                        </formulate-input>
+                        <formulate-input type="submit" value="Go" outer-class="mt-4" class="bg-green-600
                                 hover:bg-green-700 text-white font-bold
                             py-2 px-4 rounded-lg
                             text-xl"></formulate-input>
-                        </formulate-form>
-                    </div>
+                    </formulate-form>
+                </div>
 
             </div>
         </div>
 
-        <div id="sidebar" class="p-8 md:w-1/2 lg:w-1/3 md:overflow-scroll left-0 bg-white"
-            style="height: 80vh">
+        <div id="sidebar" class="p-8 md:w-1/2 lg:w-1/3 md:overflow-scroll left-0 bg-white" style="height: 80vh">
             <div id="experiments" v-if="sidebar">
                 <h1 class="font-bold  text-2xl text-left mb-4">
                     Experiments
@@ -135,7 +133,7 @@
                 <hr class="my-4">
 
                 <p>
-                <span class="font-bold">Weird experiments:</span> In these 5 experiments, we break things for fun and learning!
+                    <span class="font-bold">Weird experiments:</span> In these 5 experiments, we break things for fun and learning!
                 </p>
 
 
@@ -149,12 +147,12 @@
                             </div>
                         </h3>
                     </summary>
-                            <ul>
-                                <li> Find the IP address for <code>example.com</code>. You can do this by running <code> dig example.com</code> in your terminal. Or you can just pretend you did it, the IP is <code>93.184.216.34</code> :). </li>
-                                <li> Set an A record pointing <domain-link :domain='domain'> </domain-link> at that IP (<code>93.184.216.34</code>). You can use any TTL you want. </li>
-                                <li> Go to <domain-link :domain='domain'> </domain-link> in your browser. You should get a 404 not found error. </li>
-                            </ul>
-<p class="my-4">
+                    <ul>
+                        <li> Find the IP address for <code>example.com</code>. You can do this by running <code> dig example.com</code> in your terminal. Or you can just pretend you did it, the IP is <code>93.184.216.34</code> :). </li>
+                        <li> Set an A record pointing <domain-link :domain='domain'> </domain-link> at that IP (<code>93.184.216.34</code>). You can use any TTL you want. </li>
+                        <li> Go to <domain-link :domain='domain'> </domain-link> in your browser. You should get a 404 not found error. </li>
+                    </ul>
+                    <p class="my-4">
                     <details>
                         <summary>
                             <span class="text-green-700">
@@ -162,7 +160,7 @@
                             </span>
                         </summary>
                         <p>
-                        TODO
+                            TODO
                         </p>
                     </details>
                     </p>
@@ -198,7 +196,7 @@
                             Go to <domain-link :domain='domain'> </domain-link> in your browser again. You should get the same "Server Not Found" error as before.
                         </li>
                         <li>
-                            Repeat this with a 
+                            Repeat this with a
                             <a :href="'/#' + randomSubdomain()"> different random subdomain</a>,
                             but <span class="font-bold">don't</span> visit the domain first.
                         </li>
@@ -252,7 +250,7 @@
                             still cached.
                         </li>
                         <li>
-                            Using a 
+                            Using a
                             <a :href="'/#' + randomSubdomain()"> different random subdomain</a>, repeat
                             the same experiment with a short TTL. You might
                             need to do a force reload (Ctrl+Shift+R or similar)
@@ -285,23 +283,23 @@
                         </h3>
                     </summary>
 
-                        <p>
-                            Let's create some confusion and chaos! This is usually a bad thing, but let's do it on purpose so that you can see how it could happen accidentally.
-                            Here your goal is to convince
-                        </p>
-                        <ul>
-                            <li>
-                                Google's DNS server that your subdomain has one IP (10.11.12.13),
-                            </li>
-                            <li>
-                                Cloudflare's DNS server that your subdomain has another IP (20.21.22.23),
-                            </li>
-                            <li>
-                                Quad9's DNS server that your subdomain has a third IP (30.31.32.33),
-                            </li>
-                        </ul>
+                    <p>
+                        Let's create some confusion and chaos! This is usually a bad thing, but let's do it on purpose so that you can see how it could happen accidentally.
+                        Here your goal is to convince
+                    </p>
+                    <ul>
+                        <li>
+                            Google's DNS server that your subdomain has one IP (10.11.12.13),
+                        </li>
+                        <li>
+                            Cloudflare's DNS server that your subdomain has another IP (20.21.22.23),
+                        </li>
+                        <li>
+                            Quad9's DNS server that your subdomain has a third IP (30.31.32.33),
+                        </li>
+                    </ul>
 
-                        and have them all believe these conflicting things at the same time
+                    and have them all believe these conflicting things at the same time
                 </details>
 
                 <details class="relative my-8 border border-green-700 p-4">
@@ -315,19 +313,19 @@
                     </summary>
 
                     What if you set two A records on a domain that refer to totally different sites? Let's find out!
-                            <ul>
-                                <li> Set an A record pointing <domain-link :domain='domain'> </domain-link> at 
-                                    213.188.218.160 with a TTL of 5 seconds.
-                                </li>
-                                <li> Set another A record pointing <domain-link :domain='domain'> </domain-link> at 
-                                    213.188.209.192 with a TTL of 5 seconds.
-                                </li>
-                                <li>
-                                    In your terminal, run 
-                                    <pre>$ curl http://{{currDomain()}}.messwithdns.com</pre>
-                                    10 times.
-                                    The results I get when doing this are:
-<pre>
+                    <ul>
+                        <li> Set an A record pointing <domain-link :domain='domain'> </domain-link> at
+                            213.188.218.160 with a TTL of 5 seconds.
+                        </li>
+                        <li> Set another A record pointing <domain-link :domain='domain'> </domain-link> at
+                            213.188.209.192 with a TTL of 5 seconds.
+                        </li>
+                        <li>
+                            In your terminal, run
+                            <pre>$ curl http://{{currDomain()}}.messwithdns.com</pre>
+                            10 times.
+                            The results I get when doing this are:
+                            <pre>
 $ curl http://{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
     &lt;title&gt;orange&lt;/title&gt;
 $ curl http://{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
@@ -345,13 +343,13 @@ $ curl http://{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
 $ curl http://{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
     &lt;title&gt;purple&lt;/title&gt;
 </pre>
-                                </li>
+                        </li>
                 </details>
 
 
                 <hr class="my-4">
                 <p>
-                <span class="font-bold">Useful experiments</span>: The rest of the experiments are things that you actually might want to do in real life.
+                    <span class="font-bold">Useful experiments</span>: The rest of the experiments are things that you actually might want to do in real life.
                 </p>
                 <details class="relative my-8 border border-green-700 p-4">
                     <summary>
@@ -361,39 +359,39 @@ $ curl http://{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
                                 authoritative nameserver
                             </div>
                         </h3>
-                        </summary>
+                    </summary>
 
-                        <p>
-                            In the previous experiments, we were looking at how
-                            DNS names are cached. But you can always query the
-                            source of truth for a domain: the <strong> authoritative nameserver </strong>.
-                        </p>
+                    <p>
+                        In the previous experiments, we were looking at how
+                        DNS names are cached. But you can always query the
+                        source of truth for a domain: the <strong> authoritative nameserver </strong>.
+                    </p>
 
 
-                        <p>
-                        <ol>
-                            <li>
+                    <p>
+                    <ol>
+                        <li>
 
-                                Create an A record for <domain-link :domain='domain'> </domain-link> at <code>example.com</code>, like this:
-                                <img src="/images/cname-screenshot.png" class="block border  border-dashed border-green-700 mb-4 mt-2">
-                            </li>
-                            <li>
-                                In your terminal, run
-                                <pre>$ dig +trace {{currDomain()}}.messwithdns.com</pre> to get the authoritative nameserver. The answer should be
-                                <pre>ns1.messwithdns.com.</pre>
-                            </li>
-                            <li>
-                                Run:
-                                <pre>$ dig @ns1.messwithdns.com {{currDomain()}}.messwithdns.com</pre>
-                                to get the A record for your domain
+                            Create an A record for <domain-link :domain='domain'> </domain-link> at <code>example.com</code>, like this:
+                            <img src="/images/cname-screenshot.png" class="block border  border-dashed border-green-700 mb-4 mt-2">
+                        </li>
+                        <li>
+                            In your terminal, run
+                            <pre>$ dig +trace {{currDomain()}}.messwithdns.com</pre> to get the authoritative nameserver. The answer should be
+                            <pre>ns1.messwithdns.com.</pre>
+                        </li>
+                        <li>
+                            Run:
+                            <pre>$ dig @ns1.messwithdns.com {{currDomain()}}.messwithdns.com</pre>
+                            to get the A record for your domain
 
-                            </li>
-                            <li>
-                                Make some changes to your A record, run
-                                <pre> dig @ns1.messwithdns.com {{currDomain()}}.messwithdns.com </pre> again, and notice the changes are always immediately reflected even if there's a very big TTL!
-                            </li>
-                        </ol>
-                        </p>
+                        </li>
+                        <li>
+                            Make some changes to your A record, run
+                            <pre> dig @ns1.messwithdns.com {{currDomain()}}.messwithdns.com </pre> again, and notice the changes are always immediately reflected even if there's a very big TTL!
+                        </li>
+                    </ol>
+                    </p>
 
 
 

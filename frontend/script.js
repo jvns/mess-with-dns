@@ -1,4 +1,5 @@
 import Vue from 'vue/dist/vue.esm.js';
+
 import VueFormulate from '@braid/vue-formulate'
 import * as words from './words.json';
 import * as schemas from './schemas.json';

@@ -5,9 +5,40 @@ import (
 	"fmt"
 	"os"
 	"reflect"
+    "strings"
 
 	"github.com/miekg/dns"
 )
+
+var examples = map[string]string{
+    "A": "1.2.3.4",
+    "AAAA": "2001:db8::1",
+    "Algorithm": "1",
+    "Certificate": "MIIGDjCCA/agAwIBAgIJAJz/8nh5oYsMA0GCSqGSIb3DQEBBQUAMIGuMQswCQYDVQQGEwJKUDEOMAwGA1UECBMF",
+    "Digest": "QmFzZTY0IGVuY29kZWQgZm9ybWF0",
+    "DigestType": "1",
+    "Expire": "1",
+    "Flag": "1",
+    "KeyTag": "1",
+    "Mbox": "example.com",
+    "Minttl": "3600",
+    "Mx": "mail.messagingengine.com",
+    "Ns": "ns1.example.com",
+    "Port": "8080",
+    "Preference": "10",
+    "Priority": "10",
+    "Ptr": "www.example.com",
+    "Refresh": "3600",
+    "Retry": "3600",
+    "Serial": "1",
+    "Tag": "1",
+    "Target": "orange-ip.fly.dev",
+    "Txt": "\"Hello World\"",
+    "Type": "1",
+    "Value": "TODO",
+    "Weight": "TODO",
+    "ttl": "60",
+}
 
 func main() {
 	// Generate schemas for the dns.A struct
@@ -23,7 +54,7 @@ func main() {
 	       },
 	*/
 	// get fields of dns.A type
-	schemas := map[string][]map[string]string{}
+	schemas := map[string][]map[string]interface{}{}
 
 	schemas["A"] = genSchema(dns.A{}, map[string]string{"A": "IPv4 Address"})
 	schemas["AAAA"] = genSchema(dns.AAAA{}, map[string]string{"AAAA": "IPv6 Address"})
@@ -42,11 +73,14 @@ func main() {
 
 	// add ttl field to each schema
 	for k, schema := range schemas {
-		schema = append(schema, map[string]string{
+		schema = append(schema, map[string]interface{}{
 			"name":       "ttl",
 			"label":      "TTL",
 			"type":       "number",
 			"validation": "required",
+            "validation-messages": map[string]string{
+                "required": "Example: " + examples["ttl"],
+            },
 		})
         schemas[k] = schema
 	}
@@ -74,21 +108,21 @@ func main() {
     file.Write(x)
 }
 
-func genSchema(x interface{}, labels map[string]string) []map[string]string {
+func genSchema(x interface{}, labels map[string]string) []map[string]interface{} {
 	// use reflection to get fields of x
 	// and generate schema for each field
 	// and print it
 	reflectType := reflect.TypeOf(x)
 
 	// make array of maps
-	schemas := make([]map[string]string, 0)
+	schemas := make([]map[string]interface{}, 0)
 
 	for i := 0; i < reflectType.NumField(); i++ {
 		field := reflectType.Field(i)
 		if field.Name == "Hdr" {
 			continue
 		}
-		schema := make(map[string]string)
+		schema := make(map[string]interface{})
 		schema["name"] = field.Name
 		if label, ok := labels[field.Name]; ok {
 			schema["label"] = label
@@ -96,7 +130,13 @@ func genSchema(x interface{}, labels map[string]string) []map[string]string {
 			schema["label"] = field.Name
 		}
 		schema["type"] = getType(field.Type, field.Name)
-		schema["validation"] = getValidation(field)
+        validation := getValidation(field)
+		schema["validation"] = validation
+        valField := strings.Split(validation, ":")[0]
+
+        messages := map[string]string{}
+        messages[valField] = "Example: " + examples[field.Name]
+        schema["validation-messages"] = messages
 		//fmt.Println("'validation-messages': {'" + getValidationMessages(field.Type) + "'},")
 		schemas = append(schemas, schema)
 	}

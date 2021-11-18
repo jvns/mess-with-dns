@@ -11,6 +11,8 @@
         }
 
         .formulate-input-error {
+            list-style: none;
+            margin-left: -.5em;
             color: red;
         }
 
@@ -551,7 +553,7 @@ $ curl http://{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
                     element-class="border border-black rounded-lg mt-2 p-1" 
                     class="mr-4"
                     v-for="item in schemas[type]"
-                    v-bind:outer-class="((item.name == 'ttl' && 'w-16') || 'w-36') + ' formulate-input mt-4'"
+                    v-bind:outer-class="((item.name == 'ttl' && 'w-28') || 'w-36') + ' formulate-input mt-4'"
                     error-behavior="submit"
                     :key="item.name" v-bind="item"></formulate-input>
             </div>

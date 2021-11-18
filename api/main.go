@@ -22,20 +22,24 @@ type RecordRequest struct {
 	Domain string
 }
 
-var soa = dns.SOA{
-	Hdr: dns.RR_Header{
-		Name:   "messwithdns.com.",
-		Rrtype: dns.TypeSOA,
-		Class:  dns.ClassINET,
-		Ttl:    0, /* RFC 1035 says soa records always should have a ttl of 0 */
-	},
-	Ns:      "ns1.messwithdns.com.",
-	Mbox:    "julia.wizardzines.com.",
-	Serial:  4,
-	Refresh: 3600,
-	Retry:   3600,
-	Expire:  7300,
-	Minttl:  3600, // MINIMUM is a lower bound on the TTL field for all RRs in a zone
+func getSOA(db * sql.DB) *dns.SOA {
+    serial := GetSerial(db)
+    var soa = dns.SOA{
+        Hdr: dns.RR_Header{
+            Name:   "messwithdns.com.",
+            Rrtype: dns.TypeSOA,
+            Class:  dns.ClassINET,
+            Ttl:    0, /* RFC 1035 says soa records always should have a ttl of 0 */
+        },
+        Ns:      "ns1.messwithdns.com.",
+        Mbox:    "julia.wizardzines.com.",
+        Serial:  serial,
+        Refresh: 3600,
+        Retry:   3600,
+        Expire:  7300,
+        Minttl:  3600, // MINIMUM is a lower bound on the TTL field for all RRs in a zone
+    }
+    return &soa
 }
 
 func createRecord(db *sql.DB, w http.ResponseWriter, r *http.Request) {
@@ -139,10 +143,10 @@ func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func specialHandler(name string, qtype uint16) []dns.RR {
+func specialHandler(db *sql.DB, name string, qtype uint16) []dns.RR {
 	if name == "messwithdns.com." && qtype == dns.TypeSOA {
 		return []dns.RR{
-			&soa,
+			getSOA(db),
 		}
 	}
 	nameservers := []string{
@@ -184,7 +188,7 @@ func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	msg.SetReply(r)
 	msg.Authoritative = true
 	fmt.Println("Received request: ", r.Question[0].String())
-	specialRecords := specialHandler(r.Question[0].Name, r.Question[0].Qtype)
+	specialRecords := specialHandler(handle.db, r.Question[0].Name, r.Question[0].Qtype)
 	if len(specialRecords) > 0 {
 		msg.Answer = specialRecords
 	} else {
@@ -192,7 +196,7 @@ func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	}
 	// add SOA record
 	msg.Ns = []dns.RR{
-		&soa,
+		getSOA(handle.db),
 	}
 	err := w.WriteMsg(&msg)
 	if err != nil {

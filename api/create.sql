@@ -8,3 +8,9 @@ CREATE TABLE dns_records
 );
 -- unique constraint on name, rrtype, content
 CREATE UNIQUE INDEX dns_records_name_rrtype_content_uindex ON dns_records (name, rrtype, content);
+
+-- this table will just have one record
+CREATE TABLE dns_serials 
+(
+  serial integer PRIMARY KEY,
+);

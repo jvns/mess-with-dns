@@ -20,11 +20,28 @@ func connect() *sql.DB {
 	return db
 }
 
+func GetSerial(db *sql.DB) uint32 {
+    var serial uint32
+    err := db.QueryRow("SELECT serial FROM dns_serials").Scan(&serial)
+    if err != nil {
+        panic(err.Error())
+    }
+    return serial
+}
+
+func IncrementSerial(db *sql.DB) {
+    _, err := db.Exec("UPDATE dns_serials SET serial = serial + 1")
+    if err != nil {
+        panic(err.Error())
+    }
+}
+
 func DeleteRecord(db *sql.DB, id int) {
 	_, err := db.Exec("DELETE FROM dns_records WHERE id = ?", id)
 	if err != nil {
 		panic(err.Error())
 	}
+    IncrementSerial(db)
 }
 
 func UpdateRecord(db *sql.DB, id int, record dns.RR) {
@@ -36,6 +53,7 @@ func UpdateRecord(db *sql.DB, id int, record dns.RR) {
 	if err != nil {
 		panic(err.Error())
 	}
+    IncrementSerial(db)
 }
 
 func InsertRecord(db *sql.DB, record dns.RR) {
@@ -47,6 +65,7 @@ func InsertRecord(db *sql.DB, record dns.RR) {
 	if err != nil {
 		panic(err.Error())
 	}
+    IncrementSerial(db)
 }
 
 func GetRecordsForName(db *sql.DB, name string) map[int]dns.RR {

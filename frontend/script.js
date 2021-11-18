@@ -158,6 +158,8 @@ function convertRecord(record) {
                 record[key] += '.';
             }
         }
+        // strip whitespace
+        record[key] = record[key].trim();
         if (key != 'name' && key != 'type' && key != 'ttl') {
             // check if the type is 'number' in the schema
             const field = getSchemaField(record.type, key);

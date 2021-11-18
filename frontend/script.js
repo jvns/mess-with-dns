@@ -127,7 +127,9 @@ Vue.component('new-record', {
             const type = this.data.type;
             document.activeElement.blur();
             this.$formulate.reset('new-record')
-            this.data = {type: type};
+            this.data = {
+                type: type
+            };
         },
     }
 });
@@ -242,7 +244,9 @@ var app = new Vue({
         },
         goToRandom: function() {
             const domain = this.randomSubdomain();
-            this.setDomain({domain: domain});
+            this.setDomain({
+                domain: domain
+            });
         },
     },
 });
@@ -262,4 +266,3 @@ async function updateHash() {
 updateHash();
 // update hash on change
 window.onhashchange = updateHash;
-

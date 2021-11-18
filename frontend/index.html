@@ -127,16 +127,11 @@
 
         <div id="sidebar" class="p-8 md:w-1/2 lg:w-1/3 md:overflow-scroll left-0 bg-white" style="height: 80vh">
             <div id="experiments" v-if="sidebar">
-                <h1 class="font-bold  text-2xl text-left mb-4">
-                    Experiments
-                </h1>
+                <h1 class="font-bold  text-2xl text-left mb-4"> Experiments </h1>
                 <hr class="my-4">
-
                 <p>
                     <span class="font-bold">Weird experiments:</span> In these 5 experiments, we break things for fun and learning!
                 </p>
-
-
                 <details class="relative mb-8 mt-4 border
                     border-green-700 p-4">
                     <summary>
@@ -526,21 +521,21 @@ $ curl http://{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
         <fieldset>
             <div class="flex flex-wrap">
                 <formulate-input 
-                class='mr-4 mt-4'
-                element-class="border border-black rounded-lg mt-2 p-1" 
-                name="type" label="Type" 
-                error-behavior="submit"
-                v-model="type" type="select" 
-                :options="options"></formulate-input>
+                    class='mr-4 mt-4'
+                    element-class="border border-black rounded-lg mt-2 p-1" 
+                    name="type" label="Type" 
+                    error-behavior="submit"
+                    v-model="type" type="select" 
+                    :options="options"></formulate-input>
 
                 <formulate-input class="mr-4 mt-4"
-                element-class="border border-black rounded-lg mt-2 p-1" 
-                v-for="item in schemas[type]"
-                class="w-32"
+                    element-class="border border-black rounded-lg mt-2 p-1" 
+                    v-for="item in schemas[type]"
+                    class="w-32"
 
-                error-behavior="submit"
-                outer-class="w-32"
-                :key="item.name" v-bind="item"></formulate-input>
+                    error-behavior="submit"
+                    outer-class="w-32"
+                    :key="item.name" v-bind="item"></formulate-input>
             </div>
         </fieldset>
         <div style="color: red" v-if="error" class="pt-2">

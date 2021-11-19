@@ -333,6 +333,18 @@ bad-ip.ionized-twig.messwithdns.com. 30	IN A	30.31.32.33
 
                         </li>
                     </ol>
+                    <p class="my-4">
+                    <details>
+                        <summary>
+                            <span class="text-green-700">
+                                (click here to see the explanation)
+                            </span>
+                        </summary>
+                        <p>
+                            TODO
+                        </p>
+                    </details>
+                    </p>
                 </details>
 
                 <details class="relative my-8 border border-green-700 p-4">
@@ -355,28 +367,43 @@ bad-ip.ionized-twig.messwithdns.com. 30	IN A	30.31.32.33
                         </li>
                         <li>
                             In your terminal, run
-                            <pre>$ curl http://{{currDomain()}}.messwithdns.com</pre>
+                            <pre>$ curl http://conflict.{{currDomain()}}.messwithdns.com 2&gt;/dev/null | grep title </pre>
                             10 times.
-                            The results I get when doing this are:
+                            The result you get should change back and forth between 'orange' and 'purple', like this:
                             <pre>
-$ curl http://{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
+$ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
     &lt;title&gt;orange&lt;/title&gt;
-$ curl http://{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
+$ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
     &lt;title&gt;purple&lt;/title&gt;
-$ curl http://{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
+$ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
     &lt;title&gt;orange&lt;/title&gt;
-$ curl http://{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
+$ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
     &lt;title&gt;purple&lt;/title&gt;
-$ curl http://{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
+$ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
     &lt;title&gt;orange&lt;/title&gt;
-$ curl http://{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
+$ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
     &lt;title&gt;purple&lt;/title&gt;
-$ curl http://{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
+$ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
     &lt;title&gt;orange&lt;/title&gt;
-$ curl http://{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
+$ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
     &lt;title&gt;purple&lt;/title&gt;
 </pre>
                         </li>
+                        It can't make up its mind what website it is!
+                        <p class="my-4">
+                        <details>
+                            <summary>
+                                <span class="text-green-700">
+                                    (click here to see the explanation)
+                                </span>
+                            </summary>
+                            <p>
+                                TODO curl is doing like round robin dns blah blah, it's not random,
+                                this is actually used and it's called dns load balancing (obv not with totally different websites)
+                                don't do this as a hack for a/b testing lol
+                            </p>
+                        </details>
+                        </p>
                 </details>
 
 
@@ -449,6 +476,23 @@ $ curl http://{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
                                 MX records
                             </div>
                         </h3>
+                        <ol>
+                            <li>
+                                Go to Fastmail and sign up for an email account using the address yourname@{{currDomain()}}.messwithdns.com
+                                (they have a 30-day free trial). The setup option you use don't matter too much.
+                            </li>
+                            <li>
+                                Add an MX record for <domain-link :domain='domain'> </domain-link> pointing it to <code>ns1.messagingengine.com </code> with preference 10
+                            </li>
+                            <li>
+                                Add another MX record for <domain-link :domain='domain'> </domain-link> pointing it to <code>ns2.messagingengine.com </code> with preference 20
+                            </li>
+                            <li>
+                                Check with Fastmail that your MX records are working. There's a button in the settings
+                            </li>
+
+
+                        </ol>
                     </summary>
                 </details>
                 <details class="relative my-8 border border-green-700 p-4">

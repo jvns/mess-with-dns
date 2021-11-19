@@ -14,3 +14,16 @@ CREATE TABLE dns_serials
 (
   serial integer PRIMARY KEY,
 );
+
+CREATE TABLE dns_requests 
+(
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  src_ip VARCHAR(20) NOT NULL,
+  src_host VARCHAR(255) NOT NULL,
+  request TEXT NOT NULL,
+  response TEXT NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX dns_requests_name_uindex ON dns_requests (name);

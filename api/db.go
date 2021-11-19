@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+    "net"
 	"os"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -89,6 +90,24 @@ func GetRecordsForName(db *sql.DB, name string) map[int]dns.RR {
 		records[id] = record
 	}
 	return records
+}
+
+func LogRequest(db *sql.DB, request *dns.Msg, response *dns.Msg, src_ip net.IP, src_host string) {
+    jsonRequest, err := json.Marshal(request)
+    if err != nil {
+        fmt.Println("error logging request: ", err.Error())
+        return
+    }
+    jsonResponse, err := json.Marshal(response)
+    if err != nil {
+        fmt.Println("error logging request: ", err.Error())
+        return
+    }
+    name := request.Question[0].Name
+    _, err = db.Exec("INSERT INTO dns_requests (name, request, response, src_ip, src_host) VALUES (?, ?, ?, ?, ?)", name, jsonRequest, jsonResponse, src_ip.String(), src_host)
+    if err != nil {
+        fmt.Println("error logging request: ", err.Error())
+    }
 }
 
 func GetRecords(db *sql.DB, name string, rrtype uint16) []dns.RR {

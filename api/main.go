@@ -22,24 +22,24 @@ type RecordRequest struct {
 	Domain string
 }
 
-func getSOA(db * sql.DB) *dns.SOA {
-    serial := GetSerial(db)
-    var soa = dns.SOA{
-        Hdr: dns.RR_Header{
-            Name:   "messwithdns.com.",
-            Rrtype: dns.TypeSOA,
-            Class:  dns.ClassINET,
-            Ttl:    300, /* RFC 1035 says soa records always should have a ttl of 0 but cloudflare doesn't seem to do that*/
-        },
-        Ns:      "ns1.messwithdns.com.",
-        Mbox:    "julia.wizardzines.com.",
-        Serial:  serial,
-        Refresh: 3600,
-        Retry:   3600,
-        Expire:  7300,
-        Minttl:  3600, // MINIMUM is a lower bound on the TTL field for all RRs in a zone
-    }
-    return &soa
+func getSOA(db *sql.DB) *dns.SOA {
+	serial := GetSerial(db)
+	var soa = dns.SOA{
+		Hdr: dns.RR_Header{
+			Name:   "messwithdns.com.",
+			Rrtype: dns.TypeSOA,
+			Class:  dns.ClassINET,
+			Ttl:    300, /* RFC 1035 says soa records always should have a ttl of 0 but cloudflare doesn't seem to do that*/
+		},
+		Ns:      "ns1.messwithdns.com.",
+		Mbox:    "julia.wizardzines.com.",
+		Serial:  serial,
+		Refresh: 3600,
+		Retry:   3600,
+		Expire:  7300,
+		Minttl:  3600, // MINIMUM is a lower bound on the TTL field for all RRs in a zone
+	}
+	return &soa
 }
 
 func createRecord(db *sql.DB, w http.ResponseWriter, r *http.Request) {
@@ -183,6 +183,23 @@ func specialHandler(db *sql.DB, name string, qtype uint16) []dns.RR {
 	return nil
 }
 
+func logDNSRequest(db *sql.DB, request *dns.Msg, response *dns.Msg, remote_addr net.IP) {
+	// get remote host
+	names, err := net.LookupAddr(remote_addr.String())
+	if err != nil {
+		fmt.Println("Error looking up remote host: ", err.Error())
+		return
+	}
+	var remote_host string
+	if len(names) == 0 {
+		remote_host = ""
+	} else {
+		remote_host = names[0]
+	}
+
+	LogRequest(db, request, response, remote_addr, remote_host)
+}
+
 func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	msg := dns.Msg{}
 	msg.SetReply(r)
@@ -209,6 +226,7 @@ func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	} else {
 		fmt.Println("Response: No records found")
 	}
+    logDNSRequest(handle.db, r, &msg, w.RemoteAddr().(*net.UDPAddr).IP)
 }
 
 type UnknownRequest struct {

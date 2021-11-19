@@ -73,10 +73,8 @@
 
 
     <div class="flex flex-wrap justify-start md:justify-end bg-white squiggle-top" id="app">
-        <div class="lg:w-1/3">
-        </div>
-        <div id="main" class="bg-white p-8 md:w-1/2 lg:w-1/3 w-full">
-            <div v-if="domain && domain != ''">
+        <div id="experiment-time" v-if="domain && domain != ''" class="flex flex-wrap p-8 left-0 bg-white w-full">
+            <div class="md:w-1/2 lg:w-2/3 w-full mb-16 xl:pl-32">
                 <h1 class="text-2xl mb-8">
                     Your subdomain is: <br><span class="font-bold text-green-700">{{ domain }}.messwithdns.com</span>
                 </h1>
@@ -111,43 +109,7 @@
                     </p>
                 </div>
             </div>
-            <div v-else>
-                <h1 class="font-bold text-3xl text-left mb-8">
-                    Welcome to mess with dns!
-                </h1>
-                <p class="my-8 text-xl">
-                    This is a site where you can do weird DNS
-                    experiments without any risk -- you
-                    can use my domain to do them instead of
-                    worrying about breaking your domain :)
-                </p>
-                <div class="">
-                    <a id="randomSubdomain" class="no-underline bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-xl" :href="'/#' + randomSubdomain()">
-                        Get a random subdomain
-                    </a>
-                </div>
-                <!-- existing subdomain -->
-                <p class="mt-12 mb-2 text-xl">
-                    Or go to an existing subdomain:
-                </p>
-                <div>
-                    <formulate-form @submit="setDomain" class="flex flex-wrap">
-                        <formulate-input name="domain" type="text" :placeholder="randomSubdomain()" outer-class="mt-4" element-class="border
-                                     border-green-700 rounded-lg p-1
-                                     h-full text-xl mr-4" required>
-                        </formulate-input>
-                        <formulate-input type="submit" value="Go" outer-class="mt-4" class="bg-green-600
-                                hover:bg-green-700 text-white font-bold
-                            py-2 px-4 rounded-lg
-                            text-xl"></formulate-input>
-                    </formulate-form>
-                </div>
-
-            </div>
-        </div>
-
-        <div id="sidebar" class="p-8 md:w-1/2 lg:w-1/3 md:overflow-scroll left-0 bg-white" style="height: 80vh">
-            <div id="experiments" v-if="sidebar">
+            <div id="experiments" class="md:w-1/2 lg:w-1/3 w-full  md:overflow-scroll " style="height: 80vh">
                 <h1 class="font-bold  text-2xl text-left mb-4"> Experiments </h1>
                 <hr class="my-4">
                 <p>
@@ -455,13 +417,38 @@ $ curl http://{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
                     </summary>
                 </details>
             </div>
-            <div v-else>
-                <!-- option to open sidebar -->
-                <div class="flex justify-center">
-                    <button class="font-bold py-2 px-4 rounded" @click="sidebar = true">
-                        Show experiments 🡆
-                    </button>
-                </div>
+        </div>
+
+        <div id="main" v-else class="bg-white p-8 md:w-1/2 lg:w-1/3 m-auto">
+            <h1 class="font-bold text-3xl text-left mb-8">
+                Welcome to mess with dns!
+            </h1>
+            <p class="my-8 text-xl">
+                This is a site where you can do weird DNS
+                experiments without any risk -- you
+                can use my domain to do them instead of
+                worrying about breaking your domain :)
+            </p>
+            <div class="">
+                <a id="randomSubdomain" class="no-underline bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-xl" :href="'/#' + randomSubdomain()">
+                    Get a random subdomain
+                </a>
+            </div>
+            <!-- existing subdomain -->
+            <p class="mt-12 mb-2 text-xl">
+                Or go to an existing subdomain:
+            </p>
+            <div>
+                <formulate-form @submit="setDomain" class="flex flex-wrap">
+                    <formulate-input name="domain" type="text" :placeholder="randomSubdomain()" outer-class="mt-4" element-class="border
+                                     border-green-700 rounded-lg p-1
+                                     h-full text-xl mr-4" required>
+                    </formulate-input>
+                    <formulate-input type="submit" value="Go" outer-class="mt-4" class="bg-green-600
+                                hover:bg-green-700 text-white font-bold
+                            py-2 px-4 rounded-lg
+                            text-xl"></formulate-input>
+                </formulate-form>
             </div>
 
         </div>
@@ -540,6 +527,13 @@ $ curl http://{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
     <formulate-form name='new-record' @submit="createRecord" v-model="data">
         <fieldset>
             <div class="flex flex-wrap">
+                <formulate-input
+                    class='mr-4'
+                    outer-class="mt-4"
+                    element-class="border border-black rounded-lg mt-2 p-1" 
+                    name="name" label="Name" 
+                    error-behavior="submit"
+                    type="text"></formulate-input>
                 <formulate-input 
                     class='mr-4'
                     outer-class="mt-4"

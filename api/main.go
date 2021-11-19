@@ -192,17 +192,20 @@ func lookupHost(host net.IP) string {
     ipinfoToken := os.Getenv("IPINFO_TOKEN")
     resp, err := http.Get("http://ipinfo.io/" + host.String() + "?token=" + ipinfoToken)
     if err != nil {
+        fmt.Println("Error getting hostname: ", err.Error())
         return ""
     }
     // parse json response
     defer resp.Body.Close()
     body, err := ioutil.ReadAll(resp.Body)
     if err != nil {
+        fmt.Println("Error reading body: ", err.Error())
         return ""
     }
     var ipinfo map[string]interface{}
     err = json.Unmarshal(body, &ipinfo)
     if err != nil {
+        fmt.Println("Error unmarshalling json: ", err.Error())
         return ""
     }
     if ipinfo["org"] != nil {

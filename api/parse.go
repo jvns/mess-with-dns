@@ -17,7 +17,7 @@ func ParseRecord(jsonString []byte) (dns.RR, error) {
 	msg := make([]byte, dns.Len(rr))
 	_, err = dns.PackRR(rr, msg, 0, nil, false)
 	if err != nil {
-		return nil, fmt.Errorf("Invalid RR: %s", err)
+		return nil, fmt.Errorf("Invalid RR: %s, %#v", err, rr)
 	}
 	return rr, nil
 }

@@ -70,7 +70,7 @@ func InsertRecord(db *sql.DB, record dns.RR) {
 
 func GetRecordsForName(db *sql.DB, name string) map[int]dns.RR {
 	fmt.Println(name)
-	rows, err := db.Query("SELECT id, content FROM dns_records WHERE name = ?", name)
+	rows, err := db.Query("SELECT id, content FROM dns_records WHERE name LIKE ?", "%" + name)
 	if err != nil {
 		panic(err.Error())
 	}

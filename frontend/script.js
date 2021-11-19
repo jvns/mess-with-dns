@@ -15,7 +15,7 @@ for (const key in rrTypes) {
 
 Vue.component('record', {
     template: '#view-record',
-    props: ['record'],
+    props: ['record', 'domain'],
     data: function() {
         return {
             schemas: schemas,
@@ -29,6 +29,13 @@ Vue.component('record', {
                 this.updated_record = JSON.parse(JSON.stringify(this.record));
             }
             this.clicked = !this.clicked;
+        },
+        fullName: function() {
+            if (this.record.subname == '@') {
+                return this.domain + ".messwithdns.com.";
+            } else {
+                return this.record.name + '.' + this.domain + ".messwithdns.com.";
+            }
         },
         content: function() {
             var content = "";
@@ -141,9 +148,15 @@ function convertRecord(record) {
     // { "type": "A", "name": "example", "A": "93.184.216.34" }
     // =>
     // { "Hdr": { "Name": "example.messwithdns.com.", "Rrtype": 1, "Class": 1, "Ttl": 5, "Rdlength": 0 }, "A": "93.184.216.34" }
+    var domainName = "";
+    if (record.subname == '@') {
+        domainName = record.name + ".messwithdns.com.";
+    } else {
+        domainName = record.subname + '.' + record.name + ".messwithdns.com.";
+    }
     var newRecord = {
         "Hdr": {
-            "Name": record.name + ".messwithdns.com.",
+            "Name": domainName,
             "Rrtype": rrTypes[record.type],
             "Class": 1,
             "Ttl": parseInt(record.ttl),
@@ -160,7 +173,7 @@ function convertRecord(record) {
         }
         // strip whitespace
         record[key] = record[key].trim();
-        if (key != 'name' && key != 'type' && key != 'ttl') {
+        if (key != 'name' && key != 'subname' && key != 'type' && key != 'ttl') {
             // check if the type is 'number' in the schema
             const field = getSchemaField(record.type, key);
             if (field && field.type == 'number') {
@@ -184,7 +197,7 @@ function getSchemaField(type, key) {
 
 Vue.component('domain-link', {
     template: '#domain-link',
-    props: ['domain'],
+    props: ['domain', 'subdomain'],
 });
 
 var app = new Vue({

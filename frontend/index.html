@@ -130,8 +130,8 @@
                     </summary>
                     <ul>
                         <li> Find the IP address for <code>example.com</code>. You can do this by running <code> dig example.com</code> in your terminal. Or you can just pretend you did it, the IP is <code>93.184.216.34</code> :). </li>
-                        <li> Set an A record pointing <domain-link :domain='domain' subdomain='exp1'> </domain-link> at that IP (<code>93.184.216.34</code>). You can use any TTL you want. </li>
-                        <li> Go to <domain-link :domain='domain' subdomain='exp1'> </domain-link> in your browser. You should get a 404 not found error. </li>
+                        <li> Set an A record pointing <domain-link :domain='domain' subdomain='bad-ip'> </domain-link> at that IP (<code>93.184.216.34</code>). You can use any TTL you want. </li>
+                        <li> Go to <domain-link :domain='domain' subdomain='bad-ip'> </domain-link> in your browser. You should get a 404 not found error. </li>
                     </ul>
                     <p class="my-4">
                     <details>
@@ -165,22 +165,24 @@
                     </p>
                     <ol>
                         <li>
-                            Go to <domain-link subdomain="exp2" :domain='domain'> </domain-link>
+                            Go to <domain-link subdomain="visit-before" :domain='domain'> </domain-link>
                             in your browser. You should get an error like "Server Not Found".
                         </li>
                         <li>
-                            Create a CNAME record pointing <domain-link subdomain="exp2" :domain='domain'> </domain-link>
+                            Create a CNAME record pointing <domain-link subdomain="visit-before" :domain='domain'> </domain-link>
                             at <code>orange-ip.fly.dev</code>, like this:
                             <img src="/images/cname-screenshot.png" class="block border  border-dashed border-green-700 mb-4 mt-2">
                         </li>
                         <li>
-                            Go to <domain-link subdomain="exp2" :domain='domain'> </domain-link> in your browser again. You should get the same "Server Not Found" error as before.
+                            Go to <domain-link subdomain="visit-before" :domain='domain'> </domain-link> in your browser again. You should get the same "Server Not Found" error as before.
                         </li>
                         <li>
                             Repeat this with a different subdomain (
-                            <domain-link subdomain="exp2b" :domain='domain'> </domain-link>)
+                            <domain-link subdomain="visit-after" :domain='domain'> </domain-link>)
                             ,
-                            but <span class="font-bold">don't</span> visit the domain first.
+                            but <span class="font-bold">don't</span> visit the
+                            domain first. This should show your a website with
+                            an orange.
                         </li>
                     </ol>
 
@@ -209,7 +211,7 @@
                     </summary>
                     <ol>
                         <li>
-                            Create a CNAME record pointing <domain-link subdomain="exp3a" :domain='domain'> </domain-link>
+                            Create a CNAME record pointing <domain-link subdomain="long-ttl" :domain='domain'> </domain-link>
                             at <code>orange-ip.fly.dev</code>.
 
                             Use a long TTL like 300000 seconds.
@@ -217,15 +219,15 @@
                             <img src="/images/cname-screenshot-5.png" class="block border border-dashed border-green-700 mb-4 mt-2">
                         </li>
                         <li>
-                            Go to <domain-link subdomain="exp3a" :domain='domain'> </domain-link>
-                            in your browser.
+                            Go to <domain-link subdomain="long-ttl" :domain='domain'> </domain-link>
+                            in your browser. You should see an orange website.
                         </li>
                         <li>
                             Change the CNAME record to point at <code>purple-ip.fly.dev</code> instead.
                             <img src="/images/cname-screenshot-metafilter.png" class="block border border-dashed border-green-700 mb-4 mt-2">
                         </li>
                         <li>
-                            Go to <domain-link subdomain="exp3a" :domain='domain'> </domain-link>
+                            Go to <domain-link subdomain="long-ttl" :domain='domain'> </domain-link>
                             in your browser again. You should see
                             the same orange site -- no change!
                             This is because your old DNS record is
@@ -233,11 +235,11 @@
                         </li>
                         <li>
                             Using
-                            <domain-link subdomain="exp3b" :domain='domain'> </domain-link>
-                            , repeat the same experiment with a short TTL. You might
+                            <domain-link subdomain="short-ttl" :domain='domain'> </domain-link>
+                            , repeat steps 1-4 with a short TTL. You might
                             need to do a force reload (Ctrl+Shift+R or similar)
                             after changing the DNS record to point at the purple site.
-                            This time, the change works! (Also, you can test what happens if you use the same subdomain!)
+                            This time, the change works!
                         </li>
                     </ol>
 
@@ -258,7 +260,7 @@
                 <details class="relative my-8 border border-green-700 p-4">
                     <summary>
                         <h3 class="font-bold text-left mb-8 my-8 inline">
-                            4. Convince 3 different DNS servers that your subdomain has 3 different IPs
+                            4. Convince 3 different DNS servers that your subdomain has 3 different IPs (3-ips)
                             <div style="top: -.8em; right: 2em;" class="px-1 absolute bg-white text-right text-green-700 text-sm">
                                 caching
                             </div>

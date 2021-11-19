@@ -1,4 +1,5 @@
 #!/bin/bash
+source secrets.sh
 set -eu
 
 pscale connect messwithdns development &

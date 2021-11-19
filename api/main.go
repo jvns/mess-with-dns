@@ -188,6 +188,26 @@ func lookupHost(host net.IP) string {
     if err == nil && len(names) > 0 {
         return names[0]
     }
+    // otherwise try ipinfo.io
+    ipinfoToken := os.Getenv("IPINFO_TOKEN")
+    resp, err := http.Get("http://ipinfo.io/" + host.String() + "?token=" + ipinfoToken)
+    if err != nil {
+        return ""
+    }
+    // parse json response
+    defer resp.Body.Close()
+    body, err := ioutil.ReadAll(resp.Body)
+    if err != nil {
+        return ""
+    }
+    var ipinfo map[string]interface{}
+    err = json.Unmarshal(body, &ipinfo)
+    if err != nil {
+        return ""
+    }
+    if ipinfo["org"] != nil {
+        return ipinfo["org"].(string)
+    }
     return ""
 }
 

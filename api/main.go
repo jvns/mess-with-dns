@@ -183,21 +183,12 @@ func specialHandler(db *sql.DB, name string, qtype uint16) []dns.RR {
 	return nil
 }
 
-func logDNSRequest(db *sql.DB, request *dns.Msg, response *dns.Msg, remote_addr net.IP) {
-	// get remote host
-	names, err := net.LookupAddr(remote_addr.String())
-	if err != nil {
-		fmt.Println("Error looking up remote host: ", err.Error())
-		return
-	}
-	var remote_host string
-	if len(names) == 0 {
-		remote_host = ""
-	} else {
-		remote_host = names[0]
-	}
-
-	LogRequest(db, request, response, remote_addr, remote_host)
+func lookupHost(host net.IP) string {
+	names, err := net.LookupAddr(host.String())
+    if err == nil && len(names) > 0 {
+        return names[0]
+    }
+    return ""
 }
 
 func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
@@ -226,7 +217,8 @@ func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	} else {
 		fmt.Println("Response: No records found")
 	}
-    logDNSRequest(handle.db, r, &msg, w.RemoteAddr().(*net.UDPAddr).IP)
+    remote_addr := w.RemoteAddr().(*net.UDPAddr).IP
+	LogRequest(handle.db, r, &msg, remote_addr, lookupHost(remote_addr))
 }
 
 type UnknownRequest struct {

@@ -90,20 +90,7 @@ Vue.component('record', {
             }
         },
         deleteRecord: async function() {
-            var url = '/record/' + this.record.id;
-            var response = await fetch(url, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-            if (response.ok) {
-                // remove record from list
-                var index = app.records.indexOf(this.record);
-                app.records.splice(index, 1);
-            } else {
-                alert('Error deleting record');
-            }
+            await deleteRecord(this.record);
         },
         updateRecord: async function(data) {
             // TODO: terrible inconsistent naming, maybe fix, ugh
@@ -269,6 +256,14 @@ var app = new Vue({
             return records;
         },
 
+        clearAll: function() {
+            if (confirm('Are you sure you want to delete all records?')) {
+                for (var record of this.records) {
+                    deleteRecord(record);
+                }
+            }
+        },
+
 
         currDomain: function() {
             return this.domain || 'your-domain';
@@ -334,6 +329,23 @@ async function updateHash() {
         app.events.unshift(data);
     };
     window.events = app.events;
+}
+
+async function deleteRecord(record) {
+    var url = '/record/' + record.id;
+    var response = await fetch(url, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+    if (response.ok) {
+        // remove record from list
+        var index = app.records.indexOf(record);
+        app.records.splice(index, 1);
+    } else {
+        alert('Error deleting record');
+    }
 }
 
 updateHash();

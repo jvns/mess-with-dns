@@ -105,7 +105,7 @@
 
                 <h2 class="font-bold text-xl mb-4 mt-12"> All DNS records </h2>
                 <div v-if="records && records.length > 0">
-                    <table class="w-full">
+                    <table class="w-full" id="records">
                         <tr class="bg-gray-100 border border-gray-300">
                             <th class="text-left px-4 py-2">
                                 Name
@@ -125,10 +125,20 @@
                         </tr>
                         <tbody is="record" v-for="record in records" :key="record.id" :record="record" :domain="domain" />
                     </table>
+                    <div class="text-right mt-4">
+                        <button id="clear-all" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" @click="clearAll()">
+                            Clear All
+                        </button>
+                    </div>
+                </div>
+                <div v-else-if="records">
+                    <p id="records">
+                        No records yet! You can add one!
+                    </p>
                 </div>
                 <div v-else>
                     <p>
-                        No records yet! You can add one!
+                        Loading...
                     </p>
                 </div>
 
@@ -702,6 +712,7 @@ $ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep 
         </div>
         <div class="flex">
         <formulate-input 
+            id="create"
             outer-class="mr-auto mt-4"
             element-class="hover:bg-green-700  bg-green-500 text-white py-2 px-4 rounded"
             type="submit" label="Create"></formulate-input>

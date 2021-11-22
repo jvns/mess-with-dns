@@ -79,10 +79,12 @@ test('add CNAME record', async ({
         path: 'preload.js'
     });
     await page.goto('http://localhost:8080/#brain-juice');
-    await page.waitForSelector('.formulate-input-element--submit--label')
-    await page.selectOption('#formulate-global-3', 'CNAME')
-    await page.type('#formulate-global-7', 'example.com')
-    await page.type('#formulate-global-5', '30')
+    await page.waitForSelector('#records')
+    await page.type("[name='subname']", "bananas");
+    await page.selectOption("[name='type']", 'CNAME')
+    await page.type("[name='target']", 'example.com')
+    await page.type("[name='ttl']", '30')
+    await page.click('#create')
     expect(await page.screenshot()).toMatchSnapshot('add-cname-record-edit.png');
 });
 
@@ -95,17 +97,24 @@ test('test saving record', async ({
     });
     await page.goto('http://localhost:8080/#cord-wrinkle')
 
-    await page.waitForSelector('#formulate-global-4')
-    await page.type('#formulate-global-4', '1.2.3.4')
-    await page.type('#formulate-global-5', '30')
-    await page.click('#formulate-global-6 > .formulate-input-element--submit--label')
+    await page.waitForSelector('#records')
+    await page.type("[name='subname']", "bananas");
+    await page.type("[name='A']", '1.2.3.4')
+    await page.type("[name='ttl']", '30')
+    await page.click('#create')
 
     await page.waitForSelector('.edit')
     await page.click('.edit')
 
-    await page.waitForSelector('#formulate-global-8')
-    await page.type('#formulate-global-8', '40')
-
+    page.on('dialog', dialog => dialog.accept());
+    await page.waitForSelector("td [name='ttl']")
+    await page.type("td [name='ttl']", '10')
     await page.click('.save')
+    await page.waitForSelector("td [name='ttl']", {
+        state: 'detached'
+    })
+    await new Promise(resolve => setTimeout(resolve, 50));
     expect(await page.screenshot()).toMatchSnapshot('save-record.png');
+    await page.click('#clear-all')
+    await new Promise(resolve => setTimeout(resolve, 100));
 });

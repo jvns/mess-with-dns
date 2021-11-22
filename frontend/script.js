@@ -106,10 +106,10 @@ Vue.component('record', {
                 body: JSON.stringify(record),
             });
             if (response.ok) {
+                this.clicked = false;
                 // update record in list
                 var index = app.records.indexOf(this.record);
                 app.records[index] = this.updated_record;
-                this.clicked = false;
                 updateHash();
             } else {
                 alert('Error updating record');

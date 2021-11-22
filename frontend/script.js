@@ -13,6 +13,43 @@ for (const key in rrTypes) {
     rrTypesReverse[rrTypes[key]] = key;
 }
 
+Vue.component('view-request', {
+    template: '#view-request',
+    props: ['event'],
+    data: function() {
+        return {
+            clicked: false,
+            rrTypesReverse: rrTypesReverse,
+        };
+    },
+    methods: {
+        localTime: function(timestamp) {
+            // convert to local time
+            var date = new Date(timestamp * 1000);
+            // only show time, not day
+            // 24-hour format
+            var hours = date.getHours();
+            var minutes = "0" + date.getMinutes();
+            var seconds = "0" + date.getSeconds();
+            var formattedTime = hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
+            return formattedTime;
+        },
+        formatFull(answer) {
+            return rrTypesReverse[answer.Hdr.Rrtype] + ' ' + this.formatContent(answer);
+        },
+        formatContent(answer) {
+            var result = '';
+            for (var key in answer) {
+                if (key == 'Hdr') {
+                    continue;
+                }
+                result += answer[key] + ' ';
+            }
+            return result;
+        },
+    }
+});
+
 Vue.component('record', {
     template: '#view-record',
     props: ['record', 'domain'],
@@ -208,7 +245,6 @@ var app = new Vue({
         events: [],
         records: undefined,
         words: undefined,
-        rrTypesReverse: rrTypesReverse,
         sidebar: true,
     },
 
@@ -227,21 +263,8 @@ var app = new Vue({
             }
             return records;
         },
-        localTime: function(timestamp) {
-            // convert to local time
-            var date = new Date(timestamp * 1000);
-            return date.toLocaleString();
-        },
-        formatAnswer(answer) {
-            var result = "";
-            for (var key in answer) {
-                if (key == 'Hdr') {
-                    continue;
-                }
-                result += answer[key] + ' ';
-            }
-            return result;
-        },
+
+
         currDomain: function() {
             return this.domain || 'your-domain';
         },

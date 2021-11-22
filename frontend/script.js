@@ -205,10 +205,13 @@ var app = new Vue({
     data: {
         schemas: schemas,
         domain: undefined,
+        events: [],
         records: undefined,
         words: undefined,
+        rrTypesReverse: rrTypesReverse,
         sidebar: true,
     },
+
     methods: {
         getRecords: async function(domain) {
             const response = await fetch('/domains/' + domain);
@@ -223,6 +226,21 @@ var app = new Vue({
                 records.push(record);
             }
             return records;
+        },
+        localTime: function(timestamp) {
+            // convert to local time
+            var date = new Date(timestamp * 1000);
+            return date.toLocaleString();
+        },
+        formatAnswer(answer) {
+            var result = "";
+            for (var key in answer) {
+                if (key == 'Hdr') {
+                    continue;
+                }
+                result += answer[key] + ' ';
+            }
+            return result;
         },
         currDomain: function() {
             return this.domain || 'your-domain';
@@ -268,7 +286,6 @@ var app = new Vue({
     },
 });
 
-
 async function updateHash() {
     var hash = window.location.hash;
     if (hash.length == 0) {
@@ -278,6 +295,17 @@ async function updateHash() {
     var domain = hash.substring(1);
     app.domain = domain;
     app.records = await app.getRecords(domain);
+    app.events = [];
+    // TODO: maybe initial events should be a different endpoint from ongoing
+    // events
+    const source = new EventSource('/events/' + domain);
+    source.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        data.request = JSON.parse(data.request);
+        data.response = JSON.parse(data.response);
+        app.events.unshift(data);
+    };
+    window.events = app.events;
 }
 
 updateHash();

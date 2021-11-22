@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
     "net"
+    "time"
 	"os"
+    "strings"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/miekg/dns"
@@ -108,7 +110,63 @@ func LogRequest(db *sql.DB, request *dns.Msg, response *dns.Msg, src_ip net.IP, 
     if err != nil {
         fmt.Println("error logging request: ", err.Error())
     }
+    StreamRequest(name, jsonRequest, jsonResponse, src_ip.String(), src_host)
 }
+
+func StreamRequest(name string, request []byte, response []byte, src_ip string, src_host string) {
+    // get base domain
+    parts := strings.Split(name, ".")
+    base := strings.Join(parts[len(parts)-4:], ".")
+    x := map[string]interface{}{
+        "created_at": time.Now().Unix(),
+        "request": string(request),
+        "response": string(response),
+        "src_ip": src_ip,
+        "src_host": src_host,
+    }
+    jsonString, err := json.Marshal(x)
+    if err != nil {
+        panic(err.Error())
+        return
+    }
+    WriteToStreams(base, jsonString)
+}
+
+func GetRequests(db *sql.DB, domain string) []map[string]interface{} {
+    rows, err := db.Query("SELECT id, created_at, request, response, src_ip, src_host FROM dns_requests WHERE name LIKE ?", "%" + domain)
+    if err != nil {
+        panic(err.Error())
+    }
+    requests := make([]map[string]interface{}, 0)
+    for rows.Next() {
+        var id int
+        var created_at string
+        var request []byte
+        var response []byte
+        var src_ip string
+        var src_host string
+        err = rows.Scan(&id, &created_at, &request, &response, &src_ip, &src_host)
+        // parse created at to unix time
+        created_time, err := time.Parse("2006-01-02 15:04:05", created_at)
+        if err != nil {
+            panic(err.Error())
+        }
+        if err != nil {
+            panic(err.Error())
+        }
+        x := map[string]interface{}{
+            "id": id,
+            "created_at": created_time.Unix(),
+            "request": string(request),
+            "response": string(response),
+            "src_ip": src_ip,
+            "src_host": src_host,
+        }
+        requests = append(requests, x)
+    }
+    return requests
+}
+
 
 func GetRecords(db *sql.DB, name string, rrtype uint16) []dns.RR {
 	// return cname records if they exist

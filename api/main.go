@@ -42,6 +42,43 @@ func getSOA(db *sql.DB) *dns.SOA {
 	return &soa
 }
 
+func streamRequests(db *sql.DB, name string, w http.ResponseWriter, r *http.Request) {
+    domain := name + ".messwithdns.com."
+    requests := GetRequests(db, domain)
+    stream := CreateStream(domain)
+    defer stream.Delete()
+    c := stream.Get()
+    // server side events
+    w.Header().Set("Content-Type", "text/event-stream")
+    w.Header().Set("Cache-Control", "no-cache")
+    w.Header().Set("Connection", "keep-alive")
+    w.WriteHeader(http.StatusOK)
+    // send initial data
+    for _, request := range requests {
+        jsonOutput, err := json.Marshal(request)
+        if err != nil {
+            fmt.Println("Error marshalling json: ", err.Error())
+            w.WriteHeader(http.StatusInternalServerError)
+            return
+        }
+        w.Write([]byte("data: " + string(jsonOutput) + "\n\n"))
+    }
+    if f, ok := w.(http.Flusher); ok {
+        f.Flush()
+    }
+    // read from channel
+    // read message from channel
+    for {
+        select {
+        case msg := <-c:
+            w.Write([]byte("data: " + string(msg) + "\n\n"))
+            if f, ok := w.(http.Flusher); ok {
+                f.Flush()
+            }
+        }
+    }
+}
+
 func createRecord(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -128,6 +165,9 @@ func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// GET /domain/test : get everything from test.messwithdns.com.
 	case r.Method == "GET" && n == 2 && p[0] == "domains":
 		getDomains(handle.db, p[1], w, r)
+	// GET /events/test
+	case r.Method == "GET" && n == 2 && p[0] == "events":
+		streamRequests(handle.db, p[1], w, r)
 	// POST /record/new: add a new record
 	case r.Method == "POST" && n == 2 && p[0] == "record" && p[1] == "new":
 		createRecord(handle.db, w, r)

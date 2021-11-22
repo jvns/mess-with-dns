@@ -106,6 +106,7 @@ Vue.component('record', {
             }
         },
         updateRecord: async function(data) {
+            console.log('hiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii');
             var url = '/record/' + this.record.id;
             const record = convertRecord(data);
             var response = await fetch(url, {
@@ -208,8 +209,10 @@ function convertRecord(record) {
                 record[key] += '.';
             }
         }
-        // strip whitespace
-        record[key] = record[key].trim();
+        // trim if it's a string
+        if (typeof record[key] == 'string') {
+            record[key] = record[key].trim();
+        }
         if (key != 'name' && key != 'subname' && key != 'type' && key != 'ttl') {
             // check if the type is 'number' in the schema
             const field = getSchemaField(record.type, key);

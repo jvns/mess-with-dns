@@ -637,6 +637,9 @@ $ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep 
                     </div>
 
                     <div class="flex text-right mt-4">
+                        <formulate-input 
+                        element-class="save hover:bg-green-700 ml-4 bg-green-500 text-white py-2 px-4 rounded"
+                        type="submit" label="Save"></formulate-input>
                         <button class="delete hover:bg-gray-400 mr-auto bg-gray-200 py-2 px-4 rounded" @click="confirmDelete()">
                             Delete
                         </button>
@@ -644,9 +647,6 @@ $ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep 
                             Cancel
                         </button>
 
-                        <formulate-input 
-                        element-class="save hover:bg-green-700 ml-4 bg-green-500 text-white py-2 px-4 rounded"
-                        type="submit" label="Save"></formulate-input>
                     </div>
             </formulate-form>
             </td>

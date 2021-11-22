@@ -106,7 +106,9 @@ Vue.component('record', {
             }
         },
         updateRecord: async function(data) {
-            console.log('hiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii');
+            // TODO: terrible inconsistent naming, maybe fix, ugh
+            data.subname = this.record.name;
+            data.name = this.domain;
             var url = '/record/' + this.record.id;
             const record = convertRecord(data);
             var response = await fetch(url, {

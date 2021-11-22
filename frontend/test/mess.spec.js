@@ -51,11 +51,11 @@ test('add and delete A record', async ({
     await browserContext.addInitScript({
         path: 'preload.js'
     });
-
+    page.on('dialog', dialog => dialog.accept());
     await page.goto('http://localhost:8080/#brain-juice');
     await page.waitForSelector('#records')
 
-    await page.click("[name='A']");
+    await page.type("[name='subname']", "bananas");
     await page.type("[name='A']", '1.2.3.4')
     await page.type("[name='ttl']", '30')
     await page.click('#create')
@@ -65,8 +65,9 @@ test('add and delete A record', async ({
     expect(await page.screenshot()).toMatchSnapshot('add-a-record-edit.png');
 
     await page.waitForSelector('.delete')
-    page.on('dialog', dialog => dialog.accept());
     await page.click('.delete')
+    // sleep for a bit to allow the delete to happen
+    await new Promise(resolve => setTimeout(resolve, 500));
     expect(await page.screenshot()).toMatchSnapshot('add-a-record-deleted.png');
 });
 

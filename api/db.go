@@ -113,10 +113,18 @@ func LogRequest(db *sql.DB, request *dns.Msg, response *dns.Msg, src_ip net.IP, 
     StreamRequest(name, jsonRequest, jsonResponse, src_ip.String(), src_host)
 }
 
+func max(a, b int) int {
+    if a > b {
+        return a
+    }
+    return b
+}
+
 func StreamRequest(name string, request []byte, response []byte, src_ip string, src_host string) {
     // get base domain
     parts := strings.Split(name, ".")
-    base := strings.Join(parts[len(parts)-4:], ".")
+    start := max(0, len(parts) - 4)
+    base := strings.Join(parts[start:], ".")
     x := map[string]interface{}{
         "created_at": time.Now().Unix(),
         "request": string(request),

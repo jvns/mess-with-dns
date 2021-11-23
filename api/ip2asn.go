@@ -32,11 +32,11 @@ func parseInt(s string) int {
 }
 
 func ReadRanges() (Ranges, error) {
-    ipv4Ranges, err := ReadASNs("ip2asn-v4.txt")
+    ipv4Ranges, err := ReadASNs("ip2asn-v4.tsv")
     if err != nil {
         return Ranges{}, err
     }
-    ipv6Ranges, err := ReadASNs("ip2asn-v6.txt")
+    ipv6Ranges, err := ReadASNs("ip2asn-v6.tsv")
     if err != nil {
         return Ranges{}, err
     }
@@ -86,12 +86,17 @@ func ReadASNs(filename string) ([]IPRange, error) {
         // split line
         fields := strings.Split(line, "\t")
         // parse fields
+        name := fields[4]
+        // only take part after " - "
+        if strings.Contains(name, " - ") {
+            name = strings.Split(name, " - ")[1]
+        }
         IPRange := IPRange{
             StartIP: net.ParseIP(fields[0]),
             EndIP: net.ParseIP(fields[1]),
             Num: parseInt(fields[2]),
             Country: fields[3],
-            Name: fields[4],
+            Name: name,
         }
         lines = append(lines, IPRange)
     }

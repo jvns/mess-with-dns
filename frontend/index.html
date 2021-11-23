@@ -725,7 +725,7 @@ $ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep 
         <tr @click="clicked = !clicked">
             <td> {{ localTime(event.created_at) }} </td>
             <td>
-                {{event.src_host}}:
+                {{event.src_host}}
             </td>
             <td>
                 {{rrTypesReverse[event.request.Question[0].Qtype]}}

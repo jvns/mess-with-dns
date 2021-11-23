@@ -10,6 +10,11 @@ import (
     "strings"
 )
 
+type Ranges struct {
+    IPv4Ranges []IPRange
+    IPv6Ranges []IPRange
+}
+
 type IPRange struct {
     StartIP net.IP
     EndIP net.IP
@@ -26,14 +31,28 @@ func parseInt(s string) int {
     return i
 }
 
-func FindASN46(ipv4Ranges []IPRange, ipv6Ranges []IPRange, ip net.IP) (IPRange, error) {
-    if ip.To4() != nil {
-        return FindASN(ipv4Ranges, ip)
-    } else {
-        return FindASN(ipv6Ranges, ip)
+func ReadRanges() (Ranges, error) {
+    ipv4Ranges, err := ReadASNs("ip2asn-v4.txt")
+    if err != nil {
+        return Ranges{}, err
     }
+    ipv6Ranges, err := ReadASNs("ip2asn-v6.txt")
+    if err != nil {
+        return Ranges{}, err
+    }
+    return Ranges{
+        IPv4Ranges: ipv4Ranges,
+        IPv6Ranges: ipv6Ranges,
+    }, nil
 }
 
+func (ranges Ranges) FindASN(ip net.IP) (IPRange, error) {
+    if ip.To4() != nil {
+        return FindASN(ranges.IPv4Ranges, ip)
+    } else {
+        return FindASN(ranges.IPv6Ranges, ip)
+    }
+}
 
 func FindASN(lines []IPRange, ip net.IP) (IPRange, error) {
     // binary search

@@ -15,8 +15,8 @@ import (
 )
 
 type handler struct {
-	db *sql.DB
-    ipRanges *Ranges
+	db       *sql.DB
+	ipRanges *Ranges
 }
 
 type RecordRequest struct {
@@ -44,40 +44,40 @@ func getSOA(db *sql.DB) *dns.SOA {
 }
 
 func streamRequests(db *sql.DB, name string, w http.ResponseWriter, r *http.Request) {
-    domain := name + ".messwithdns.com."
-    requests := GetRequests(db, domain)
-    stream := CreateStream(domain)
-    defer stream.Delete()
-    c := stream.Get()
-    // server side events
-    w.Header().Set("Content-Type", "text/event-stream")
-    w.Header().Set("Cache-Control", "no-cache")
-    w.Header().Set("Connection", "keep-alive")
-    w.WriteHeader(http.StatusOK)
-    // send initial data
-    for _, request := range requests {
-        jsonOutput, err := json.Marshal(request)
-        if err != nil {
-            fmt.Println("Error marshalling json: ", err.Error())
-            w.WriteHeader(http.StatusInternalServerError)
-            return
-        }
-        w.Write([]byte("data: " + string(jsonOutput) + "\n\n"))
-    }
-    if f, ok := w.(http.Flusher); ok {
-        f.Flush()
-    }
-    // read from channel
-    // read message from channel
-    for {
-        select {
-        case msg := <-c:
-            w.Write([]byte("data: " + string(msg) + "\n\n"))
-            if f, ok := w.(http.Flusher); ok {
-                f.Flush()
-            }
-        }
-    }
+	domain := name + ".messwithdns.com."
+	requests := GetRequests(db, domain)
+	stream := CreateStream(domain)
+	defer stream.Delete()
+	c := stream.Get()
+	// server side events
+	w.Header().Set("Content-Type", "text/event-stream")
+	w.Header().Set("Cache-Control", "no-cache")
+	w.Header().Set("Connection", "keep-alive")
+	w.WriteHeader(http.StatusOK)
+	// send initial data
+	for _, request := range requests {
+		jsonOutput, err := json.Marshal(request)
+		if err != nil {
+			fmt.Println("Error marshalling json: ", err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		w.Write([]byte("data: " + string(jsonOutput) + "\n\n"))
+	}
+	if f, ok := w.(http.Flusher); ok {
+		f.Flush()
+	}
+	// read from channel
+	// read message from channel
+	for {
+		select {
+		case msg := <-c:
+			w.Write([]byte("data: " + string(msg) + "\n\n"))
+			if f, ok := w.(http.Flusher); ok {
+				f.Flush()
+			}
+		}
+	}
 }
 
 func createRecord(db *sql.DB, w http.ResponseWriter, r *http.Request) {
@@ -226,15 +226,15 @@ func specialHandler(db *sql.DB, name string, qtype uint16) []dns.RR {
 
 func lookupHost(ranges *Ranges, host net.IP) string {
 	names, err := net.LookupAddr(host.String())
-    if err == nil && len(names) > 0 {
-        return names[0]
-    }
-    // otherwise search ASN database
-    r, err := ranges.FindASN(host)
-    if err != nil {
-        return ""
-    }
-    return r.Name
+	if err == nil && len(names) > 0 {
+		return names[0]
+	}
+	// otherwise search ASN database
+	r, err := ranges.FindASN(host)
+	if err != nil {
+		return ""
+	}
+	return r.Name
 }
 
 func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
@@ -263,7 +263,7 @@ func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	} else {
 		fmt.Println("Response: No records found")
 	}
-    remote_addr := w.RemoteAddr().(*net.UDPAddr).IP
+	remote_addr := w.RemoteAddr().(*net.UDPAddr).IP
 	LogRequest(handle.db, r, &msg, remote_addr, lookupHost(handle.ipRanges, remote_addr))
 }
 
@@ -273,12 +273,12 @@ type UnknownRequest struct {
 
 func main() {
 	db := connect()
-    defer db.Close()
-    ranges, err := ReadRanges()
-    if err != nil {
-        panic(err)
-    }
-    handler := &handler{db: db, ipRanges: &ranges}
+	defer db.Close()
+	ranges, err := ReadRanges()
+	if err != nil {
+		panic(err)
+	}
+	handler := &handler{db: db, ipRanges: &ranges}
 	// udp port command line argument
 	port := ":53"
 	if len(os.Args) > 1 {

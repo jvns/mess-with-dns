@@ -1,0 +1,69 @@
+a {
+    text-decoration: underline;
+}
+
+.formulate-input-error {
+    list-style: none;
+    margin-left: -.5em;
+    color: red;
+}
+
+li {
+    margin: .5em 0;
+    /* numbers */
+}
+
+ol li {
+    list-style-type: decimal;
+}
+
+ol,
+ul {
+    margin-left: 1em;
+}
+
+pre {
+    /* don't show scrollbar unless needed */
+    overflow: auto;
+    padding: .5em;
+    margin: .5em 0;
+    background-color: #d9f2d9;
+    font-size: .8em;
+}
+
+.formulate-input input {
+    width: 100%;
+}
+
+.formulate-input textarea {
+    width: 100%;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
+.request-table thead {
+    background-color: #eee;
+    border: 1px solid #ccc;
+}
+
+.request-table th {
+    padding: .5em;
+    font-family: monospace;
+    font-size: 1rem;
+}
+
+.request-table td {
+    padding: 5px .5rem;
+    font-family: monospace;
+    font-size: 1rem;
+}

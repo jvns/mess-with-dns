@@ -1,242 +1,35 @@
 import Vue from 'vue/dist/vue.esm.js';
 
 import VueFormulate from '@braid/vue-formulate'
-import * as words from './words.json';
-import * as schemas from './schemas.json';
-import * as rrTypes from './rrTypes.json';
-
 Vue.use(VueFormulate)
 
-// reverse rrTypes
-const rrTypesReverse = {};
-for (const key in rrTypes) {
-    rrTypesReverse[rrTypes[key]] = key;
-}
+import * as words from './words.json';
+import * as schemas from './schemas.json';
+import {
+    transformRecord
+} from './common.js';
 
-Vue.component('view-request', {
-    template: '#view-request',
-    props: ['event'],
-    data: function() {
-        return {
-            clicked: false,
-            rrTypesReverse: rrTypesReverse,
-        };
-    },
-    methods: {
-        localTime: function(timestamp) {
-            // convert to local time
-            var date = new Date(timestamp * 1000);
-            // only show time, not day
-            // 24-hour format
-            var hours = date.getHours();
-            var minutes = "0" + date.getMinutes();
-            var seconds = "0" + date.getSeconds();
-            var formattedTime = hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
-            return formattedTime;
-        },
-        formatFull(answer) {
-            return rrTypesReverse[answer.Hdr.Rrtype] + ' ' + this.formatContent(answer);
-        },
-        formatContent(answer) {
-            var result = '';
-            for (var key in answer) {
-                if (key == 'Hdr') {
-                    continue;
-                }
-                result += answer[key] + ' ';
-            }
-            return result;
-        },
-    }
-});
 
-Vue.component('record', {
-    template: '#view-record',
-    props: ['record', 'domain'],
-    data: function() {
-        return {
-            schemas: schemas,
-            clicked: false,
-            updated_record: {},
-        };
-    },
-    methods: {
-        toggle: function() {
-            if (!this.clicked) {
-                this.updated_record = JSON.parse(JSON.stringify(this.record));
-            }
-            this.clicked = !this.clicked;
-        },
-        fullName: function() {
-            if (this.record.subname == '@') {
-                return this.domain + ".messwithdns.com.";
-            } else {
-                return this.record.name + '.' + this.domain + ".messwithdns.com.";
-            }
-        },
-        content: function() {
-            var content = "";
-            for (const key in this.record) {
-                if (key == 'name' || key == 'type' || key == 'ttl' || key == 'id') {
-                    continue;
-                }
-                content += this.record[key] + " ";
-            }
-            return content;
-        },
-        confirmDelete: function() {
-            if (confirm('Are you sure you want to delete this record?')) {
-                this.deleteRecord();
-            }
-        },
-        deleteRecord: async function() {
-            await deleteRecord(this.record);
-        },
-        updateRecord: async function(data) {
-            // TODO: terrible inconsistent naming, maybe fix, ugh
-            data.subname = this.record.name;
-            data.name = this.domain;
-            var url = '/record/' + this.record.id;
-            const record = convertRecord(data);
-            var response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(record),
-            });
-            if (response.ok) {
-                this.clicked = false;
-                // update record in list
-                var index = app.records.indexOf(this.record);
-                app.records[index] = this.updated_record;
-                updateHash();
-            } else {
-                alert('Error updating record');
-            }
-        },
-    },
-});
+import ViewRecord from './components/ViewRecord.ts';
+import ViewRequest from './components/ViewRequest.js';
+import NewRecord from './components/NewRecord.js';
+import DomainLink from './components/DomainLink.js';
+import Experiments from './components/Experiments.js';
 
-Vue.component('new-record', {
-    template: '#new-record',
-    props: ['domain'],
-    data: function() {
-        return {
-            schemas: schemas,
-            type: 'A',
-            data: undefined,
-            // don't include 'default' in keys
-            options: Object.keys(schemas).filter(key => key != 'default'),
-            error: undefined,
-        };
-    },
-    created: function() {
-        // clear error when type is changed
-        this.$watch('type', function() {
-            this.error = undefined;
-        });
-    },
+Vue.component('record', ViewRecord);
+Vue.component('view-request', ViewRequest);
+Vue.component('new-record', NewRecord);
+Vue.component('domain-link', DomainLink);
+Vue.component('experiments', Experiments);
 
-    methods: {
-        createRecord: async function(data) {
-            // { "type": "A", "name": "example", "A": "93.184.216.34" }
-            // =>
-            // { "Hdr": { "Name": "example.messwithdns.com.", "Rrtype": 1, "Class": 1, "Ttl": 5, "Rdlength": 0 }, "A": "93.184.216.34" }
-            data.name = this.domain;
-            const record = convertRecord(data);
-            const response = await fetch('/record/new', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(record)
-            });
-            // check for errors
-            if (response.status != 200) {
-                this.error = await response.text();
-                return;
-            }
-            this.error = undefined;
-            updateHash();
-            // clear form but keep type
-            const type = this.data.type;
-            document.activeElement.blur();
-            this.$formulate.reset('new-record')
-            this.data = {
-                type: type
-            };
-        },
-    }
-});
 
-function convertRecord(record) {
-    // convert to api format
-    // { "type": "A", "name": "example", "A": "93.184.216.34" }
-    // =>
-    // { "Hdr": { "Name": "example.messwithdns.com.", "Rrtype": 1, "Class": 1, "Ttl": 5, "Rdlength": 0 }, "A": "93.184.216.34" }
-    var domainName = "";
-    if (record.subname == '@') {
-        domainName = record.name + ".messwithdns.com.";
-    } else {
-        domainName = record.subname + '.' + record.name + ".messwithdns.com.";
-    }
-    var newRecord = {
-        "Hdr": {
-            "Name": domainName,
-            "Rrtype": rrTypes[record.type],
-            "Class": 1,
-            "Ttl": parseInt(record.ttl),
-            "Rdlength": 0,
-        },
-    }
-    // copy rest of fields from form directly
-    for (var key in record) {
-        if (key == 'Target' || key == 'Mx' || key == 'Ns') {
-            // make sure it's a FQDN
-            if (!record[key].endsWith('.')) {
-                record[key] += '.';
-            }
-        }
-        // trim if it's a string
-        if (typeof record[key] == 'string') {
-            record[key] = record[key].trim();
-        }
-        if (key != 'name' && key != 'subname' && key != 'type' && key != 'ttl') {
-            // check if the type is 'number' in the schema
-            const field = getSchemaField(record.type, key);
-            if (field && field.type == 'number') {
-                newRecord[key] = parseInt(record[key]);
-            } else {
-                newRecord[key] = record[key];
-            }
-        }
-    }
-    return newRecord;
-}
-
-function getSchemaField(type, key) {
-    const fields = schemas[type];
-    for (const field of fields) {
-        if (field.name == key) {
-            return field;
-        }
-    }
-}
-
-Vue.component('domain-link', {
-    template: '#domain-link',
-    props: ['domain', 'subdomain'],
-});
-
-var app = new Vue({
+const vm = new Vue({
     el: '#app',
     data: {
         schemas: schemas,
         domain: undefined,
         events: [],
         records: undefined,
-        words: undefined,
         sidebar: true,
     },
 
@@ -244,11 +37,10 @@ var app = new Vue({
         getRecords: async function(domain) {
             const response = await fetch('/domains/' + domain);
             const json = await response.json();
-            // transform records
             // id is key, value is record
             const records = [];
             for (var key in json) {
-                const record = this.transformRecord(json[key]);
+                const record = transformRecord(json[key]);
                 // parse key as int
                 record.id = parseInt(key);
                 records.push(record);
@@ -259,36 +51,15 @@ var app = new Vue({
         clearAll: function() {
             if (confirm('Are you sure you want to delete all records?')) {
                 for (var record of this.records) {
-                    deleteRecord(record);
+                    this.deleteRecord(record);
                 }
             }
         },
 
-
-        currDomain: function() {
-            return this.domain || 'your-domain';
-        },
-        transformRecord: function(record) {
-            // { "Hdr": { "Name": "example.messwithdns.com.", "Rrtype": 1, "Class": 1, "Ttl": 5, "Rdlength": 0 }, "A": "
-            // =>
-            // { ttl: 5, name: "example", type: 'A' }
-            var basic = {
-                ttl: record.Hdr.Ttl,
-                name: record.Hdr.Name.split('.')[0],
-                type: rrTypesReverse[record.Hdr.Rrtype],
-            };
-            // copy rest of fields from record directly
-            for (var key in record) {
-                if (key != 'Hdr') {
-                    basic[key] = record[key];
-                }
-            }
-            return basic;
-        },
         setDomain: function(data) {
             this.domain = data.domain;
-            window.location.hash = app.domain;
-            updateHash()
+            window.location.hash = this.domain;
+            this.updateHash()
         },
         randomSubdomain: function() {
             // predicate - object
@@ -306,48 +77,50 @@ var app = new Vue({
                 domain: domain
             });
         },
-    },
-});
-
-async function updateHash() {
-    var hash = window.location.hash;
-    if (hash.length == 0) {
-        app.domain = undefined;
-        return;
-    }
-    var domain = hash.substring(1);
-    app.domain = domain;
-    app.records = await app.getRecords(domain);
-    app.events = [];
-    // TODO: maybe initial events should be a different endpoint from ongoing
-    // events
-    const source = new EventSource('/events/' + domain);
-    source.onmessage = function(event) {
-        const data = JSON.parse(event.data);
-        data.request = JSON.parse(data.request);
-        data.response = JSON.parse(data.response);
-        app.events.unshift(data);
-    };
-    window.events = app.events;
-}
-
-async function deleteRecord(record) {
-    var url = '/record/' + record.id;
-    var response = await fetch(url, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json',
+        deleteRecord: async function(record) {
+            var url = '/record/' + record.id;
+            var response = await fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            if (response.ok) {
+                // remove record from list
+                var index = this.records.indexOf(record);
+                this.records.splice(index, 1);
+                return true;
+            } else {
+                alert('Error deleting record');
+                return false;
+            }
         },
-    });
-    if (response.ok) {
-        // remove record from list
-        var index = app.records.indexOf(record);
-        app.records.splice(index, 1);
-    } else {
-        alert('Error deleting record');
-    }
-}
+        updateRecord: function(oldRecord, newRecord) {
+            var index = this.records.indexOf(oldRecord);
+            this.records[index] = newRecord;
+        },
 
-updateHash();
-// update hash on change
-window.onhashchange = updateHash;
+        updateHash: async function() {
+            var hash = window.location.hash;
+            if (hash.length == 0) {
+                this.domain = undefined;
+                return;
+            }
+            var domain = hash.substring(1);
+            this.domain = domain;
+            this.records = await this.getRecords(domain);
+            this.events = [];
+            // TODO: maybe initial events should be a different endpoint from ongoing
+            // events
+            const source = new EventSource('/events/' + domain);
+            source.onmessage = event => {
+                const data = JSON.parse(event.data);
+                data.request = JSON.parse(data.request);
+                data.response = JSON.parse(data.response);
+                this.events.unshift(data);
+            };
+        },
+    }
+});
+vm.updateHash();
+window.onhashchange = vm.updateHash;

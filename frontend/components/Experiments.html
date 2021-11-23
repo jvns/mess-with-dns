@@ -1,0 +1,400 @@
+<div id="experiments" class="px-8 md:w-1/2 lg:w-1/3 w-full  md:overflow-scroll " style="height: 80vh">
+    <h1 class="font-bold  text-2xl text-left mb-4"> Experiments </h1>
+    <hr class="my-4">
+    <p>
+        <span class="font-bold">Weird experiments:</span> In these 5 experiments, we break things for fun and learning!
+    </p>
+    <details class="relative mb-8 mt-4 border
+        border-green-700 p-4">
+        <summary>
+            <h3 class="text-left font-bold mb-8 my-8 inline">
+                1. Point to an IP that doesn't recognize your domain
+                <span style="top: -.8em; right: 2em;" class="px-1 absolute bg-white text-right text-green-700 text-sm block">
+                    A records
+                </span>
+            </h3>
+        </summary>
+        <ul>
+            <li> Find the IP address for <code>example.com</code>. You can do this by running <code> dig example.com</code> in your terminal. Or you can just pretend you did it, the IP is <code>93.184.216.34</code> :). </li>
+            <li> Set an A record pointing <domain-link :domain='domain' subdomain='bad-ip'> </domain-link> at that IP (<code>93.184.216.34</code>). You can use any TTL you want. </li>
+            <li> Go to <domain-link :domain='domain' subdomain='bad-ip'> </domain-link> in your browser. You should get a 404 not found error. </li>
+        </ul>
+        <details class="my-4">
+            <summary>
+                <span class="text-green-700">
+                    (click here to see the explanation)
+                </span>
+            </summary>
+            <p>
+                TODO
+            </p>
+        </details>
+    </details>
+    <details class="relative my-4 border border-green-700 p-4">
+        <summary>
+            <h3 class="font-bold text-left mb-8 my-8 inline">
+                2. Visit a domain before creating its record
+                <span style="top: -.8em; right: 2em;" class="px-1 absolute bg-white text-right text-green-700 text-sm block">
+                    caching
+                </span>
+            </h3>
+        </summary>
+
+        <p class="my-4">
+            If you visit a domain before setting your DNS records for
+            that domain, it still won't work for some time after
+            setting the record!
+            Here's an experiment you can do to see
+            that happen yourself:
+        </p>
+        <ol>
+            <li>
+                Go to <domain-link subdomain="visit-before" :domain='domain'> </domain-link>
+                in your browser. You should get an error like "Server Not Found".
+            </li>
+            <li>
+                Create a CNAME record pointing <domain-link subdomain="visit-before" :domain='domain'> </domain-link>
+                at <code>orange-ip.fly.dev</code>, like this:
+                <img src="/images/cname-screenshot.png" class="block border  border-dashed border-green-700 mb-4 mt-2">
+            </li>
+            <li>
+                Go to <domain-link subdomain="visit-before" :domain='domain'> </domain-link> in your browser again. You should get the same "Server Not Found" error as before.
+            </li>
+            <li>
+                Repeat this with a different subdomain (
+                <domain-link subdomain="visit-after" :domain='domain'> </domain-link>)
+                ,
+                but <span class="font-bold">don't</span> visit the
+                domain first. This should show your a website with
+                an orange.
+            </li>
+        </ol>
+
+        <p class="my-4">
+        <details>
+            <summary>
+                <span class="text-green-700">
+                    (click here to see the explanation)
+                </span>
+            </summary>
+            <p>
+                This is because of something called "negative DNS caching" -- DNS servers will cache the <strong>absence</strong> of a record.
+            </p>
+        </details>
+        </p>
+    </details>
+
+    <details class="relative my-8 border border-green-700 p-4">
+        <summary>
+            <h3 class="font-bold text-left mb-8 my-8 inline">
+                3. Test the difference between setting a short TTL and a long TTL
+                <div style="top: -.8em; right: 2em;" class="px-1 absolute bg-white text-right text-green-700 text-sm">
+                    caching
+                </div>
+            </h3>
+        </summary>
+        <ol>
+            <li>
+                Create a CNAME record pointing <domain-link subdomain="long-ttl" :domain='domain'> </domain-link>
+                at <code>orange-ip.fly.dev</code>.
+
+                Use a long TTL like 300000 seconds.
+                <!-- TODO: change screenshots -->
+                <img src="/images/cname-screenshot-5.png" class="block border border-dashed border-green-700 mb-4 mt-2">
+            </li>
+            <li>
+                Go to <domain-link subdomain="long-ttl" :domain='domain'> </domain-link>
+                in your browser. You should see an orange website.
+            </li>
+            <li>
+                Change the CNAME record to point at <code>purple-ip.fly.dev</code> instead.
+                <img src="/images/cname-screenshot-metafilter.png" class="block border border-dashed border-green-700 mb-4 mt-2">
+            </li>
+            <li>
+                Go to <domain-link subdomain="long-ttl" :domain='domain'> </domain-link>
+                in your browser again. You should see
+                the same orange site -- no change!
+                This is because your old DNS record is
+                still cached.
+                You might also notice that there are no new request in the "Requests" section.
+            </li>
+            <li>
+                Using
+                <domain-link subdomain="short-ttl" :domain='domain'> </domain-link>
+                , repeat steps 1-4 with a short TTL. You might
+                need to do a force reload (Ctrl+Shift+R or similar)
+                after changing the DNS record to point at the purple site.
+                This time, the change works!
+            </li>
+        </ol>
+
+        <p class="my-4">
+        <details>
+            <summary>
+                <span class="text-green-700">
+                    (click here to see the explanation)
+                </span>
+            </summary>
+            <p>
+                TODO: add explanation
+            </p>
+        </details>
+        </p>
+    </details>
+
+    <details class="relative my-8 border border-green-700 p-4">
+        <summary>
+            <h3 class="font-bold text-left mb-8 my-8 inline">
+                4. Convince 3 different DNS servers that your subdomain has 3 different IPs (3-ips)
+                <div style="top: -.8em; right: 2em;" class="px-1 absolute bg-white text-right text-green-700 text-sm">
+                    caching
+                </div>
+            </h3>
+        </summary>
+
+        <p class="my-4">
+            Let's create some confusion and chaos! This is usually a bad thing, but let's do it on purpose so that you can see how it could happen accidentally.
+        </p>
+        <p class="my-4">
+            Your goal is to convince:
+        </p>
+        <ul style="list-style-type: disc;" class="pl-8">
+            <li>
+                Google's DNS server that your subdomain has one IP (10.11.12.13),
+            </li>
+            <li>
+                Cloudflare's DNS server that your subdomain has another IP (20.21.22.23)
+            </li>
+            <li>
+                Quad9's DNS server that your subdomain has a third IP (30.31.32.33)
+            </li>
+        </ul>
+
+        <p class="my-4">
+            Let's start!
+        </p>
+        <ol>
+            <li>
+                Create an A record pointing <domain-link subdomain="3-ips" :domain='domain'> </domain-link>
+                at <code>10.11.12.13</code>. Use a long TTL like 3600 seconds.
+                <img src="/images/cname-screenshot-5.png" class="block border border-dashed border-green-700 mb-4 mt-2">
+            </li>
+            <li>
+                In your terminal, run
+                <pre>$ dig @8.8.8.8 3-ips.{{domain}}.messwithdns.com</pre>
+                Run it 10 times just to be safe. Google has many DNS servers, so we want to hit most of them.
+            </li>
+            <li>
+                Change the A record to point at <code>20.21.22.23</code> instead. Keep the TTL the same.
+            </li>
+            <li>
+                Time to tell Cloudflare about the domain! In your terminal, run
+                <pre>$ dig @1.1.1.1 3-ips.{{domain}}.messwithdns.com</pre>
+                Run it a few times.
+            </li>
+            <li>
+                Last change!
+                Change the A record to point at <code>30.31.32.33</code> instead. Keep the TTL the same.
+            </li>
+            <li>
+                Now we'll tell Quad9 about the domain. In your terminal, run
+                <pre>$ dig @9.9.9.9 3-ips.{{domain}}.messwithdns.com</pre>
+            </li>
+            <li>
+                Now, let's ask all 3 providers what they think our IP address is. Here's what I see:
+
+                <pre>
+$ dig @8.8.8.8 3-ips.{{domain}}.messwithdns.com
+bad-ip.ionized-twig.messwithdns.com. 30	IN A	10.11.12.13
+$ dig @1.1.1.1 3-ips.{{domain}}.messwithdns.com
+bad-ip.ionized-twig.messwithdns.com. 30	IN A	20.21.22.23
+$ dig @9.9.9.9 3-ips.{{domain}}.messwithdns.com
+bad-ip.ionized-twig.messwithdns.com. 30	IN A	30.31.32.33
+</pre>
+                All of the 3 DNS servers have different opinion about what our IP address is! Mischief managed.
+
+            </li>
+        </ol>
+        <p class="my-4">
+        <details>
+            <summary>
+                <span class="text-green-700">
+                    (click here to see the explanation)
+                </span>
+            </summary>
+            <p>
+                TODO
+            </p>
+        </details>
+        </p>
+    </details>
+
+    <details class="relative my-8 border border-green-700 p-4">
+        <summary>
+            <h3 class="font-bold text-left mb-8 my-8 inline">
+                5. Set two conflicting A records
+                <div style="top: -.8em; right: 2em;" class="px-1 absolute bg-white text-right text-green-700 text-sm">
+                    A records
+                </div>
+            </h3>
+        </summary>
+
+        What if you set two A records on a domain that refer to totally different sites? Let's find out!
+        <ul>
+            <li> Set an A record pointing <domain-link subdomain="conflict" :domain='domain'> </domain-link> at
+                213.188.218.160 with a TTL of 5 seconds.
+            </li>
+            <li> Set another A record pointing <domain-link subdomain="conflict" :domain='domain'> </domain-link> at
+                213.188.209.192 with a TTL of 5 seconds.
+            </li>
+            <li>
+                In your terminal, run
+                <pre>$ curl http://conflict.{{currDomain()}}.messwithdns.com 2&gt;/dev/null | grep title </pre>
+                10 times.
+                The result you get should change back and forth between 'orange' and 'purple', like this:
+                <pre>
+$ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
+&lt;title&gt;orange&lt;/title&gt;
+$ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
+&lt;title&gt;purple&lt;/title&gt;
+$ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
+&lt;title&gt;orange&lt;/title&gt;
+$ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
+&lt;title&gt;purple&lt;/title&gt;
+$ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
+&lt;title&gt;orange&lt;/title&gt;
+$ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
+&lt;title&gt;purple&lt;/title&gt;
+$ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
+&lt;title&gt;orange&lt;/title&gt;
+$ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
+&lt;title&gt;purple&lt;/title&gt;
+</pre>
+            </li>
+            It can't make up its mind what website it is!
+            <p class="my-4">
+            <details>
+                <summary>
+                    <span class="text-green-700">
+                        (click here to see the explanation)
+                    </span>
+                </summary>
+                <p>
+                    TODO curl is doing like round robin dns blah blah, it's not random,
+                    this is actually used and it's called dns load balancing (obv not with totally different websites)
+                    don't do this as a hack for a/b testing lol
+                </p>
+            </details>
+            </p>
+    </details>
+
+
+    <hr class="my-4">
+    <p>
+        <span class="font-bold">Useful experiments</span>: The rest of the experiments are things that you actually might want to do in real life.
+    </p>
+    <details class="relative my-8 border border-green-700 p-4">
+        <summary>
+            <h3 class="font-bold text-left mb-8 my-8 inline">
+                1. Query the source of truth
+                <div style="top: -.8em; right: 2em;" class="px-1 absolute bg-white text-right text-green-700 text-sm">
+                    authoritative nameserver
+                </div>
+            </h3>
+        </summary>
+
+        <p>
+            In the previous experiments, we were looking at how
+            DNS names are cached. But you can always query the
+            source of truth for a domain: the <strong> authoritative nameserver </strong>.
+        </p>
+
+
+        <p>
+        <ol>
+            <li>
+
+                Create an A record for <domain-link :domain='domain'> </domain-link> at <code>example.com</code>, like this:
+                <img src="/images/cname-screenshot.png" class="block border  border-dashed border-green-700 mb-4 mt-2">
+            </li>
+            <li>
+                In your terminal, run
+                <pre>$ dig +trace {{currDomain()}}.messwithdns.com</pre> to get the authoritative nameserver. The answer should be
+                <pre>ns1.messwithdns.com.</pre>
+            </li>
+            <li>
+                Run:
+                <pre>$ dig @ns1.messwithdns.com {{currDomain()}}.messwithdns.com</pre>
+                to get the A record for your domain
+
+            </li>
+            <li>
+                Make some changes to your A record, run
+                <pre> dig @ns1.messwithdns.com {{currDomain()}}.messwithdns.com </pre> again, and notice the changes are always immediately reflected even if there's a very big TTL!
+            </li>
+        </ol>
+        </p>
+
+
+
+    </details>
+    <details class="relative my-8 border border-green-700 p-4">
+        <summary>
+            <h3 class="font-bold text-left mb-8 my-8 inline">
+                2. Get a Let's Encrypt certificate
+                <div style="top: -.8em; right: 2em;" class="px-1 absolute bg-white text-right text-green-700 text-sm">
+                    TXT records
+                </div>
+            </h3>
+            </h3>
+        </summary>
+    </details>
+
+    <details class="relative my-8 border border-green-700 p-4">
+        <summary>
+            <h3 class="font-bold text-left mb-8 my-8 inline">
+                3. Receive an email
+                <div style="top: -.8em; right: 2em;" class="px-1 absolute bg-white text-right text-green-700 text-sm">
+                    MX records
+                </div>
+            </h3>
+            <ol>
+                <li>
+                    Go to Fastmail and sign up for an email account using the address yourname@{{currDomain()}}.messwithdns.com
+                    (they have a 30-day free trial). The setup option you use don't matter too much.
+                </li>
+                <li>
+                    Add an MX record for <domain-link :domain='domain'> </domain-link> pointing it to <code>ns1.messagingengine.com </code> with preference 10
+                </li>
+                <li>
+                    Add another MX record for <domain-link :domain='domain'> </domain-link> pointing it to <code>ns2.messagingengine.com </code> with preference 20
+                </li>
+                <li>
+                    Check with Fastmail that your MX records are working. There's a button in the settings
+                </li>
+
+
+            </ol>
+        </summary>
+    </details>
+    <details class="relative my-8 border border-green-700 p-4">
+        <summary>
+            <h3 class="font-bold text-left mb-8 my-8 inline">
+                4. Set up Netlify or GitHub Pages
+                <div style="top: -.8em; right: 2em;" class="px-1 absolute bg-white text-right text-green-700 text-sm">
+                    CNAME records
+                </div>
+            </h3>
+        </summary>
+    </details>
+    <details class="relative my-8 border border-green-700 p-4">
+        <summary>
+            <h3 class="font-bold text-left mb-8 my-8 inline">
+                5. Send an email (and pass the SPF check)
+                <div style="top: -.8em; right: 2em;" class="px-1 absolute bg-white text-right text-green-700 text-sm">
+                    TXT records (SPF)
+                </div>
+            </h3>
+        </summary>
+    </details>
+</div>

@@ -1,0 +1,66 @@
+<tbody>
+  <tr class="border border-gray-200 cursor-pointer" @click="toggle()">
+    <td class="px-4 py-2">
+      <a :href="'http://' + fullName()" target="_blank" @click="$event.stopPropagation()">{{ fullName() }}</a>
+    </td>
+    <td class="px-4 py-2">{{ record.type }}</td>
+    <td class="view-content">{{ content() }}</td>
+    <td>{{ record.ttl }}</td>
+    <td class="text-right">
+      <button class="edit hover:text-green-700 text-green-500 font-bold py-2 px-4 rounded">
+        Edit
+        <span v-if="clicked">
+          <svg
+            style="transform: rotate(90deg)"
+            fill="currentColor"
+            class="inline w-4"
+            aria-label="caret-right"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 16 16"
+          >
+            <path
+              d="M4.488 1.85l.854-.353 6.15 6.15v.707l-6.15 6.15-.854-.354V1.85z"
+            ></path>
+          </svg>
+        </span>
+        <span v-else>
+          <svg class="inline w-4" aria-label="caret-right" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+            <path
+              d="M4.488 1.85l.854-.353 6.15 6.15v.707l-6.15 6.15-.854-.354V1.85z"
+            ></path>
+          </svg>
+        </span>
+      </button>
+    </td>
+  </tr>
+  <tr class="border border-gray-200" v-if="clicked">
+    <td colspan="4" class="pl-8">
+      <formulate-form v-model="updated_record" class="mt-2" @submit="updateRecord">
+        <div class="flex">
+          <formulate-input
+            class="ml-4"
+            element-class="border border-black rounded-lg mt-2 p-1"
+            v-for="item in schemas[record.type]"
+            :key="item.name"
+            v-bind="item"
+          ></formulate-input>
+        </div>
+
+        <div class="flex text-right mt-4">
+          <button type="button" class=" delete hover:bg-gray-400 mr-auto bg-gray-200 py-2 px-4 rounded " @click="confirmDelete()">
+            Delete
+          </button>
+          <button type="button" class="hover:bg-gray-400 bg-gray-200 py-2 px-4 rounded" @click="cancel()" >
+            Cancel
+          </button>
+
+          <formulate-input
+            element-class="save hover:bg-green-700 ml-4 bg-green-500 text-white py-2 px-4 rounded"
+            type="submit"
+            label="Save"
+          ></formulate-input>
+        </div>
+      </formulate-form>
+    </td>
+  </tr>
+</tbody>

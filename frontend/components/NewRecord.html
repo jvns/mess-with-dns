@@ -1,0 +1,46 @@
+<formulate-form name="new-record" @submit="createRecord" v-model="data">
+  <fieldset>
+    <div class="flex flex-wrap">
+      <formulate-input
+        class="mr-4"
+        outer-class="mt-4"
+        element-class="border border-black rounded-lg mt-2 p-1"
+        name="subname"
+        label="Name"
+        error-behavior="submit"
+        type="text"
+      ></formulate-input>
+      <formulate-input
+        class="mr-4"
+        outer-class="mt-4"
+        element-class="border border-black rounded-lg mt-2 p-1"
+        name="type"
+        label="Type"
+        error-behavior="submit"
+        v-model="type"
+        type="select"
+        :options="options"
+      ></formulate-input>
+
+      <formulate-input
+        element-class="border border-black rounded-lg mt-2 p-1"
+        class="mr-4"
+        v-for="item in schemas[type]"
+        v-bind:outer-class="((item.name == 'ttl' && 'w-28') || 'w-36') + ' formulate-input mt-4'"
+        error-behavior="submit"
+        :key="item.name"
+        v-bind="item"
+      ></formulate-input>
+    </div>
+  </fieldset>
+  <div style="color: red" v-if="error" class="pt-2">{{error}}</div>
+  <div class="flex w-full">
+    <formulate-input
+      id="create"
+      outer-class="ml-auto mt-4"
+      element-class="hover:bg-green-700  bg-green-500 text-white py-2 px-4 rounded"
+      type="submit"
+      label="Create"
+    ></formulate-input>
+  </div>
+</formulate-form>

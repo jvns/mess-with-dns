@@ -1,0 +1,62 @@
+<tbody>
+  <tr @click="clicked = !clicked">
+    <td>{{ localTime(event.created_at) }}</td>
+    <td>{{event.src_host}}</td>
+    <td>{{rrTypesReverse[event.request.Question[0].Qtype]}}</td>
+    <td>{{event.request.Question[0].Name}}</td>
+    <td class="bg-green-100 border-t border-green-300">
+      <div
+        class="flex justify-between"
+        v-if="event.response.Answer && event.response.Answer.length > 0"
+      >
+        <div>
+          <ul class="p-0 m-0">
+            <li v-for="answer in event.response.Answer">
+              {{formatFull(answer)}}
+            </li>
+          </ul>
+        </div>
+        <span v-if="clicked">
+          <svg
+            style="transform: rotate(90deg)"
+            fill="currentColor"
+            class="inline w-4"
+            aria-label="caret-right"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 16 16"
+          >
+            <path
+              d="M4.488 1.85l.854-.353 6.15 6.15v.707l-6.15 6.15-.854-.354V1.85z"
+            ></path>
+          </svg>
+        </span>
+        <span v-else>
+          <svg
+            class="inline w-4"
+            aria-label="caret-right"
+            fill="currentColor"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 16 16"
+          >
+            <path
+              d="M4.488 1.85l.854-.353 6.15 6.15v.707l-6.15 6.15-.854-.354V1.85z"
+            ></path>
+          </svg>
+        </span>
+      </div>
+      <span v-else> (0 records) </span>
+    </td>
+  </tr>
+  <tr v-if="clicked">
+    <td colspan="4"></td>
+    <td colspan="1" class="bg-green-100 p-8 font-mono">
+      <ul class="p-0 m-0">
+        <li v-for="answer in event.response.Answer">
+          Type: {{rrTypesReverse[answer.Hdr.Rrtype]}}<br />
+          TTL: {{answer.Hdr.Ttl}}<br />
+          Content: {{formatContent(answer)}}
+        </li>
+      </ul>
+    </td>
+  </tr>
+</tbody>

@@ -1,0 +1,112 @@
+import rrTypes from './rrTypes.json';
+import schemas from './schemas.json';
+
+export interface Record {
+    domain: string
+    subdomain: string
+    type: string
+    ttl: string|number
+}
+
+export interface Header {
+    Name: string
+    Rrtype: number
+    Class: number
+    Ttl: number
+    Rdlength: number
+}
+
+export interface GoRecord {
+    Hdr: Header
+}
+
+export const rrTypesReverse = {};
+for (const key in rrTypes) {
+    rrTypesReverse[rrTypes[key]] = key;
+}
+
+export function fullName(record: Record) {
+    if (record.subdomain == '@') {
+        return record.domain + ".messwithdns.com.";
+    } else {
+        return record.subdomain + '.' + record.domain + ".messwithdns.com.";
+    }
+}
+
+export function convertRecord(record: Record): GoRecord {
+    // convert to api format
+    // { "type": "A", "name": "example", "A": "93.184.216.34" }
+    // =>
+    // { "Hdr": { "Name": "example.messwithdns.com.", "Rrtype": 1, "Class": 1, "Ttl": 5, "Rdlength": 0 }, "A": "93.184.216.34" }
+    const domainName = fullName(record);
+    const newRecord: GoRecord = {
+        Hdr: {
+            Name: domainName,
+            Rrtype: rrTypes[record.type],
+            Class: 1,
+            Ttl: parseInt(record.ttl),
+            Rdlength: 0,
+        },
+    }
+    // copy rest of fields from form directly
+    for (const key in record) {
+        if (key == 'Target' || key == 'Mx' || key == 'Ns') {
+            // make sure it's a FQDN
+            if (!record[key].endsWith('.')) {
+                record[key] += '.';
+            }
+        }
+        // trim if it's a string
+        if (typeof record[key] == 'string') {
+            record[key] = record[key].trim();
+        }
+        if (key != 'domain' && key != 'subdomain' && key != 'type' && key != 'ttl') {
+            // check if the type is 'number' in the schema
+            const field = getSchemaField(record.type, key);
+            if (field && field.type == 'number') {
+                newRecord[key] = parseInt(record[key]);
+            } else {
+                newRecord[key] = record[key];
+            }
+        }
+    }
+    return newRecord;
+}
+
+function parseName(name: string): [string, string] {
+    const parts = name.split('.');
+    if (parts.length == 5) {
+        return [parts[0], parts[1]]
+    } else {
+        return ['@', parts[0]]
+    }
+}
+
+export function transformRecord(record: GoRecord): Record {
+    // { "Hdr": { "Name": "example.messwithdns.com.", "Rrtype": 1, "Class": 1, "Ttl": 5, "Rdlength": 0 }, "A": "
+    // =>
+    // { ttl: 5, name: "example", type: 'A' }
+    const [subdomain, domain] = parseName(record.Hdr.Name)
+    var basic = {
+        ttl: record.Hdr.Ttl,
+        domain: domain,
+        subdomain: subdomain,
+        type: rrTypesReverse[record.Hdr.Rrtype],
+    };
+    // copy rest of fields from record directly
+    for (var key in record) {
+        if (key != 'Hdr') {
+            basic[key] = record[key];
+        }
+    }
+    return basic;
+}
+
+function getSchemaField(type, key) {
+    const fields = schemas[type];
+    for (const field of fields) {
+        if (field.name == key) {
+            return field;
+        }
+    }
+}

@@ -16,24 +16,28 @@ ADD ./frontend/package.json /app/package.json
 WORKDIR /app
 RUN npm install
 ADD ./frontend/ /app/
-RUN esbuild script.js  --bundle --sourcemap --minify --outfile=bundle.js
+RUN bash esbuild.sh
 
 FROM ubuntu:20.04
 
 RUN apt-get update
 RUN apt-get install -y ca-certificates wget
-RUN update-ca-certificates
 RUN wget https://iptoasn.com/data/ip2asn-v4.tsv.gz
 RUN gunzip ip2asn-v4.tsv.gz
 RUN wget https://iptoasn.com/data/ip2asn-v6.tsv.gz
 RUN gunzip ip2asn-v6.tsv.gz
+
+RUN update-ca-certificates
+
 RUN mkdir -p /app
 RUN mv ip2asn* /app
 
 COPY --from=go /app/mess-with-dns /usr/bin/mess-with-dns
 
 WORKDIR /app
-COPY ./frontend /app/frontend
+COPY ./frontend/index.html /app/frontend/index.html
+COPY ./frontend/css /app/frontend/css
+COPY ./frontend/images /app/frontend/images
 COPY --from=node /app/bundle.js /app/frontend/bundle.js
 COPY --from=node /app/bundle.js.map /app/frontend/bundle.js.map
 

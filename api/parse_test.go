@@ -23,5 +23,11 @@ func TestParseASN(t *testing.T) {
     ranges, _ := ReadASNs("../ip2asn-v4.tsv")
     r, _ := FindASN(ranges, net.ParseIP("172.217.13.174"))
     assert.Equal(t, r.Num, 15169)
-    assert.Equal(t, r.Name, "GOOGLE - Google LLC")
+    assert.Equal(t, r.Name, "Google LLC")
+
+    _, err := FindASN(ranges, net.ParseIP("255.255.255.255"))
+    assert.Equal(t, err.Error(), "not found")
+
+    _, err = FindASN(ranges, net.ParseIP("0.0.0.0"))
+    assert.Equal(t, err.Error(), "not found")
 }

@@ -26,6 +26,15 @@ func parseInt(s string) int {
     return i
 }
 
+func FindASN46(ipv4Ranges []IPRange, ipv6Ranges []IPRange, ip net.IP) (IPRange, error) {
+    if ip.To4() != nil {
+        return FindASN(ipv4Ranges, ip)
+    } else {
+        return FindASN(ipv6Ranges, ip)
+    }
+}
+
+
 func FindASN(lines []IPRange, ip net.IP) (IPRange, error) {
     // binary search
     start := 0

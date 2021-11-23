@@ -21,8 +21,14 @@ RUN esbuild script.js  --bundle --sourcemap --minify --outfile=bundle.js
 FROM ubuntu:20.04
 
 RUN apt-get update
-RUN apt-get install -y ca-certificates
+RUN apt-get install -y ca-certificates wget
 RUN update-ca-certificates
+RUN wget https://iptoasn.com/data/ip2asn-v4.tsv.gz
+RUN gunzip ip2asn-v4.tsv.gz
+RUN wget https://iptoasn.com/data/ip2asn-v6.tsv.gz
+RUN gunzip ip2asn-v6.tsv.gz
+RUN mkdir -p /app
+RUN mv ip2asn* /app
 
 COPY --from=go /app/mess-with-dns /usr/bin/mess-with-dns
 

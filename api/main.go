@@ -16,6 +16,7 @@ import (
 
 type handler struct {
 	db *sql.DB
+    ipRanges *Ranges
 }
 
 type RecordRequest struct {
@@ -223,35 +224,17 @@ func specialHandler(db *sql.DB, name string, qtype uint16) []dns.RR {
 	return nil
 }
 
-func lookupHost(host net.IP) string {
+func lookupHost(ranges *Ranges, host net.IP) string {
 	names, err := net.LookupAddr(host.String())
     if err == nil && len(names) > 0 {
         return names[0]
     }
-    // otherwise try ipinfo.io
-    ipinfoToken := os.Getenv("IPINFO_TOKEN")
-    resp, err := http.Get("http://ipinfo.io/" + host.String() + "?token=" + ipinfoToken)
+    // otherwise search ASN database
+    r, err := ranges.FindASN(host)
     if err != nil {
-        fmt.Println("Error getting hostname: ", err.Error())
         return ""
     }
-    // parse json response
-    defer resp.Body.Close()
-    body, err := ioutil.ReadAll(resp.Body)
-    if err != nil {
-        fmt.Println("Error reading body: ", err.Error())
-        return ""
-    }
-    var ipinfo map[string]interface{}
-    err = json.Unmarshal(body, &ipinfo)
-    if err != nil {
-        fmt.Println("Error unmarshalling json: ", err.Error())
-        return ""
-    }
-    if ipinfo["org"] != nil {
-        return ipinfo["org"].(string)
-    }
-    return ""
+    return r.Name
 }
 
 func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
@@ -281,7 +264,7 @@ func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 		fmt.Println("Response: No records found")
 	}
     remote_addr := w.RemoteAddr().(*net.UDPAddr).IP
-	LogRequest(handle.db, r, &msg, remote_addr, lookupHost(remote_addr))
+	LogRequest(handle.db, r, &msg, remote_addr, lookupHost(handle.ipRanges, remote_addr))
 }
 
 type UnknownRequest struct {
@@ -290,7 +273,12 @@ type UnknownRequest struct {
 
 func main() {
 	db := connect()
-	handler := &handler{db: db}
+    defer db.Close()
+    ranges, err := ReadRanges()
+    if err != nil {
+        panic(err)
+    }
+    handler := &handler{db: db, ipRanges: &ranges}
 	// udp port command line argument
 	port := ":53"
 	if len(os.Args) > 1 {
@@ -304,7 +292,7 @@ func main() {
 		}
 	}()
 	fmt.Println("Listening on :8080")
-	err := (&http.Server{Addr: ":8080", Handler: handler}).ListenAndServe()
+	err = (&http.Server{Addr: ":8080", Handler: handler}).ListenAndServe()
 	if err != nil {
 		panic(err)
 	}

@@ -29,8 +29,9 @@ export default {
             // { "type": "A", "name": "example", "A": "93.184.216.34" }
             // =>
             // { "Hdr": { "Name": "example.messwithdns.com.", "Rrtype": 1, "Class": 1, "Ttl": 5, "Rdlength": 0 }, "A": "93.184.216.34" }
-            data.name = this.domain;
+            data.domain = this.domain;
             const record = convertRecord(data);
+            console.log(record);
             const response = await fetch('/record/new', {
                 method: 'POST',
                 headers: {

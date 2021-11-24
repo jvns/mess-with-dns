@@ -7,6 +7,6 @@ find . -name '*.go'| entr -r bash -c 'cd api; go build && cd .. && PLANETSCALE_C
 cd frontend
 ls *.js components/* | entr bash esbuild.sh &
 
-trap "kill $(jobs -p)" SIGINT SIGTERM
+trap 'kill $(jobs -p)' SIGINT SIGTERM
 
 wait

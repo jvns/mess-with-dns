@@ -24,11 +24,11 @@
     <div class="flex flex-wrap justify-start md:justify-end bg-white squiggle-top" id="app">
         <div id="experiment-time" v-if="domain && domain != ''" class="flex flex-wrap p-8 left-0 bg-white w-full">
             <div class="md:w-1/2 lg:w-2/3 w-full mb-16 xl:pl-32 pr-8 xl:pr-16">
-                <h1 class="text-2xl mb-8">
+                <h1 class="text-2xl mb-8" id="subdomain-title">
                     Your subdomain is: <br><span class="font-bold text-green-700">{{ domain }}.messwithdns.com</span>
                 </h1>
 
-                <h2 class="font-bold text-xl mt-4"> Add a record </h2>
+                <h2 class="font-bold text-xl mt-4 add-record"> Add a record </h2>
 
                 <new-record :domain='domain' :schemas='schemas'> </new-record>
 

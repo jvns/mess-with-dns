@@ -1,7 +1,7 @@
 import * as schemas from '../schemas.json';
 import template from './NewRecord.html';
 import {
-    convertRecord
+    createRecord
 } from '../common.js';
 
 export default {
@@ -26,26 +26,16 @@ export default {
 
     methods: {
         createRecord: async function(data) {
-            // { "type": "A", "name": "example", "A": "93.184.216.34" }
-            // =>
-            // { "Hdr": { "Name": "example.messwithdns.com.", "Rrtype": 1, "Class": 1, "Ttl": 5, "Rdlength": 0 }, "A": "93.184.216.34" }
             data.domain = this.domain;
-            const record = convertRecord(data);
-            console.log(record);
-            const response = await fetch('/record/new', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(record)
-            });
+            const response = await createRecord(data);
+            window.response = response;
             // check for errors
             if (response.status != 200) {
                 this.error = await response.text();
                 return;
             }
             this.error = undefined;
-            this.$parent.updateHash();
+            this.$parent.refreshRecords();
             // clear form but keep type
             const type = this.data.type;
             document.activeElement.blur();

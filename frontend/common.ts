@@ -2,10 +2,16 @@ import rrTypes from './rrTypes.json';
 import schemas from './schemas.json';
 
 export interface Record {
+    id: string
     domain: string
     subdomain: string
     type: string
-    ttl: string|number
+    ttl: string
+}
+
+interface RecordUpdate {
+    type: string
+    ttl: string
 }
 
 export interface Header {
@@ -33,7 +39,7 @@ export function fullName(record: Record) {
     }
 }
 
-export function convertRecord(record: Record): GoRecord {
+function convertRecord(record: Record): GoRecord {
     // convert to api format
     // { "type": "A", "name": "example", "A": "93.184.216.34" }
     // =>
@@ -82,24 +88,77 @@ function parseName(name: string): [string, string] {
     }
 }
 
-export function transformRecord(record: GoRecord): Record {
+function transformRecord(id: string, record: GoRecord): Record {
     // { "Hdr": { "Name": "example.messwithdns.com.", "Rrtype": 1, "Class": 1, "Ttl": 5, "Rdlength": 0 }, "A": "
     // =>
     // { ttl: 5, name: "example", type: 'A' }
     const [subdomain, domain] = parseName(record.Hdr.Name)
-    var basic = {
-        ttl: record.Hdr.Ttl,
+    const basic = {
+        id: id,
+        ttl: record.Hdr.Ttl + '',
         domain: domain,
         subdomain: subdomain,
         type: rrTypesReverse[record.Hdr.Rrtype],
     };
     // copy rest of fields from record directly
-    for (var key in record) {
+    for (const key in record) {
         if (key != 'Hdr') {
             basic[key] = record[key];
         }
     }
     return basic;
+}
+export async function deleteRecord(record: Record) {
+    const url = '/record/' + record.id;
+    const response = await fetch(url, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+    if (!response.ok) {
+        alert('Error deleting record');
+    }
+}
+
+export async function updateRecord(old: Record, newRecord: RecordUpdate) {
+    const url = '/record/' + old.id;
+    // this merge thing seems a bit hacky
+    const merged = {...old, ...newRecord};
+    const goRecord = convertRecord(merged);
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(goRecord),
+    });
+    return response; 
+}
+
+export async function createRecord(record: Record) {
+    const goRecord = convertRecord(record);
+    const response = await fetch('/record/new', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(goRecord),
+    });
+    return response;
+}
+
+export async function getRecords(domain) {
+    const response = await fetch('/domains/' + domain);
+    const json = await response.json();
+    // id is key, value is record
+    const records = [];
+    for (const id in json) {
+        const record = transformRecord(id, json[id]);
+        // parse key as int
+        records.push(record);
+    }
+    return records;
 }
 
 function getSchemaField(type, key) {

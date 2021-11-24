@@ -6,7 +6,8 @@ Vue.use(VueFormulate)
 import * as words from './words.json';
 import * as schemas from './schemas.json';
 import {
-    transformRecord
+    getRecords,
+    deleteRecord
 } from './common.js';
 
 
@@ -34,25 +35,12 @@ const vm = new Vue({
     },
 
     methods: {
-        getRecords: async function(domain) {
-            const response = await fetch('/domains/' + domain);
-            const json = await response.json();
-            // id is key, value is record
-            const records = [];
-            for (var key in json) {
-                const record = transformRecord(json[key]);
-                // parse key as int
-                record.id = parseInt(key);
-                records.push(record);
-            }
-            return records;
-        },
-
         clearAll: function() {
             if (confirm('Are you sure you want to delete all records?')) {
                 for (var record of this.records) {
-                    this.deleteRecord(record);
+                    deleteRecord(record);
                 }
+                this.refreshRecords();
             }
         },
 
@@ -77,27 +65,8 @@ const vm = new Vue({
                 domain: domain
             });
         },
-        deleteRecord: async function(record) {
-            var url = '/record/' + record.id;
-            var response = await fetch(url, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-            if (response.ok) {
-                // remove record from list
-                var index = this.records.indexOf(record);
-                this.records.splice(index, 1);
-                return true;
-            } else {
-                alert('Error deleting record');
-                return false;
-            }
-        },
-        updateRecord: function(oldRecord, newRecord) {
-            var index = this.records.indexOf(oldRecord);
-            this.records[index] = newRecord;
+        refreshRecords: async function() {
+            this.records = await getRecords(this.domain);
         },
 
         updateHash: async function() {
@@ -108,7 +77,7 @@ const vm = new Vue({
             }
             var domain = hash.substring(1);
             this.domain = domain;
-            this.records = await this.getRecords(domain);
+            this.refreshRecords();
             this.events = [];
             // TODO: maybe initial events should be a different endpoint from ongoing
             // events

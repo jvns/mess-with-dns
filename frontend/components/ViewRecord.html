@@ -1,11 +1,11 @@
 <tbody>
   <tr class="border border-gray-200 cursor-pointer" @click="toggle()">
-    <td class="px-4 py-2">
+    <td class="px-4 py-2 view-name">
       <a :href="'http://' + fullName()" target="_blank" @click="$event.stopPropagation()">{{ fullName() }}</a>
     </td>
-    <td class="px-4 py-2">{{ record.type }}</td>
+    <td class="px-4 py-2 view-type">{{ record.type }}</td>
     <td class="view-content">{{ content() }}</td>
-    <td>{{ record.ttl }}</td>
+    <td class="view-ttl">{{ record.ttl }}</td>
     <td class="text-right">
       <button class="edit hover:text-green-700 text-green-500 font-bold py-2 px-4 rounded">
         Edit
@@ -47,10 +47,10 @@
         </div>
 
         <div class="flex text-right mt-4">
-          <button type="button" class=" delete hover:bg-gray-400 mr-auto bg-gray-200 py-2 px-4 rounded " @click="confirmDelete()">
+          <button type="button" class="delete hover:bg-gray-400 mr-auto bg-gray-200 py-2 px-4 rounded " @click="confirmDelete()">
             Delete
           </button>
-          <button type="button" class="hover:bg-gray-400 bg-gray-200 py-2 px-4 rounded" @click="cancel()" >
+          <button type="button" class="cancel hover:bg-gray-400 bg-gray-200 py-2 px-4 rounded" @click="clicked = false" >
             Cancel
           </button>
 

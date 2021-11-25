@@ -1,10 +1,10 @@
 <tbody>
   <tr @click="clicked = !clicked">
-    <td>{{ localTime(event.created_at) }}</td>
-    <td>{{event.src_host}}</td>
-    <td>{{rrTypesReverse[event.request.Question[0].Qtype]}}</td>
-    <td>{{event.request.Question[0].Name}}</td>
-    <td class="bg-green-100 border-t border-green-300">
+    <td class="request-time">{{ localTime(event.created_at) }}</td>
+    <td class="request-host">{{event.src_host}}</td>
+    <td class="request-type">{{rrTypesReverse[event.request.Question[0].Qtype]}}</td>
+    <td class="request-name">{{event.request.Question[0].Name}}</td>
+    <td class="request-response bg-green-100 border-t border-green-300">
       <div
         class="flex justify-between"
         v-if="event.response.Answer && event.response.Answer.length > 0"
@@ -47,7 +47,7 @@
       <span v-else> (0 records) </span>
     </td>
   </tr>
-  <tr v-if="clicked">
+  <tr v-if="clicked" class="expand-request">
     <td colspan="4"></td>
     <td colspan="1" class="bg-green-100 p-8 font-mono">
       <ul class="p-0 m-0">

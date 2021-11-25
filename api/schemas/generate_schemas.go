@@ -5,39 +5,39 @@ import (
 	"fmt"
 	"os"
 	"reflect"
-    "strings"
+	"strings"
 
 	"github.com/miekg/dns"
 )
 
 var examples = map[string]string{
-    "A": "1.2.3.4",
-    "AAAA": "2001:db8::1",
-    "Algorithm": "1",
-    "Certificate": "MIIGDjCCA/agAwIBAgIJAJz/8nh5oYsMA0GCSqGSIb3DQEBBQUAMIGuMQswCQYDVQQGEwJKUDEOMAwGA1UECBMF",
-    "Digest": "QmFzZTY0IGVuY29kZWQgZm9ybWF0",
-    "DigestType": "1",
-    "Expire": "1",
-    "Flag": "1",
-    "KeyTag": "1",
-    "Mbox": "example.com",
-    "Minttl": "3600",
-    "Mx": "mail.messagingengine.com",
-    "Ns": "ns1.example.com",
-    "Port": "8080",
-    "Preference": "10",
-    "Priority": "10",
-    "Ptr": "www.example.com",
-    "Refresh": "3600",
-    "Retry": "3600",
-    "Serial": "1",
-    "Tag": "1",
-    "Target": "orange-ip.fly.dev",
-    "Txt": "\"Hello World\"",
-    "Type": "1",
-    "Value": "TODO",
-    "Weight": "TODO",
-    "ttl": "60",
+	"A":           "1.2.3.4",
+	"AAAA":        "2001:db8::1",
+	"Algorithm":   "1",
+	"Certificate": "MIIGDjCCA/agAwIBAgIJAJz/8nh5oYsMA0GCSqGSIb3DQEBBQUAMIGuMQswCQYDVQQGEwJKUDEOMAwGA1UECBMF",
+	"Digest":      "32996839A6D808AFE3EB4A795A0E6A7A39A76FC52FF228B22B76F6D6",
+	"DigestType":  "1",
+	"Expire":      "1",
+	"Flag":        "1",
+	"KeyTag":      "1",
+	"Mbox":        "example.com",
+	"Minttl":      "3600",
+	"Mx":          "mail.messagingengine.com",
+	"Ns":          "ns1.example.com",
+	"Port":        "8080",
+	"Preference":  "10",
+	"Priority":    "10",
+	"Ptr":         "www.example.com",
+	"Refresh":     "3600",
+	"Retry":       "3600",
+	"Serial":      "1",
+	"Tag":         "1",
+	"Target":      "orange-ip.fly.dev",
+	"Txt":         "\"Hello World\"",
+	"Type":        "1",
+	"Value":       "TODO",
+	"Weight":      "TODO",
+	"ttl":         "60",
 }
 
 func main() {
@@ -78,21 +78,21 @@ func main() {
 			"label":      "TTL",
 			"type":       "number",
 			"validation": "required",
-            "validation-messages": map[string]string{
-                "required": "Example: " + examples["ttl"],
-            },
+			"validation-messages": map[string]string{
+				"required": "Example: " + examples["ttl"],
+			},
 		})
-        schemas[k] = schema
+		schemas[k] = schema
 	}
 
 	// serialize schemas to json
 	x, _ := json.MarshalIndent(schemas, "", "  ")
-    file, err := os.Create("../frontend/schemas.json")
-    if err != nil {
-        fmt.Println(err)
-        os.Exit(1)
-    }
-    file.Write(x)
+	file, err := os.Create("../frontend/schemas.json")
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	file.Write(x)
 
 	rrTypes := make(map[string]uint16)
 	// iterate over map
@@ -100,12 +100,12 @@ func main() {
 		rrTypes[v] = k
 	}
 	x, _ = json.MarshalIndent(rrTypes, "", "  ")
-    file, err = os.Create("../frontend/rrTypes.json")
-    if err != nil {
-        fmt.Println(err)
-        os.Exit(1)
-    }
-    file.Write(x)
+	file, err = os.Create("../frontend/rrTypes.json")
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	file.Write(x)
 }
 
 func genSchema(x interface{}, labels map[string]string) []map[string]interface{} {
@@ -130,13 +130,13 @@ func genSchema(x interface{}, labels map[string]string) []map[string]interface{}
 			schema["label"] = field.Name
 		}
 		schema["type"] = getType(field.Type, field.Name)
-        validation := getValidation(field)
+		validation := getValidation(field)
 		schema["validation"] = validation
-        valField := strings.Split(validation, ":")[0]
+		valField := strings.Split(validation, ":")[0]
 
-        messages := map[string]string{}
-        messages[valField] = "Example: " + examples[field.Name]
-        schema["validation-messages"] = messages
+		messages := map[string]string{}
+		messages[valField] = "Example: " + examples[field.Name]
+		schema["validation-messages"] = messages
 		//fmt.Println("'validation-messages': {'" + getValidationMessages(field.Type) + "'},")
 		schemas = append(schemas, schema)
 	}

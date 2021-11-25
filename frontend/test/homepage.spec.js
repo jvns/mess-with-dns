@@ -9,8 +9,7 @@ test('clicking random subdomain brings us to subdomain page', async ({
 }) => {
     await page.goto('http://localhost:8080');
     await page.click('#randomSubdomain');
-    const text = await page.innerText('.add-record');
-    expect(text).toBe('Add a record');
+    await expect(page.locator('.add-record')).toHaveText('Add a record');
 });
 
 test('typing in domain brings us to domain page', async ({
@@ -19,6 +18,5 @@ test('typing in domain brings us to domain page', async ({
     await page.goto('http://localhost:8080');
     await page.type("[name='domain']", "fruity-pebble");
     await page.click("[type='submit']");
-    const text = await page.innerText('#subdomain-title');
-    expect(text).toBe('Your subdomain is:\nfruity-pebble.messwithdns.com')
+    await expect(page.locator('#subdomain-title')).toHaveText('Your subdomain is:\nfruity-pebble.messwithdns.com');
 });

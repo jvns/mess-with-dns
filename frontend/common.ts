@@ -56,10 +56,16 @@ function convertRecord(record: Record): GoRecord {
     }
     // copy rest of fields from form directly
     for (const key in record) {
-        if (key == 'Target' || key == 'Mx' || key == 'Ns') {
+        if (key == 'Target' || key == 'Mx' || key == 'Ns' || key == 'Ptr' || key == 'Mbox') {
             // make sure it's a FQDN
             if (!record[key].endsWith('.')) {
                 record[key] += '.';
+            }
+        }
+        if (key == 'Txt') {
+            // make sure it's a list of strings
+            if (!Array.isArray(record[key])) {
+                record[key] = [record[key]];
             }
         }
         // trim if it's a string

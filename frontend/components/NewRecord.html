@@ -7,6 +7,8 @@
         element-class="border border-black rounded-lg mt-2 p-1"
         name="subdomain"
         label="Name"
+        validation="required"
+        :validation-messages='{"required": "Example: bananas"}'
         error-behavior="submit"
         type="text"
       ></formulate-input>
@@ -33,7 +35,7 @@
       ></formulate-input>
     </div>
   </fieldset>
-  <div style="color: red" v-if="error" class="pt-2">{{error}}</div>
+  <div style="color: red" v-if="error" class="pt-2 server-error">{{error}}</div>
   <div class="flex w-full">
     <formulate-input
       id="create"

@@ -165,18 +165,24 @@ func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch {
 	// GET /domain/test : get everything from test.messwithdns.com.
 	case r.Method == "GET" && n == 2 && p[0] == "domains":
+		// set cache control header
+		w.Header().Set("Cache-Control", "private, no-store")
 		getDomains(handle.db, p[1], w, r)
 	// GET /events/test
 	case r.Method == "GET" && n == 2 && p[0] == "events":
+		w.Header().Set("Cache-Control", "private, no-store")
 		streamRequests(handle.db, p[1], w, r)
 	// POST /record/new: add a new record
 	case r.Method == "POST" && n == 2 && p[0] == "record" && p[1] == "new":
+		w.Header().Set("Cache-Control", "private, no-store")
 		createRecord(handle.db, w, r)
 	// DELETE /record/<ID>:
 	case r.Method == "DELETE" && n == 2 && p[0] == "record":
+		w.Header().Set("Cache-Control", "private, no-store")
 		deleteRecord(handle.db, p[1], w, r)
 	// POST /record/<ID>: updates a record
 	case r.Method == "POST" && n == 2 && p[0] == "record":
+		w.Header().Set("Cache-Control", "private, no-store")
 		updateRecord(handle.db, p[1], w, r)
 	default:
 		// serve static files

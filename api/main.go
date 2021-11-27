@@ -24,10 +24,9 @@ type RecordRequest struct {
 	Domain string
 }
 
-var soa *dns.SOA
+var soaSerial uint32
 
-func getSOA(db *sql.DB) *dns.SOA {
-	serial := GetSerial(db)
+func getSOA() *dns.SOA {
 	var soa = dns.SOA{
 		Hdr: dns.RR_Header{
 			Name:   "messwithdns.com.",
@@ -37,7 +36,7 @@ func getSOA(db *sql.DB) *dns.SOA {
 		},
 		Ns:      "ns1.messwithdns.com.",
 		Mbox:    "julia.wizardzines.com.",
-		Serial:  serial,
+		Serial:  soaSerial,
 		Refresh: 3600,
 		Retry:   3600,
 		Expire:  7300,
@@ -196,7 +195,7 @@ func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func specialHandler(db *sql.DB, name string, qtype uint16) []dns.RR {
 	if name == "messwithdns.com." && qtype == dns.TypeSOA {
 		return []dns.RR{
-			soa,
+			getSOA(),
 		}
 	}
 	nameservers := []string{
@@ -274,7 +273,7 @@ func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	}
 	// add SOA record
 	msg.Ns = []dns.RR{
-		soa,
+		getSOA(),
 	}
 	err := w.WriteMsg(&msg)
 	if err != nil {
@@ -299,17 +298,9 @@ type UnknownRequest struct {
 	Hdr dns.RR_Header
 }
 
-func refreshSOA(db *sql.DB) {
-	for {
-		soa = getSOA(db)
-		time.Sleep(time.Minute * 2)
-		fmt.Println("Refreshing SOA record")
-	}
-}
-
 func main() {
 	db := connect()
-	go refreshSOA(db)
+	soaSerial = GetSerial(db)
 	defer db.Close()
 	ranges, err := ReadRanges()
 	if err != nil {

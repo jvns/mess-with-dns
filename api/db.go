@@ -33,10 +33,27 @@ func GetSerial(db *sql.DB) uint32 {
 }
 
 func IncrementSerial(db *sql.DB) {
-	_, err := db.Exec("UPDATE dns_serials SET serial = serial + 1")
+	// increment serial and also get the new serial
+	// start transaction
+	tx, err := db.Begin()
 	if err != nil {
 		panic(err.Error())
 	}
+	// update serial
+
+	_, err = tx.Exec("UPDATE dns_serials SET serial = serial + 1")
+	if err != nil {
+		panic(err.Error())
+	}
+	// get new serial
+	var serial uint32
+	err = tx.QueryRow("SELECT serial FROM dns_serials").Scan(&serial)
+	if err != nil {
+		panic(err.Error())
+	}
+	// commit transaction
+	err = tx.Commit()
+	soaSerial = serial
 }
 
 func DeleteRecord(db *sql.DB, id int) {

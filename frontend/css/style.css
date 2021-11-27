@@ -67,3 +67,38 @@ input[type=number] {
     font-family: monospace;
     font-size: 1rem;
 }
+
+/***************** experiments */
+
+#experiments h3 {
+    font-weight: bold;
+    margin: 2em 0;
+    display: inline;
+}
+
+.experiment {
+    position: relative;
+    margin-bottom: 2em;
+    margin-top: 1em;
+    padding: 1em;
+    border: 1px solid #059669;
+}
+
+#experiments ol {
+    list-style-type: decimal;
+}
+
+#experiments .category {
+    top: -.8em;
+    right: 2em;
+    display: block; 
+    position: absolute; 
+    padding-left: 0.25rem;
+    padding-right: 0.25rem; 
+    background-color: #ffffff; 
+    color: #047857; 
+    font-size: 0.875rem;
+    line-height: 1.25rem; 
+    text-align: right; 
+}
+

@@ -135,7 +135,6 @@ func StreamRequest(name string, request []byte, response []byte, src_ip string, 
 	jsonString, err := json.Marshal(x)
 	if err != nil {
 		panic(err.Error())
-		return
 	}
 	WriteToStreams(base, jsonString)
 }

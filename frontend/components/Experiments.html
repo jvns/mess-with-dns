@@ -108,32 +108,7 @@
     <details class="experiment">
         <summary>
             <h3>
-                1. Point to an IP that doesn't recognize your domain
-                <span class="category">
-                    A records
-                </span>
-            </h3>
-        </summary>
-        <ol>
-            <li> Find the IP address for <code>example.com</code>. You can do this by running <code> dig example.com</code> in your terminal. Or you can just pretend you did it, the IP is <code>93.184.216.34</code> :). </li>
-            <li> Set an A record pointing <domain-link :domain='domain' subdomain='bad-ip'> </domain-link> at that IP (<code>93.184.216.34</code>). You can use any TTL you want. </li>
-            <li> Go to <domain-link :domain='domain' subdomain='bad-ip'> </domain-link> in your browser. You should get a 404 not found error. </li>
-        </ol>
-        <details class="my-4">
-            <summary>
-                <span class="text-green-700">
-                    (click here to see the explanation)
-                </span>
-            </summary>
-            <p>
-                TODO
-            </p>
-        </details>
-    </details>
-    <details class="experiment">
-        <summary>
-            <h3>
-                2. Visit a domain before creating its record
+                1. Visit a domain before creating its record
                 <span class="category">
                     caching
                 </span>
@@ -187,7 +162,7 @@
     <details class="experiment">
         <summary>
             <h3>
-                3. Test the difference between setting a short TTL and a long TTL
+                2. Test the difference between setting a short TTL and a long TTL
                 <span class="category">
                     caching
                 </span>
@@ -242,6 +217,31 @@
         </p>
     </details>
 
+    <details class="experiment">
+        <summary>
+            <h3>
+                3. Point to <code>example.com</code>
+                <span class="category">
+                    A records
+                </span>
+            </h3>
+        </summary>
+        <ol>
+            <li> Find the IP address for <code>example.com</code>. You can do this by running <code> dig example.com</code> in your terminal. Or you can just pretend you did it, the IP is <code>93.184.216.34</code> :). </li>
+            <li> Set an A record pointing <domain-link :domain='domain' subdomain='bad-ip'> </domain-link> at that IP (<code>93.184.216.34</code>). You can use any TTL you want. </li>
+            <li> Go to <domain-link :domain='domain' subdomain='bad-ip'> </domain-link> in your browser. You should get a 404 not found error. </li>
+        </ol>
+        <details class="my-4">
+            <summary>
+                <span class="text-green-700">
+                    (click here to see the explanation)
+                </span>
+            </summary>
+            <p>
+                TODO
+            </p>
+        </details>
+    </details>
     <details class="experiment">
         <summary>
             <h3>

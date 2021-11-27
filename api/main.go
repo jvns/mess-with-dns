@@ -200,6 +200,19 @@ func specialHandler(db *sql.DB, name string, qtype uint16) []dns.RR {
 		"213.188.214.254",
 		"213.188.214.237",
 	}
+	if name == "fly-test." && qtype == dns.TypeA {
+		return []dns.RR{
+			&dns.A{
+				Hdr: dns.RR_Header{
+					Name:   name,
+					Rrtype: dns.TypeA,
+					Class:  dns.ClassINET,
+					Ttl:    3600,
+				},
+				A: net.ParseIP("1.2.3.4"),
+			},
+		}
+	}
 	if name == "ns1.messwithdns.com." && qtype == dns.TypeA {
 		return []dns.RR{
 			&dns.A{

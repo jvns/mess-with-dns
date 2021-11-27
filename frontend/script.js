@@ -7,6 +7,8 @@ import * as words from './words.json';
 import * as schemas from './schemas.json';
 import {
     getRecords,
+    getRequests,
+    fixRequest,
     deleteRecord
 } from './common.js';
 
@@ -78,14 +80,13 @@ const vm = new Vue({
             var domain = hash.substring(1);
             this.domain = domain;
             this.refreshRecords();
-            this.events = [];
-            // TODO: maybe initial events should be a different endpoint from ongoing
-            // events
-            const source = new EventSource('/events/' + domain);
+            // get past requests
+            this.events = await getRequests(this.domain);
+            // subscribe to stream for future requests
+            const source = new EventSource('/requeststream/' + domain);
             source.onmessage = event => {
                 const data = JSON.parse(event.data);
-                data.request = JSON.parse(data.request);
-                data.response = JSON.parse(data.response);
+                fixRequest(data);
                 this.events.unshift(data);
             };
         },

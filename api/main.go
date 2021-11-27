@@ -45,32 +45,28 @@ func getSOA() *dns.SOA {
 	return &soa
 }
 
-func streamRequests(db *sql.DB, name string, w http.ResponseWriter, r *http.Request) {
+func getRequests(db *sql.DB, name string, w http.ResponseWriter, r *http.Request) {
 	domain := name + ".messwithdns.com."
 	requests := GetRequests(db, domain)
-	stream := CreateStream(domain)
-	defer stream.Delete()
-	c := stream.Get()
-	// server side events
+	jsonOutput, err := json.Marshal(requests)
+	if err != nil {
+		fmt.Println("Error marshalling json: ", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonOutput)
+}
+
+func streamRequests(db *sql.DB, name string, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/event-stream")
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")
 	w.WriteHeader(http.StatusOK)
-	// send initial data
-	for _, request := range requests {
-		jsonOutput, err := json.Marshal(request)
-		if err != nil {
-			fmt.Println("Error marshalling json: ", err.Error())
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		w.Write([]byte("data: " + string(jsonOutput) + "\n\n"))
-	}
-	if f, ok := w.(http.Flusher); ok {
-		f.Flush()
-	}
-	// read from channel
-	// read message from channel
+	domain := name + ".messwithdns.com."
+	stream := CreateStream(domain)
+	defer stream.Delete()
+	c := stream.Get()
 	for {
 		select {
 		case msg := <-c:
@@ -170,8 +166,12 @@ func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		// set cache control header
 		w.Header().Set("Cache-Control", "private, no-store")
 		getDomains(handle.db, p[1], w, r)
-	// GET /events/test
-	case r.Method == "GET" && n == 2 && p[0] == "events":
+	// GET /requests/test
+	case r.Method == "GET" && n == 2 && p[0] == "requests":
+		w.Header().Set("Cache-Control", "private, no-store")
+		getRequests(handle.db, p[1], w, r)
+	// GET /requeststream/test
+	case r.Method == "GET" && n == 2 && p[0] == "requeststream":
 		w.Header().Set("Cache-Control", "private, no-store")
 		streamRequests(handle.db, p[1], w, r)
 	// POST /record/new: add a new record

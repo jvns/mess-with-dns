@@ -167,6 +167,20 @@ export async function getRecords(domain) {
     return records;
 }
 
+export async function getRequests(domain) {
+    const response = await fetch('/requests/' + domain);
+    const json = await response.json();
+    for (const event of json) {
+        fixRequest(event);
+    }
+    return json;
+}
+
+export async function fixRequest(event) {
+    event.request = JSON.parse(event.request);
+    event.response = JSON.parse(event.response);
+}
+
 function getSchemaField(type, key) {
     const fields = schemas[type];
     for (const field of fields) {

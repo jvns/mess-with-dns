@@ -76,6 +76,18 @@ input[type=number] {
     display: inline;
 }
 
+/* screenshot */
+#experiments img {
+    display: block; 
+    margin-top: 0.5rem; 
+    margin-bottom: 1rem; 
+    border-width: 1px; 
+    border-color: #047857; 
+    border-style: dashed; 
+    padding: .25rem;
+}
+
+
 .experiment {
     position: relative;
     margin: 1em 0;

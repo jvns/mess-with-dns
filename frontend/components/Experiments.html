@@ -129,7 +129,7 @@
             </li>
             <li>
                 Create a CNAME record pointing <domain-link subdomain="visit-before" :domain='domain'> </domain-link>
-                at <code>orange-ip.fly.dev</code>, like this:
+                at <code>orange.messwithdns.com</code>, like this:
                 <img src="/images/cname-screenshot.png" class="block border  border-dashed border-green-700 mb-4 mt-2">
             </li>
             <li>
@@ -162,28 +162,61 @@
     <details class="experiment">
         <summary>
             <h3>
-                2. Test the difference between setting a short TTL and a long TTL
+                2. Set a very long TTL
                 <span class="category">
                     caching
                 </span>
             </h3>
         </summary>
+        <p>
+        Setting a very long TTL (like 10 days) makes your life very
+        inconvenient: if you want to make a change, you need to wait up to 10
+        days for the change to happen! Let's try setting a 10-day TTL on a
+        record.
+        </p>
+        <p>
+ First, let's see how things normally work with a short (30 second) TTL 
+        </p>
         <ol>
             <li>
-                Create a CNAME record pointing <domain-link subdomain="long-ttl" :domain='domain'> </domain-link>
-                at <code>orange-ip.fly.dev</code>.
+                Create a CNAME record pointing <domain-link subdomain="short-ttl" :domain='domain'> </domain-link>
+                at <code>orange.messwithdns.com</code>. Set the TTL to 30 seconds.
 
-                Use a long TTL like 300000 seconds.
-                <!-- TODO: change screenshots -->
-                <img src="/images/cname-screenshot-5.png" class="block border border-dashed border-green-700 mb-4 mt-2">
+                <img src="/images/short-ttl.png">
             </li>
             <li>
                 Go to <domain-link subdomain="long-ttl" :domain='domain'> </domain-link>
                 in your browser. You should see an orange website.
             </li>
             <li>
-                Change the CNAME record to point at <code>purple-ip.fly.dev</code> instead.
-                <img src="/images/cname-screenshot-metafilter.png" class="block border border-dashed border-green-700 mb-4 mt-2">
+                Click 'Edit' and change the CNAME record to point at <code>purple.messwithdns.com</code> instead.
+                <img src="/images/short-purple-ttl.png">
+            </li>
+            <li>
+                <p>
+                Go to <domain-link subdomain="long-ttl" :domain='domain'> </domain-link>
+                in your browser again. You might need to force-refresh with
+                Ctrl+Shift-R/Cmd+Shift+R, but you should see a purple site now.
+                The update worked!
+                </p>
+                <p>
+                Now, let's see what happens if you set a long TTL.
+                </p>
+            </li>
+            <li>
+                Create a CNAME record pointing <domain-link subdomain="long-ttl" :domain='domain'> </domain-link>
+                at <code>orange.messwithdns.com</code>.
+
+                Use a long TTL like 3000000 seconds (that's 30 days!).
+                <img src="/images/long-ttl.png">
+            </li>
+            <li>
+                Go to <domain-link subdomain="long-ttl" :domain='domain'> </domain-link>
+                in your browser. You should see an orange website.
+            </li>
+            <li>
+                Click 'Edit' and change the CNAME record to point at <code>purple.messwithdns.com</code> instead.
+                <img src="/images/long-purple-ttl.png">
             </li>
             <li>
                 Go to <domain-link subdomain="long-ttl" :domain='domain'> </domain-link>
@@ -191,15 +224,7 @@
                 the same orange site -- no change!
                 This is because your old DNS record is
                 still cached.
-                You might also notice that there are no new request in the "Requests" section.
-            </li>
-            <li>
-                Using
-                <domain-link subdomain="short-ttl" :domain='domain'> </domain-link>
-                , repeat steps 1-4 with a short TTL. You might
-                need to do a force reload (Ctrl+Shift+R or similar)
-                after changing the DNS record to point at the purple site.
-                This time, the change works!
+                You might also notice that there are no new requests in the "Requests" section.
             </li>
         </ol>
 

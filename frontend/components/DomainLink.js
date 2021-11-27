@@ -3,6 +3,7 @@ export default {
 <code>
   <a
     v-if="domain && domain.length > 0"
+    target="_blank"
     :href="'http://' + subdomain + '.' + domain + '.messwithdns.com'"
     ><span class="text-green-700">{{subdomain}}.{{ domain }}</span
     >.messwithdns.com</a

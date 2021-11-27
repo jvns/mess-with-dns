@@ -78,8 +78,7 @@ input[type=number] {
 
 .experiment {
     position: relative;
-    margin-bottom: 2em;
-    margin-top: 1em;
+    margin: 1em 0;
     padding: 1em;
     border: 1px solid #059669;
 }

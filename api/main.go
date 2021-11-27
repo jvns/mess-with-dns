@@ -10,6 +10,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/miekg/dns"
 )
@@ -257,6 +258,8 @@ func lookupHost(ranges *Ranges, host net.IP) string {
 }
 
 func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
+	// get time
+	start := time.Now()
 	msg := dns.Msg{}
 	msg.SetReply(r)
 	msg.Authoritative = true
@@ -277,10 +280,14 @@ func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 		return
 	}
 	// print response
+	// get time since start
+	elapsed := time.Since(start)
 	if len(msg.Answer) > 0 {
-		fmt.Println("Response: ", msg.Answer[0].String())
+		fmt.Println("Response: ", msg.Answer[0].String(), elapsed)
 	} else {
-		fmt.Println("Response: No records found")
+		// print elapsed time
+		fmt.Println("Response: (no records found)", elapsed)
+
 	}
 	remote_addr := w.RemoteAddr().(*net.UDPAddr).IP
 	LogRequest(handle.db, r, &msg, remote_addr, lookupHost(handle.ipRanges, remote_addr))

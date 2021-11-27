@@ -15,6 +15,57 @@
     </h1>
     <hr class="my-4">
     <p>
+        <span class="font-bold">Tutorial experiments:</span> These 4 experiments explain some DNS basics and how the site works
+    </p>
+    <details class="experiment">
+        <summary>
+            <h3>
+                1. Create an A record
+                <span class="category">
+                    A records
+                </span>
+            </h3>
+        </summary>
+        <p>
+        Let's create the most basic DNS record: an A record. For the IP address, we'll use an IP (213.188.218.160) I set up
+        for this project which just shows a picture of an orange.
+        </p>
+        <ol>
+            <li>Configure an A record for <domain-link :domain='domain' subdomain='orange'> </domain-link> pointing it to 213.188.218.160, like this:
+                <img src="/images/orange-a.png">
+            </li>
+            <li> Click "Create" </li>
+            <li>
+                Go to <domain-link :domain='domain' subdomain='orange'> </domain-link> in your browser
+            </li>
+            <li> You should see a website with a picture of an orange! </li>
+        </ol>
+    </details>
+    <details class="experiment">
+        <summary>
+            <h3>
+                2. Create a CNAME record
+                <span class="category">
+                    CNAME records
+                </span>
+            </h3>
+        </summary>
+        <p>
+        Now, let's create a CNAME record that points at exact the same orange IP address, but indirectly.
+        </p>
+        <ol>
+            <li>Configure an CNAME record for <domain-link :domain='domain' subdomain='fruit'> </domain-link> that points at <code>orange.messwithdns.com</code>, like this:
+                <img src="/images/orange-cname.png">
+            </li>
+            <li> Click "Create" </li>
+            <li>
+                Go to <domain-link :domain='domain' subdomain='fruit'> </domain-link> in your browser.
+        </li>
+        <li> You should see a website with a picture of an orange! </li>
+        </ol>
+    </details>
+    <hr class="my-4">
+    <p>
         <span class="font-bold">Weird experiments:</span> In these 5 experiments, we break things for fun and learning!
     </p>
     <details class="experiment">

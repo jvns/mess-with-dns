@@ -88,6 +88,10 @@ input[type=number] {
     list-style-type: decimal;
 }
 
+#experiments p {
+    margin: 1em 0;
+}
+
 #experiments .category {
     top: -.8em;
     right: 2em;

@@ -87,6 +87,24 @@ input[type=number] {
     padding: .25rem;
 }
 
+#experiments .steps {
+   padding-left: 1em;
+   margin-left: 0;
+   padding-left: 2em;
+   text-indent: -1em;
+}
+
+#experiments .steps li:before {
+    content: "✓";
+    padding-right: .25em;
+    color: #047857; 
+}
+
+#experiments .wont:before,  #experiments .wont:after {
+    content: "✕";
+    color: red;
+    padding: 0 .25em;
+}
 
 .experiment {
     position: relative;

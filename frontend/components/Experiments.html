@@ -116,11 +116,13 @@
         </summary>
 
         <p class="my-4">
-            If you visit a domain before setting your DNS records for
-            that domain, it still won't work for some time after
-            setting the record!
-            Here's an experiment you can do to see
-            that happen yourself:
+            Did you know that just <span clas="font-bold">visiting</span> a
+            domain can make it not work? This is weird but true!  In this experiment, we'll:
+            <ul class="steps">
+                <li>Create a DNS record for a subdomain, and then visit it after (this will work!)</li>
+                <li>Visit a subdomain, and create the DNS record for it, and then visit it again (this <span class="wont">won't</span> work!)</li>
+            </ul>
+            Let's go!
         </p>
         <ol>
             <li>
@@ -171,11 +173,14 @@
         <p>
         Setting a very long TTL (like 10 days) makes your life very
         inconvenient: if you want to make a change, you need to wait up to 10
-        days for the change to happen! Let's try setting a 10-day TTL on a
-        record.
+        days for the change to happen! We'll:
+            <ul class="pl-2 md:pl-8 steps">
+                <li> Create a record with a <span class="font-bold">short</span> TTL, visit the page in our browser, change the record, and refresh the page. We'll see the change!</li>
+                <li> Create a record with a <span class="font-bold">long</span> TTL, visit the page in our browser, change the record, and refresh the page. We <span class="wont">won't</span> see the change!</li>
+            </ul>
         </p>
         <p>
- First, let's see how things normally work with a short (30 second) TTL 
+Let's start with the short TTL! 
         </p>
         <ol>
             <li>
@@ -185,7 +190,7 @@
                 <img src="/images/short-ttl.png">
             </li>
             <li>
-                Go to <domain-link subdomain="long-ttl" :domain='domain'> </domain-link>
+                Go to <domain-link subdomain="short-ttl" :domain='domain'> </domain-link>
                 in your browser. You should see an orange website.
             </li>
             <li>
@@ -194,7 +199,7 @@
             </li>
             <li>
                 <p>
-                Go to <domain-link subdomain="long-ttl" :domain='domain'> </domain-link>
+                Go to <domain-link subdomain="short-ttl" :domain='domain'> </domain-link>
                 in your browser again. You might need to force-refresh with
                 Ctrl+Shift-R/Cmd+Shift+R, but you should see a purple site now.
                 The update worked!
@@ -251,7 +256,18 @@
                 </span>
             </h3>
         </summary>
+        <p>
+        Did you know that if you point 2 different domains at the same IP
+        address, you can get different webpages when you visit the 2 domains? We're going to
+        <ul class="steps">
+            <li>Point your domain at the same IP as a <a href="https://example.com">example.com</a></li>
+            <li>Get a 404 error (which is different from what happens when you visit example.com)</li>
+        </ul>
+
+        Let's start!
+        </p>
         <ol>
+            <li> Visit <a href="https://example.com">example.com</a> in your browser. Notice that you don't get a 404 error.</li>
             <li> Find the IP address for <code>example.com</code>. You can do this by running <code> dig example.com</code> in your terminal. Or you can just pretend you did it, the IP is <code>93.184.216.34</code> :). </li>
             <li> Set an A record pointing <domain-link :domain='domain' subdomain='bad-ip'> </domain-link> at that IP (<code>93.184.216.34</code>). You can use any TTL you want. </li>
             <li> Go to <domain-link :domain='domain' subdomain='bad-ip'> </domain-link> in your browser. You should get a 404 not found error. </li>
@@ -278,12 +294,13 @@
         </summary>
 
         <p class="my-4">
-            Let's create some confusion and chaos! This is usually a bad thing, but let's do it on purpose so that you can see how it could happen accidentally.
+            Did you know that different DNS resolvers can have conflicting beliefs about the IP address for your domain?
+            This is usually a bad thing, but let's make it happen on purpose so that you can see how it could happen accidentally.
         </p>
         <p class="my-4">
-            Your goal is to convince:
+            We're going to convince:
         </p>
-        <ol style="list-style-type: disc;" class="pl-8">
+        <ul class="steps">
             <li>
                 Google's DNS server that your subdomain has one IP (10.11.12.13),
             </li>
@@ -363,8 +380,14 @@ bad-ip.ionized-twig.messwithdns.com. 30	IN A	30.31.32.33
                 </span>
             </h3>
         </summary>
+        Lots of domains have multiple IP addresses associated with them.
+        Usually you don't notice because the two IP addresses serve the exact
+        same webpage. But we can see more easily how this works by using two IPs which are totally different websites. 
+        <ul class="steps">
+            <li> Create 2 records that point to different webpages (one orange and one purple) </li>
+            <li> Use curl to repeatedly request the same domain, and see what happens!</li>
+        </ul>
 
-        What if you set two A records on a domain that refer to totally different sites? Let's find out!
         <ol>
             <li> Set an A record pointing <domain-link subdomain="conflict" :domain='domain'> </domain-link> at
                 213.188.218.160 with a TTL of 5 seconds.
@@ -431,8 +454,14 @@ $ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep 
 
         <p>
             In the previous experiments, we were looking at how
-            DNS names are cached. But you can always query the
-            source of truth for a domain: the <strong> authoritative nameserver </strong>.
+            DNS names are cached. 
+
+            But you can always query the source of truth for a domain: the <strong> authoritative nameserver </strong> and get an uncached result. Let's
+            <ul class="pl-2 md:pl-8 steps">
+                <li>Create a DNS record with a really long TTL (like 5 hours)</li>
+                <li>See that it gets cached by your usual DNS server, but that when we query the authoritative server we get the up-to-date result</li>
+            </ul>
+            But you can always query the source of truth for a domain: the <strong> authoritative nameserver </strong>.
         </p>
 
 

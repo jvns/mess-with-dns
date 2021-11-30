@@ -126,24 +126,26 @@
         </p>
         <ol>
             <li>
-                Go to <domain-link subdomain="visit-before" :domain='domain'> </domain-link>
-                in your browser. You should get an error like "Server Not Found".
+                Create a CNAME record pointing <domain-link subdomain="visit-after" :domain='domain'> </domain-link>
+                at <code>orange.messwithdns.com</code>, like this:
+                <img src="/images/visit-after.png">
+            </li>
+            <li>
+                Go to <domain-link subdomain="visit-after" :domain='domain'> </domain-link>
+                in your browser. You should see an orange site -- everything works!
+            </li>
+            <li>
+                Now, go to <domain-link subdomain="visit-before" :domain='domain'> </domain-link>
+                in your browser. You should get an error like "Server Not
+                Found", since we haven't created the record yet.
             </li>
             <li>
                 Create a CNAME record pointing <domain-link subdomain="visit-before" :domain='domain'> </domain-link>
                 at <code>orange.messwithdns.com</code>, like this:
-                <img src="/images/cname-screenshot.png" class="block border  border-dashed border-green-700 mb-4 mt-2">
+                <img src="/images/visit-before.png">
             </li>
             <li>
-                Go to <domain-link subdomain="visit-before" :domain='domain'> </domain-link> in your browser again. You should get the same "Server Not Found" error as before.
-            </li>
-            <li>
-                Repeat this with a different subdomain (
-                <domain-link subdomain="visit-after" :domain='domain'> </domain-link>)
-                ,
-                but <span class="font-bold">don't</span> visit the
-                domain first. This should show you a website with
-                an orange.
+                Go to <domain-link subdomain="visit-before" :domain='domain'> </domain-link> in your browser again. You should get the same "Server Not Found" error as before. Even if you force reload the page!
             </li>
         </ol>
 

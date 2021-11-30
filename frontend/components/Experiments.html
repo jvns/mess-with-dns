@@ -485,7 +485,7 @@ bad-ip.ionized-twig.messwithdns.com. 30	IN A	30.31.32.33
                 In your terminal, run
                 <pre>$ curl http://conflict.{{currDomain()}}.messwithdns.com 2&gt;/dev/null | grep title </pre>
                 10 times.
-                The result you get should change back and forth between 'orange' and 'purple', like this:
+                When I run it, the result I get changes back and forth between 'orange' and 'purple', like this. You might see different behaviour though, which we'll talk about in the explanation :)
                 <pre>
 $ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
 &lt;title&gt;orange&lt;/title&gt;
@@ -515,10 +515,28 @@ $ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep 
                     </span>
                 </summary>
                 <p>
-                    TODO curl is doing like round robin dns blah blah, it's not random,
-                    this is actually used and it's called dns load balancing (obv not with totally different websites)
-                    don't do this as a hack for a/b testing lol
+                    The weirdest thing about this experiment is actually that I've seen 3
+                    different results from different people I've tested it with, even though
+                    everyone was using the same version of curl. So, why do different people see
+                    different behaviour? Let's start by thinking about what happens when you run <code>curl</code>.
                 </p>
+                <ul class="explanation-list">
+                    <li class="you    "> You create 2 records </li>
+                    <li class="you"> You run <code>curl conflict.{{domain}}.messwithdns.com</code></li>
+                    <li class="you"> You run <code>curl conflict.{{domain}}.messwithdns.com</code> again, it gets sent to your resolver</li>
+                    <li class="resolver">Resolver has the 2 records cached, and returns them</li>
+                </ul>
+
+                Your resolver now has 2 records, and it needs to decide what order to return them in. It might do any of:
+                <ul class="normal-list">
+                    <li>Return the records in the same order it received them</li>
+                    <li>Change the order every time it receives a request (this is what mine does!)</li>
+                    <li>Pick an order at random</li>
+                    <li>Maybe do something else that I haven't listed here! I don't know!</li>
+                </ul>
+
+                curl will then pick the first record returned, but which one that is depends on the order that the resolver picked.
+
             </details>
             </p>
     </details>

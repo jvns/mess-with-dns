@@ -113,6 +113,10 @@ ul.explanation-list {
     display: inline-block;
 }
 
+.normal-list li {
+    list-style-type: disc;
+}
+
 .explanation-list li.you:before {
     content: "🧕";
 }

@@ -25,9 +25,9 @@ ul {
 pre {
     /* don't show scrollbar unless needed */
     overflow: auto;
-    padding: .5em;
+    padding: .75em;
     margin: .5em 0;
-    background-color: #d9f2d9;
+    background-color: #efe;
     font-size: .8em;
 }
 
@@ -100,17 +100,21 @@ input[type=number] {
     color: #047857; 
 }
 
-ul.explanation-list {
-   margin-left: 0;
-   padding-left: 3em;
-   text-indent: -2em;
+.experiment details {
+    background: #efe;
+    padding: 1em;
 }
 
+ul.explanation-list {
+    position: relative;
+    padding-left: 3em;
+}
 .explanation-list li:before {
+    position: absolute;
+    left: 0;
     content: " ";
-    padding-right: .25em;
-    width: 2em;
-    display: inline-block;
+    width: 4em;
+    flex-shrink: 0;
 }
 
 .normal-list li {

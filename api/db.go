@@ -157,7 +157,7 @@ func StreamRequest(name string, request []byte, response []byte, src_ip string, 
 }
 
 func GetRequests(db *sql.DB, domain string) []map[string]interface{} {
-	rows, err := db.Query("SELECT id, created_at, request, response, src_ip, src_host FROM dns_requests WHERE name LIKE ?", "%"+domain)
+	rows, err := db.Query("SELECT id, created_at, request, response, src_ip, src_host FROM dns_requests WHERE name LIKE ? ORDER BY created_at DESC", "%"+domain)
 	if err != nil {
 		panic(err.Error())
 	}

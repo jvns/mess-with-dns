@@ -155,7 +155,29 @@
                 </span>
             </summary>
             <p>
-                This is because of something called "negative DNS caching" -- DNS servers will cache the <strong>absence</strong> of a record.
+                Here's what happens with "visit-after", where everything's working as expected
+                <ul class="explanation-list">
+                    <li class="you    "> You create the record </li>
+                    <li class="browser"> Browser asks: where's visit-after.{{domain}}.messwithdns.com? </li>
+                    <li class="server"> DNS server responds: success! </li>
+                </ul>
+            </p>
+
+            <p>
+            With visit-before, it doesn't work because of something DNS resolvers do called <strong>negative caching</strong>, where they cache the <strong>absence</strong> of a record.
+
+            <ul class="explanation-list">
+                <li class="browser ">Browser: where's visit-before.{{domain}}.messwithdns.com? </li>
+                <li class="server  ">DNS server: doesn't exist! </li>
+                <li class="resolver no-arrow">DNS resolver: "oops it doesn't exist! Better cache that!" </li>
+                <li class="resolver">DNS resolver: Doesn't exist</li>
+                <li class="you">You create record </li>
+                <li class="browser">Request: where's visit-before.{{domain}}.messwithdns.com? </li>
+                <li class="resolver no-arrow">DNS resolver: "I saw this before!! It doesn't exist!" </li>
+                <li class="resolver">DNS resolver: doesn't exist </li>
+                <li class="you">You: :( :( :( IT EXISTS THOUGH </li>
+                <li class="you">You wait 1 hour and try again, everything works because the cache expired </li>
+                </ul>
             </p>
         </details>
         </p>
@@ -240,9 +262,43 @@ Let's start with the short TTL!
                     (click here to see the explanation)
                 </span>
             </summary>
-            <p>
-                TODO: add explanation
-            </p>
+
+    <p>
+        When the TTL is 30 seconds, the second time you make the request, the
+        cache will have expired so you'll get the new version. Here's what that looks like in detail:
+    </p>
+    <ul class="explanation-list">
+        <li class="you ">You create a record</li>
+        <li class="browser ">Browser asks: where's short-ttl.{{domain}}.messwithdns.com? </li>
+        <li class="resolver action">Resolver doesn't have this in cache, so requests it</li>
+        <li class="server ">DNS server responds: Here's the IP! The TTL is 30 seconds!</li>
+        <li class="resolver action">Resolver caches the IP for 30 seconds</li>
+        <li class="resolver">Resolver responds: Here's the IP!</li>
+        <li class="action"> ... 30 seconds pass </li>
+        <li class="you ">You update the record</li>
+        <li class="browser ">Browser asks: where's short-ttl.{{domain}}.messwithdns.com? </li>
+        <li class="resolver action">Resolver notices that the cache expired, and requests it again</li>
+        <li class="server ">DNS server responds: Here's the IP!</li>
+        <li class="resolver action">Resolver caches the IP for 30 seconds</li>
+        <li class="resolver">Resolver responds: Here's the new IP!</li>
+    </ul>
+
+    <p>
+    And when the TTL is a big number like 10 days, the cache never expires, so you can't get the updated site. Here's what that looks like:
+    </p>
+
+    <ul class="explanation-list">
+        <li class="you ">You create a record</li>
+        <li class="browser ">Browser asks: where's long-ttl.{{domain}}.messwithdns.com? </li>
+        <li class="resolver action">Resolver doesn't have this in cache, so requests it</li>
+        <li class="server ">DNS server responds: Here's the IP! The TTL is 10 days!</li>
+        <li class="resolver action">Resolver caches the IP for 10 days</li>
+        <li class="resolver">Resolver responds: Here's the IP!</li>
+        <li class="action"> ... 30 seconds pass </li>
+        <li class="you ">You update the record</li>
+        <li class="browser ">Browser asks: where's long-ttl.{{domain}}.messwithdns.com? </li>
+        <li class="resolver">Resolver responds: I have that cached! Here's the IP!</li>
+    </ul>
         </details>
         </p>
     </details>
@@ -279,8 +335,33 @@ Let's start with the short TTL!
                 </span>
             </summary>
             <p>
-                TODO
+                Why do we get a 404? Well, when your browser requests a website, it
+                sends a <code>Host</code> header with the name of the domain you typed in.
+                If the server (like Apache/nginx) doesn't recognize that name, it'll often
+                return a 404. Here's more detail about how that works.
             </p>
+
+            When you request example.com and everything works, here's what happens:
+            </p>
+            <ul class="explanation-list">
+                <li class="you">Type example.com into your browser</li>
+                <li class="browser">Browser asks: where's example.com?</li>
+                <li class="resolver">Resolver responds: 93.184.216.34</li>
+                <li class="browser">Browser (to 93.184.216.34): an HTTP request for <code>Host: example.com</code>!</li>
+                <li class="example">Example.com server: I know that site! Here's a response!</li>
+            </ul>
+            <p>
+                But when you request bad-ip.{{domain}}.messwithdns.com and you get a 404, here's how it goes:
+            </p>
+            <ul class="explanation-list">
+                <li class="you">Type example.com into your browser</li>
+                <li class="browser">Browser asks: where's bad-ip.{{domain}}.messwithdns.com?</li>
+                <li class="resolver">Resolver responds: 93.184.216.34</li>
+                <li class="action">(everything is the same so far!)</li>
+                <li class="browser">Browser (to 93.184.216.34): an HTTP request for <code>Host: bad-ip.{{domain}}.messwithdns.com</code>!</li>
+                <li class="example">Example.com server: I've never heard of that site!! 404! </li>
+            </ul>
+
         </details>
     </details>
     <details class="experiment">
@@ -365,7 +446,12 @@ bad-ip.ionized-twig.messwithdns.com. 30	IN A	30.31.32.33
                 </span>
             </summary>
             <p>
-                TODO
+                The reason this works is that Google, Cloudflare, and Quad9 will never
+                proactively look up our domain -- they only look up domain when someone
+                makes a request for it. And because you're literally the only person in the
+                world who's ever made a request for bad-ip.{{domain}}.messwithdns.com,
+                you have total control over when they learn about the domain for the first
+                time.
             </p>
         </details>
         </p>

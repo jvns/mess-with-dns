@@ -100,6 +100,56 @@ input[type=number] {
     color: #047857; 
 }
 
+ul.explanation-list {
+   margin-left: 0;
+   padding-left: 3em;
+   text-indent: -2em;
+}
+
+.explanation-list li:before {
+    content: " ";
+    padding-right: .25em;
+    width: 2em;
+    display: inline-block;
+}
+
+.explanation-list li.you:before {
+    content: "🧕";
+}
+
+.explanation-list li.browser:before {
+    content: "🌐➞";
+}
+
+.explanation-list li.server:before {
+    content: "🖳🠔";
+    color: blue;
+}
+
+.explanation-list li.resolver:before {
+    content: "🖳🠔";
+    color: red;
+}
+
+.explanation-list li.example.action:before {
+    content: "🖳➞";
+    color: green;
+}
+
+.explanation-list li.resolver.action:before {
+    content: "🖳";
+    color: red;
+}
+
+.action {
+    font-style: italic;
+}
+
+.action:before {
+    font-style: normal;
+}
+
+
 #experiments .wont:before,  #experiments .wont:after {
     content: "✕";
     color: red;

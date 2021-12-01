@@ -1,12 +1,12 @@
 <tbody>
-  <tr class="border border-gray-200 cursor-pointer" @click="toggle()">
+  <tr class="border border-gray-200 cursor-pointer" >
     <td class="px-4 py-2 view-name">
       <a :href="'http://' + fullName()" target="_blank" @click="$event.stopPropagation()">{{ fullName() }}</a>
     </td>
     <td class="px-4 py-2 view-type">{{ record.type }}</td>
     <td class="view-content">{{ content() }}</td>
     <td class="view-ttl">{{ record.ttl }}</td>
-    <td class="text-right">
+    <td class="view-edit text-right" @click="toggle()">
       <button class="edit hover:text-green-700 text-green-500 font-bold py-2 px-4 rounded">
         Edit
         <span v-if="clicked">
@@ -37,6 +37,23 @@
     <td colspan="4" class="pl-8">
       <formulate-form v-model="updated_record" class="mt-2" @submit="updateRecord">
         <div class="flex">
+        <formulate-input
+            element-class="border border-black rounded-lg mt-2 p-1"
+          label="Name"
+          name="subdomain"
+          type="text"
+          ></formulate-input>
+        <formulate-input
+                element-class="border border-black rounded-lg mt-2 p-1"
+                class="ml-4"
+                name="type"
+                label="Type"
+                type="select"
+                :disabled="true"
+                :options="[record.type]"
+              ></formulate-input>
+
+
           <formulate-input
             class="ml-4"
             element-class="border border-black rounded-lg mt-2 p-1"

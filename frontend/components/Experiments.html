@@ -31,9 +31,16 @@
             for this project which just shows a picture of an orange.
         </p>
         <ol>
-            <li>Configure an A record for <domain-link :domain='domain' subdomain='orange'> </domain-link> pointing it to 213.188.218.160, like this:
+            <li>
+                Create a record with
+                <ul class="record-expl">
+                    <li><strong>Name:</strong> orange <br> </li>
+                    <li><strong>Type:</strong> A <br> </li>
+                    <li><strong>IPv4 Address:</strong> <code>213.188.218.160</code> <br> </li>
+                    <li><strong>TTL: </strong> 60</li>
+                </ul>
                 <img src="/images/orange-a.png">
-                Set the TTL to 60 seconds (TTLs are always in seconds on this page).
+                TTLs are always in seconds on this page.
             </li>
             <li> Click "Create" </li>
             <li>
@@ -56,10 +63,13 @@
             same orange IP address, but indirectly.
         </p>
         <ol>
-            <li>Create a CNAME record with <br>
-                <strong>Name:</strong> fruit <br>
-                <strong>Target:</strong> <code>orange.messwithdns.com</code> <br>
-                <strong>TTL: </strong> 60  (TTLs are always in seconds on this page), like this:
+            <li>Create a record with <br>
+                <ul class="record-expl">
+                    <li><strong>Name:</strong> fruit  </li>
+                    <li><strong>Type:</strong> CNAME  </li>
+                    <li><strong>Target:</strong> <code>orange.messwithdns.com</code> </li>
+                    <li><strong>TTL: </strong> 60</li>
+                </ul>
                 <img src="/images/orange-cname.png">
             </li>
             <li> Click "Create" </li>
@@ -72,7 +82,7 @@
     <details class="experiment">
         <summary>
             <h3>
-                3. Look at a DNS request/response
+                3. See how CNAME records work
                 <span class="category">
                     requests
                 </span>
@@ -82,23 +92,21 @@
             The "Requests" section at the bottom of this page lets you see all
             DNS requests being made for subdomains of <code
                 class="text-green-700">{{ domain}}.messwithdns.com</code>!
-            Let's look at an example, so you can see how it works.
+            Let's look at the CNAME record we created in the previous experiment, to see how CNAME records work! 
         </p>
         <ol>
-            <li>Configure an CNAME record for <domain-link :domain='domain' subdomain='purple'> </domain-link> that points at <code>purple.messwithdns.com</code>, like this:
-                <img src="/images/tut-request.png">
-            </li>
-            <li> Click "Create" </li>
-            <li>
-                Go to <domain-link :domain='domain' subdomain='purple'> </domain-link> in your browser
-            </li>
             <li>Look in the "Requests" section at the bottom of the page. You should see a request for
-                <domain-link :domain='domain' subdomain='purple'> </domain-link>.
+                <domain-link :domain='domain' subdomain='orange'> </domain-link>.
             </li>
             <li> 
                 Look at the "Request source" on the request. Do you recognize
                 it? It might be your ISP, or a public DNS resolver like
                 Cloudflare or Google 
+            </li>
+            <li> 
+                Look at the type of the request and response. You should see
+                that it's requesting an A record, but the DNS server responded
+                with a CNAME record.
             </li>
         </ol>
     </details>
@@ -127,9 +135,13 @@
         </p>
         <ol>
             <li>
-                Create a CNAME record pointing <domain-link subdomain="visit-after" :domain='domain'> </domain-link>
-                at <code>orange.messwithdns.com</code>, like this:
-                <img src="/images/visit-after.png">
+                Create a CNAME record with 
+                <ul class="record-expl">
+                    <li><strong>Name:</strong> visit-after <br> </li>
+                    <li><strong>Type:</strong> CNAME <br> </li>
+                    <li><strong>Target:</strong> <code>orange.messwithdns.com</code> <br> </li>
+                    <li><strong>TTL: </strong> 3600</li>
+                </ul>
             </li>
             <li>
                 Go to <domain-link subdomain="visit-after" :domain='domain'> </domain-link>
@@ -141,9 +153,13 @@
                 Found", since we haven't created the record yet.
             </li>
             <li>
-                Create a CNAME record pointing <domain-link subdomain="visit-before" :domain='domain'> </domain-link>
-                at <code>orange.messwithdns.com</code>, like this:
-                <img src="/images/visit-before.png">
+                Create a CNAME record with:
+                <ul class="record-expl">
+                    <li><strong>Name:</strong> visit-before <br> </li>
+                    <li><strong>Type:</strong> CNAME <br> </li>
+                    <li><strong>Target:</strong> <code>orange.messwithdns.com</code> <br> </li>
+                    <li><strong>TTL: </strong> 3600</li>
+                </ul>
             </li>
             <li>
                 Go to <domain-link subdomain="visit-before" :domain='domain'> </domain-link> in your browser again. You should get the same "Server Not Found" error as before. Even if you force reload the page!
@@ -209,9 +225,13 @@ Let's start with the short TTL!
         </p>
         <ol>
             <li>
-                Create a CNAME record pointing <domain-link subdomain="short-ttl" :domain='domain'> </domain-link>
-                at <code>orange.messwithdns.com</code>. Set the TTL to 30 seconds.
-
+                Create a CNAME record with:
+                <ul class="record-expl">
+                    <li><strong>Name:</strong> short-ttl <br> </li>
+                    <li><strong>Type:</strong> CNAME <br> </li>
+                    <li><strong>Target:</strong> <code>orange.messwithdns.com</code> <br> </li>
+                    <li><strong>TTL: </strong> 30</li>
+                </ul>
                 <img src="/images/short-ttl.png">
             </li>
             <li>
@@ -234,10 +254,13 @@ Let's start with the short TTL!
                 </p>
             </li>
             <li>
-                Create a CNAME record pointing <domain-link subdomain="long-ttl" :domain='domain'> </domain-link>
-                at <code>orange.messwithdns.com</code>.
-
-                Use a long TTL like 3000000 seconds (that's 30 days!).
+                Create a CNAME record with:
+                <ul class="record-expl">
+                    <li><strong>Name:</strong> long-ttl <br> </li>
+                    <li><strong>Type:</strong> CNAME <br> </li>
+                    <li><strong>Target:</strong> <code>orange.messwithdns.com</code> <br> </li>
+                    <li><strong>TTL: </strong> 3000000 (that's 30 days! Or use any reasonably big number)</li>
+                </ul>
                 <img src="/images/long-ttl.png">
             </li>
             <li>
@@ -328,7 +351,14 @@ Let's start with the short TTL!
         <ol>
             <li> Visit <a href="https://example.com">example.com</a> in your browser. Notice that you don't get a 404 error.</li>
             <li> Find the IP address for <code>example.com</code>. You can do this by running <code> dig example.com</code> in your terminal. Or you can just pretend you did it, the IP is <code>93.184.216.34</code> :). </li>
-            <li> Set an A record pointing <domain-link :domain='domain' subdomain='bad-ip'> </domain-link> at that IP (<code>93.184.216.34</code>). You can use any TTL you want. </li>
+            <li> 
+                Create an A record with
+                <ul class="record-expl">
+                    <li><strong>Name:</strong> bad-ip <br> </li>
+                    <li><strong>Target:</strong> <code>93.184.216.34</code> <br> </li>
+                    <li><strong>TTL: </strong> anything you want</li>
+                </ul>
+            </li>
             <li> Go to <domain-link :domain='domain' subdomain='bad-ip'> </domain-link> in your browser. You should get a 404 not found error. </li>
         </ol>
         <details class="my-4">
@@ -401,8 +431,13 @@ Let's start with the short TTL!
         </p>
         <ol>
             <li>
-                Create an A record pointing <domain-link subdomain="3-ips" :domain='domain'> </domain-link>
-                at <code>10.11.12.13</code>. Use a long TTL like 3600 seconds.
+                Create an A record with:
+                <ul class="record-expl">
+                    <li><strong>Name:</strong> 3-ips <br> </li>
+                    <li><strong>Target:</strong> <code>10.11.12.13</code> <br> </li>
+                    <li><strong>TTL:</strong> 3600</li>
+                </ul>
+                We need a reasonably long TTL because the resolvers need to cache the IP for at least the length of this experiment.
                 <img src="/images/cname-screenshot-5.png" class="block border border-dashed border-green-700 mb-4 mt-2">
             </li>
             <li>
@@ -478,15 +513,25 @@ bad-ip.ionized-twig.messwithdns.com. 30	IN A	30.31.32.33
         </ul>
 
         <ol>
-            <li> Set an A record pointing <domain-link subdomain="conflict" :domain='domain'> </domain-link> at
-                213.188.218.160 with a TTL of 5 seconds.
+            <li>
+                Create an A record with:
+                <ul class="record-expl">
+                    <li><strong>Name:</strong> conflict <br> </li>
+                    <li><strong>IPv4 Address:</strong> <code>213.188.218.160</code> <br> </li>
+                    <li><strong>TTL:</strong> 5</li>
+                </ul>
             </li>
-            <li> Set another A record pointing <domain-link subdomain="conflict" :domain='domain'> </domain-link> at
-                213.188.209.192 with a TTL of 5 seconds.
+            <li> Create another A record with:
+                <ul class="record-expl">
+                    <li><strong>Name:</strong> conflict <br> </li>
+                    <li><strong>IPv4 Address:</strong> <code>213.188.209.192</code> <br> </li>
+                    <li><strong>TTL:</strong> 5</li>
+                </ul>
+                
             </li>
             <li>
                 In your terminal, run
-                <pre>$ curl http://conflict.{{currDomain()}}.messwithdns.com 2&gt;/dev/null | grep title </pre>
+                <pre>curl http://conflict.{{currDomain()}}.messwithdns.com 2&gt;/dev/null | grep title </pre>
                 10 times.
                 When I run it, the result I get changes back and forth between 'orange' and 'purple', like this. You might see different behaviour though, which we'll talk about in the explanation :)
                 <pre>
@@ -576,12 +621,18 @@ $ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep 
         <ol>
             <li>
 
+                Create an A record with:
+                <ul class="record-expl">
+                    <li><strong>Name:</strong> truth <br> </li>
+                    <li><strong>IPv4 Address:</strong> <code>1.2.3.4</code> <br> </li>
+                    <li><strong>TTL:</strong> 5</li>
+                </ul>
                 Create an A record for <domain-link :domain='domain'> </domain-link> at <code>example.com</code>, like this:
                 <img src="/images/cname-screenshot.png" class="block border  border-dashed border-green-700 mb-4 mt-2">
             </li>
             <li>
                 In your terminal, run
-                <pre>$ dig +trace {{currDomain()}}.messwithdns.com</pre> to get the authoritative nameserver. The answer should be
+                <pre>$ dig asdfasdfasdfadsf TODO
                 <pre>ns1.messwithdns.com.</pre>
             </li>
             <li>
@@ -620,13 +671,23 @@ $ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep 
         <ol>
             <li>
                 Go to Fastmail and sign up for an email account using the address yourname@{{currDomain()}}.messwithdns.com
-                (they have a 30-day free trial). The setup option you use don't matter too much.
+                (they have a 30-day free trial). The setup options you use don't matter too much.
             </li>
             <li>
-                Add an MX record for <domain-link :domain='domain'> </domain-link> pointing it to <code>ns1.messagingengine.com </code> with preference 10
+                Create an MX record with:
+                <ul class="record-expl">
+                    <li><strong>Name:</strong> @ <br> </li>
+                    <li><strong>Preference:</strong> <code>10</code> <br> </li>
+                    <li><strong>Target:</strong> <code>ns1.messagingengine.com</code> <br> </li>
+                </ul>
             </li>
             <li>
-                Add another MX record for <domain-link :domain='domain'> </domain-link> pointing it to <code>ns2.messagingengine.com </code> with preference 20
+                Add another MX record with
+<ul class="record-expl">
+                    <li><strong>Name:</strong> @ <br> </li>
+                    <li><strong>Preference:</strong> <code>20</code> <br> </li>
+                    <li><strong>Target:</strong> <code>ns2.messagingengine.com</code> <br> </li>
+                </ul>
             </li>
             <li>
                 Check with Fastmail that your MX records are working. There's a button in the settings

@@ -197,3 +197,13 @@ ul.explanation-list {
     text-align: right; 
 }
 
+
+.record-expl li {
+    list-style-type: none;
+    line-height: 1em;
+}
+
+.record-expl {
+    padding: 0;
+    margin: 0;
+}

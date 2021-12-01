@@ -14,85 +14,91 @@ import (
 )
 
 // connect to planetscale
-func connect() *sql.DB {
+func connect() (*sql.DB, error) {
 	// get connection string from environment
 	db, err := sql.Open("mysql", os.Getenv("PLANETSCALE_CONNECTION_STRING"))
 	if err != nil {
-		panic(err.Error())
+		return nil, err
 	}
-	return db
+	return db, nil
 }
 
-func GetSerial(db *sql.DB) uint32 {
+func GetSerial(db *sql.DB) (uint32, error) {
 	var serial uint32
 	err := db.QueryRow("SELECT serial FROM dns_serials").Scan(&serial)
 	if err != nil {
-		panic(err.Error())
+		return 0, err
 	}
-	return serial
+	return serial, nil
 }
 
-func IncrementSerial(db *sql.DB) {
+func IncrementSerial(db *sql.DB) error {
 	// increment serial and also get the new serial
 	// start transaction
 	tx, err := db.Begin()
 	if err != nil {
-		panic(err.Error())
+		return err
 	}
 	// update serial
-
 	_, err = tx.Exec("UPDATE dns_serials SET serial = serial + 1")
 	if err != nil {
-		panic(err.Error())
+		return err
 	}
 	// get new serial
 	var serial uint32
 	err = tx.QueryRow("SELECT serial FROM dns_serials").Scan(&serial)
 	if err != nil {
-		panic(err.Error())
+		return err
 	}
 	// commit transaction
 	err = tx.Commit()
+	if err != nil {
+		return err
+	}
 	soaSerial = serial
+	return nil
 }
 
-func DeleteRecord(db *sql.DB, id int) {
+func DeleteRecord(db *sql.DB, id int) error {
 	_, err := db.Exec("DELETE FROM dns_records WHERE id = ?", id)
 	if err != nil {
-		panic(err.Error())
+		return err
 	}
 	IncrementSerial(db)
+	return nil
 }
 
-func UpdateRecord(db *sql.DB, id int, record dns.RR) {
+func UpdateRecord(db *sql.DB, id int, record dns.RR) error {
 	jsonString, err := json.Marshal(record)
 	if err != nil {
-		panic(err.Error())
+		return err
 	}
 	_, err = db.Exec("UPDATE dns_records SET name = ?, rrtype = ?, content = ? WHERE id = ?", record.Header().Name, record.Header().Rrtype, jsonString, id)
 	if err != nil {
-		panic(err.Error())
+		return err
 	}
 	IncrementSerial(db)
+	return nil
 }
 
-func InsertRecord(db *sql.DB, record dns.RR) {
+func InsertRecord(db *sql.DB, record dns.RR) error {
 	jsonString, err := json.Marshal(record)
 	if err != nil {
-		panic(err.Error())
+		return err
 	}
 	_, err = db.Exec("INSERT INTO dns_records (name, rrtype, content) VALUES (?, ?, ?)", record.Header().Name, record.Header().Rrtype, jsonString)
 	if err != nil {
-		panic(err.Error())
+		return err
 	}
 	IncrementSerial(db)
+	return nil
 }
 
-func GetRecordsForName(db *sql.DB, name string) map[int]dns.RR {
+func GetRecordsForName(db *sql.DB, name string) (map[int]dns.RR, error) {
 	fmt.Println(name)
 	rows, err := db.Query("SELECT id, content FROM dns_records WHERE name LIKE ?", "%"+name)
 	if err != nil {
-		panic(err.Error())
+		return nil, err
 	}
 	records := make(map[int]dns.RR)
 	for rows.Next() {
@@ -100,34 +106,33 @@ func GetRecordsForName(db *sql.DB, name string) map[int]dns.RR {
 		var id int
 		err = rows.Scan(&id, &content)
 		if err != nil {
-			panic(err.Error())
+			return nil, err
 		}
 		record, err := ParseRecord(content)
 		if err != nil {
-			panic(err.Error())
+			return nil, err
 		}
 		records[id] = record
 	}
-	return records
+	return records, nil
 }
 
-func LogRequest(db *sql.DB, request *dns.Msg, response *dns.Msg, src_ip net.IP, src_host string) {
+func LogRequest(db *sql.DB, request *dns.Msg, response *dns.Msg, src_ip net.IP, src_host string) error {
 	jsonRequest, err := json.Marshal(request)
 	if err != nil {
-		fmt.Println("error logging request: ", err.Error())
-		return
+		return err
 	}
 	jsonResponse, err := json.Marshal(response)
 	if err != nil {
-		fmt.Println("error logging request: ", err.Error())
-		return
+		return err
 	}
 	name := request.Question[0].Name
 	_, err = db.Exec("INSERT INTO dns_requests (name, request, response, src_ip, src_host) VALUES (?, ?, ?, ?, ?)", name, jsonRequest, jsonResponse, src_ip.String(), src_host)
 	if err != nil {
-		fmt.Println("error logging request: ", err.Error())
+		return err
 	}
 	StreamRequest(name, jsonRequest, jsonResponse, src_ip.String(), src_host)
+	return nil
 }
 
 func max(a, b int) int {
@@ -137,7 +142,7 @@ func max(a, b int) int {
 	return b
 }
 
-func StreamRequest(name string, request []byte, response []byte, src_ip string, src_host string) {
+func StreamRequest(name string, request []byte, response []byte, src_ip string, src_host string) error {
 	// get base domain
 	parts := strings.Split(name, ".")
 	start := max(0, len(parts)-4)
@@ -151,9 +156,10 @@ func StreamRequest(name string, request []byte, response []byte, src_ip string, 
 	}
 	jsonString, err := json.Marshal(x)
 	if err != nil {
-		panic(err.Error())
+		return err
 	}
 	WriteToStreams(base, jsonString)
+	return nil
 }
 
 func DeleteRequestsForDomain(db *sql.DB, domain string) error {
@@ -164,10 +170,10 @@ func DeleteRequestsForDomain(db *sql.DB, domain string) error {
 	return nil
 }
 
-func GetRequests(db *sql.DB, domain string) []map[string]interface{} {
+func GetRequests(db *sql.DB, domain string) ([]map[string]interface{}, error) {
 	rows, err := db.Query("SELECT id, created_at, request, response, src_ip, src_host FROM dns_requests WHERE name LIKE ? ORDER BY created_at DESC", "%"+domain)
 	if err != nil {
-		panic(err.Error())
+		return make([]map[string]interface{}, 0), err
 	}
 	requests := make([]map[string]interface{}, 0)
 	for rows.Next() {
@@ -178,13 +184,13 @@ func GetRequests(db *sql.DB, domain string) []map[string]interface{} {
 		var src_ip string
 		var src_host string
 		err = rows.Scan(&id, &created_at, &request, &response, &src_ip, &src_host)
+		if err != nil {
+			return make([]map[string]interface{}, 0), err
+		}
 		// parse created at to unix time
 		created_time, err := time.Parse("2006-01-02 15:04:05", created_at)
 		if err != nil {
-			panic(err.Error())
-		}
-		if err != nil {
-			panic(err.Error())
+			return make([]map[string]interface{}, 0), err
 		}
 		x := map[string]interface{}{
 			"id":         id,
@@ -196,27 +202,27 @@ func GetRequests(db *sql.DB, domain string) []map[string]interface{} {
 		}
 		requests = append(requests, x)
 	}
-	return requests
+	return requests, nil
 }
 
-func GetRecords(db *sql.DB, name string, rrtype uint16) []dns.RR {
+func GetRecords(db *sql.DB, name string, rrtype uint16) ([]dns.RR, error) {
 	// return cname records if they exist
 	rows, err := db.Query("SELECT content FROM dns_records WHERE name = ? AND (rrtype = ? OR rrtype = 5)", name, rrtype)
 	if err != nil {
-		panic(err.Error())
+		return make([]dns.RR, 0), err
 	}
 	var records []dns.RR
 	for rows.Next() {
 		var content []byte
 		err = rows.Scan(&content)
 		if err != nil {
-			panic(err.Error())
+			return make([]dns.RR, 0), err
 		}
 		record, err := ParseRecord(content)
 		if err != nil {
-			panic(err.Error())
+			return make([]dns.RR, 0), err
 		}
 		records = append(records, record)
 	}
-	return records
+	return records, nil
 }

@@ -58,7 +58,12 @@ func deleteRequests(db *sql.DB, name string, w http.ResponseWriter, r *http.Requ
 
 func getRequests(db *sql.DB, name string, w http.ResponseWriter, r *http.Request) {
 	domain := name + ".messwithdns.com."
-	requests := GetRequests(db, domain)
+	requests, err := GetRequests(db, domain)
+	if err != nil {
+		fmt.Println("Error getting requests: ", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 	jsonOutput, err := json.Marshal(requests)
 	if err != nil {
 		fmt.Println("Error marshalling json: ", err.Error())
@@ -152,7 +157,12 @@ func updateRecord(db *sql.DB, id string, w http.ResponseWriter, r *http.Request)
 
 func getDomains(db *sql.DB, domain string, w http.ResponseWriter, r *http.Request) {
 	// read body from json request
-	records := GetRecordsForName(db, domain+".messwithdns.com.")
+	records, err := GetRecordsForName(db, domain+".messwithdns.com.")
+	if err != nil {
+		fmt.Println("Error getting records: ", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 	jsonOutput, err := json.Marshal(records)
 	if err != nil {
 		fmt.Println("Error marshalling json: ", err.Error())
@@ -284,7 +294,16 @@ func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	if len(specialRecords) > 0 {
 		msg.Answer = specialRecords
 	} else {
-		msg.Answer = GetRecords(handle.db, r.Question[0].Name, r.Question[0].Qtype)
+		answer, err := GetRecords(handle.db, r.Question[0].Name, r.Question[0].Qtype)
+		if err != nil {
+			// internal server error
+			msg := dns.Msg{}
+			msg.SetRcode(r, dns.RcodeServerFailure)
+			w.WriteMsg(&msg)
+			fmt.Println("Error getting records:", err)
+			return
+		}
+		msg.Answer = answer
 	}
 	// add SOA record
 	msg.Ns = []dns.RR{
@@ -314,12 +333,18 @@ type UnknownRequest struct {
 }
 
 func main() {
-	db := connect()
-	soaSerial = GetSerial(db)
+	db, err := connect()
+	if err != nil {
+		panic(fmt.Sprintf("Error connecting to database: %s", err.Error()))
+	}
+	soaSerial, err = GetSerial(db)
+	if err != nil {
+		panic(fmt.Sprintf("Error getting SOA serial: %s", err.Error()))
+	}
 	defer db.Close()
 	ranges, err := ReadRanges()
 	if err != nil {
-		panic(err)
+		panic(fmt.Sprintf("Error reading ranges: %s", err.Error()))
 	}
 	handler := &handler{db: db, ipRanges: &ranges}
 	// udp port command line argument

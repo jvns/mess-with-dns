@@ -4,10 +4,10 @@ const {
     expect
 } = require('@playwright/test');
 
-const { randomString, clearRecords } = require('./helpers');
-
+const { randomString, setName } = require('./helpers');
 const { Resolver } = require('dns');
 const resolver = new Resolver();
+
 resolver.setServers(['127.0.0.1:5353']);
 
 function getIp(hostname) {
@@ -22,10 +22,6 @@ function getIp(hostname) {
     });
 }
 
-
-
-const {setName} = require('./helpers');
-
 test.describe.parallel('suite', () => {
 
 test('empty dns request gets streamed', async ({ page }) => {
@@ -33,6 +29,7 @@ test('empty dns request gets streamed', async ({ page }) => {
     await page.goto('http://localhost:8080#' + name);
     const fullName = 'duckface.' + name + '.messwithdns.com.'
     await getIp(fullName);
+    page.on('dialog', dialog => dialog.accept());
     await expect(page.locator('.request-name')).toHaveText(fullName);
     await expect(page.locator('.request-host')).toHaveText('localhost.lan.');
     await expect(page.locator('.request-response')).toHaveText('(0 records)');
@@ -53,6 +50,18 @@ test('clicking request expands it', async ({ page }) => {
     await page.click('.request-response');
     await page.waitForSelector('.expand-request', {state: 'detached'});
 });
+
+test('clearing requests works', async ({ page }) => {
+    const name = randomString();
+    await page.goto('http://localhost:8080#' + name);
+    const fullName = 'bananas.' + name + '.messwithdns.com.'
+    await getIp(fullName);
+    await expect(page.locator('.request-response')).toHaveText('(0 records)');
+    page.on('dialog', dialog => dialog.accept());
+    await page.click('#clear-requests');
+    await page.waitForSelector('.request-response', {state: 'detached'});
+});
+
 
 
 });

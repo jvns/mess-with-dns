@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gorilla/websocket"
 	"github.com/miekg/dns"
 )
 
@@ -59,10 +60,13 @@ func getRequests(db *sql.DB, name string, w http.ResponseWriter, r *http.Request
 }
 
 func streamRequests(db *sql.DB, name string, w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/event-stream")
-	w.Header().Set("Cache-Control", "no-cache")
-	w.Header().Set("Connection", "keep-alive")
-	w.WriteHeader(http.StatusOK)
+	// create websocket connection
+	conn, err := websocket.Upgrade(w, r, nil, 1024, 1024)
+	if err != nil {
+		fmt.Println("Error upgrading websocket: ", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 	domain := name + ".messwithdns.com."
 	stream := CreateStream(domain)
 	defer stream.Delete()
@@ -70,10 +74,7 @@ func streamRequests(db *sql.DB, name string, w http.ResponseWriter, r *http.Requ
 	for {
 		select {
 		case msg := <-c:
-			w.Write([]byte("data: " + string(msg) + "\n\n"))
-			if f, ok := w.(http.Flusher); ok {
-				f.Flush()
-			}
+			conn.WriteMessage(websocket.TextMessage, msg)
 		}
 	}
 }

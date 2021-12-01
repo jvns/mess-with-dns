@@ -71,6 +71,15 @@ const vm = new Vue({
             this.records = await getRecords(this.domain);
         },
 
+        openWebsocket: async function() {
+            const ws = new WebSocket('ws://' + window.location.host + '/requeststream/' + this.domain);
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                fixRequest(data);
+                this.events.unshift(data);
+            };
+        },
+
         updateHash: async function() {
             var hash = window.location.hash;
             if (hash.length == 0) {
@@ -83,12 +92,7 @@ const vm = new Vue({
             // get past requests
             this.events = await getRequests(this.domain);
             // subscribe to stream for future requests
-            const source = new EventSource('/requeststream/' + domain);
-            source.onmessage = event => {
-                const data = JSON.parse(event.data);
-                fixRequest(data);
-                this.events.unshift(data);
-            };
+            this.openWebsocket();
         },
     }
 });

@@ -29,7 +29,7 @@ async function createRecord(page, subdomain) {
     await page.click('#create')
     await expect(page.locator('.view-name')).toContainText(subdomain);
     page.on('dialog', dialog => dialog.accept());
-    await page.click('.view-type')
+    await page.click('.edit')
     // I don't know why, but this test is flaky if we only delete once :(
     await page.waitForSelector(".delete")
     const delButton = page.locator(".delete")

@@ -4,7 +4,7 @@ import {
 import template from "./ViewRequest.html";
 export default {
     template: template,
-    props: ["event"],
+    props: ["request"],
     data: function() {
         return {
             clicked: false,

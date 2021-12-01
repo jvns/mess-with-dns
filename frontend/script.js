@@ -8,6 +8,7 @@ import * as schemas from './schemas.json';
 import {
     getRecords,
     getRequests,
+    deleteRequests,
     fixRequest,
     deleteRecord
 } from './common.js';
@@ -31,18 +32,24 @@ const vm = new Vue({
     data: {
         schemas: schemas,
         domain: undefined,
-        events: [],
+        requests: [],
         records: undefined,
         sidebar: true,
     },
 
     methods: {
-        clearAll: function() {
+        clearRecords: function() {
             if (confirm('Are you sure you want to delete all records?')) {
                 for (var record of this.records) {
                     deleteRecord(record);
                 }
                 this.refreshRecords();
+            }
+        },
+        clearRequests: function() {
+            if (confirm('Are you sure you want to delete all requests?')) {
+                deleteRequests(this.domain);
+                this.refreshRequests();
             }
         },
 
@@ -70,13 +77,16 @@ const vm = new Vue({
         refreshRecords: async function() {
             this.records = await getRecords(this.domain);
         },
+        refreshRequests: async function() {
+            this.requests = await getRequests(this.domain);
+        },
 
         openWebsocket: async function() {
             const ws = new WebSocket('ws://' + window.location.host + '/requeststream/' + this.domain);
             ws.onmessage = (event) => {
                 const data = JSON.parse(event.data);
                 fixRequest(data);
-                this.events.unshift(data);
+                this.requests.unshift(data);
             };
             // reopen websocket on close
             ws.onclose = () => {
@@ -94,7 +104,7 @@ const vm = new Vue({
             this.domain = domain;
             this.refreshRecords();
             // get past requests
-            this.events = await getRequests(this.domain);
+            this.refreshRequests();
             // subscribe to stream for future requests
             this.openWebsocket();
         },

@@ -46,6 +46,16 @@ func getSOA() *dns.SOA {
 	return &soa
 }
 
+func deleteRequests(db *sql.DB, name string, w http.ResponseWriter, r *http.Request) {
+	domain := name + ".messwithdns.com."
+	err := DeleteRequestsForDomain(db, domain)
+	if err != nil {
+		fmt.Println("Error deleting requests: ", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+}
+
 func getRequests(db *sql.DB, name string, w http.ResponseWriter, r *http.Request) {
 	domain := name + ".messwithdns.com."
 	requests := GetRequests(db, domain)
@@ -171,6 +181,10 @@ func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case r.Method == "GET" && n == 2 && p[0] == "requests":
 		w.Header().Set("Cache-Control", "private, no-store")
 		getRequests(handle.db, p[1], w, r)
+	// DELETE /requests/test
+	case r.Method == "DELETE" && n == 2 && p[0] == "requests":
+		w.Header().Set("Cache-Control", "private, no-store")
+		deleteRequests(handle.db, p[1], w, r)
 	// GET /requeststream/test
 	case r.Method == "GET" && n == 2 && p[0] == "requeststream":
 		w.Header().Set("Cache-Control", "private, no-store")

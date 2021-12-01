@@ -176,6 +176,13 @@ export async function getRequests(domain) {
     return json;
 }
 
+export async function deleteRequests(domain: string) {
+    const response = await fetch('/requests/' + domain, {
+        method: 'DELETE',
+    });
+    return response;
+}
+
 export async function fixRequest(event) {
     event.request = JSON.parse(event.request);
     event.response = JSON.parse(event.response);

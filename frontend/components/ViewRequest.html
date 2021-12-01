@@ -1,17 +1,17 @@
 <tbody>
   <tr @click="clicked = !clicked">
-    <td class="request-time">{{ localTime(event.created_at) }}</td>
-    <td class="request-host">{{event.src_host}}</td>
-    <td class="request-type">{{rrTypesReverse[event.request.Question[0].Qtype]}}</td>
-    <td class="request-name">{{event.request.Question[0].Name}}</td>
+    <td class="request-time">{{ localTime(request.created_at) }}</td>
+    <td class="request-host">{{request.src_host}}</td>
+    <td class="request-type">{{rrTypesReverse[request.request.Question[0].Qtype]}}</td>
+    <td class="request-name">{{request.request.Question[0].Name}}</td>
     <td class="request-response bg-green-100 border-t border-green-300">
       <div
         class="flex justify-between"
-        v-if="event.response.Answer && event.response.Answer.length > 0"
+        v-if="request.response.Answer && request.response.Answer.length > 0"
       >
         <div>
           <ul class="p-0 m-0">
-            <li v-for="answer in event.response.Answer">
+            <li v-for="answer in request.response.Answer">
               {{formatFull(answer)}}
             </li>
           </ul>
@@ -51,7 +51,7 @@
     <td colspan="4"></td>
     <td colspan="1" class="bg-green-100 p-8 font-mono">
       <ul class="p-0 m-0">
-        <li v-for="answer in event.response.Answer">
+        <li v-for="answer in request.response.Answer">
           Type: {{rrTypesReverse[answer.Hdr.Rrtype]}}<br />
           TTL: {{answer.Hdr.Ttl}}<br />
           Content: {{formatContent(answer)}}

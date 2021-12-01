@@ -156,6 +156,14 @@ func StreamRequest(name string, request []byte, response []byte, src_ip string, 
 	WriteToStreams(base, jsonString)
 }
 
+func DeleteRequestsForDomain(db *sql.DB, domain string) error {
+	_, err := db.Exec("DELETE FROM dns_requests WHERE name LIKE ?", "%"+domain)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func GetRequests(db *sql.DB, domain string) []map[string]interface{} {
 	rows, err := db.Query("SELECT id, created_at, request, response, src_ip, src_host FROM dns_requests WHERE name LIKE ? ORDER BY created_at DESC", "%"+domain)
 	if err != nil {

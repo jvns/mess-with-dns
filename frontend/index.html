@@ -32,7 +32,12 @@
 
                 <new-record :domain='domain' :schemas='schemas'> </new-record>
 
-                <h2 class="font-bold text-xl mb-4 mt-12"> All DNS records </h2>
+                <h2 class="font-bold text-xl mb-4 mt-12"> All DNS records 
+
+                        <a v-if="records && records.length > 0" class="pr-4 cursor-pointer" @click="clearRecords()">
+                            (clear)
+                        </a>
+                </h2>
                 <div v-if="records && records.length > 0">
                     <table class="w-full" id="records">
                         <tr class="bg-gray-100 border border-gray-300">
@@ -54,11 +59,6 @@
                         </tr>
                         <tbody is="record" v-for="record in records" :key="record.id" :record="record" :domain="domain" />
                     </table>
-                    <div class="text-right mt-4">
-                        <button id="clear-all" class="bg-green-500 hover:bg-green-700 text-white py-2 px-4 rounded" @click="clearAll()">
-                            Clear All
-                        </button>
-                    </div>
                 </div>
                 <div v-else-if="records">
                     <p id="no-records-yet">
@@ -71,7 +71,12 @@
                     </p>
                 </div>
 
-                <h2 class="font-bold text-xl mt-12 mb-4"> Requests </h2>
+                <h2 class="font-bold text-xl mt-12 mb-4"> Requestsasdf
+                        <a v-if="requests && requests.length > 0" class="pr-4 cursor-pointer" 
+                            @click="clearRequests()">
+                            (clear)
+                        </a>
+                </h2>
                 <p class="my-4">
                     This is a list of all requests made to our authoritative DNS server for your domain.
                 </p>
@@ -87,7 +92,7 @@
                         </tr>
                     </thead>
 
-                    <tbody is="view-request" v-for="event in events" :event="event" />
+                    <tbody is="view-request" v-for="request in requests" :request="request" />
                 </table>
             </div>
             <experiments :domain="domain"> </experiments>

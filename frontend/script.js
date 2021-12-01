@@ -35,6 +35,7 @@ const vm = new Vue({
         requests: [],
         records: undefined,
         sidebar: true,
+        websocketOpen: false,
     },
 
     methods: {
@@ -83,14 +84,24 @@ const vm = new Vue({
 
         openWebsocket: async function() {
             const ws = new WebSocket('ws://' + window.location.host + '/requeststream/' + this.domain);
+            ws.addEventListener('open', () => {
+                this.websocketOpen = true;
+            }),
+            ws.onerror = () => {
+                // try to reconnect after 5 seconds
+                setTimeout(() => {
+                    this.openWebsocket();
+                }, 5000);
+            }
+            // reopen websocket on close
+            ws.onclose = () => {
+                this.websocketOpen = false;
+                this.openWebsocket();
+            };
             ws.onmessage = (event) => {
                 const data = JSON.parse(event.data);
                 fixRequest(data);
                 this.requests.unshift(data);
-            };
-            // reopen websocket on close
-            ws.onclose = () => {
-                this.openWebsocket();
             };
         },
 

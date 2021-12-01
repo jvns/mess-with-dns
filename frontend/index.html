@@ -71,11 +71,12 @@
                     </p>
                 </div>
 
-                <h2 class="font-bold text-xl mt-12 mb-4"> Requests
+                <h2 class="font-bold text-xl mt-12 mb-8 relative"> Requests
                         <a id="clear-requests" v-if="requests && requests.length > 0" class="pr-4 cursor-pointer" 
                             @click="clearRequests()">
                             (clear)
                         </a>
+                        <span v-if="websocketOpen" class="absolute left-0 top-full pl-2 text-green-700 text-sm font-normal"> updating live </span>
                 </h2>
                 <p class="my-4">
                     This is a list of all requests made to our authoritative DNS server for your domain.

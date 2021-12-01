@@ -48,7 +48,7 @@ async function checkError(page, msg) {
 
 async function clearRecords(page) {
     page.on('dialog', dialog => dialog.accept());
-    const clearAll = page.locator('#clear-all');
+    const clearAll = page.locator('#clear-records');
     await clearAll.click();
     await clearAll.click({force: true});
     await clearAll.click({force: true});

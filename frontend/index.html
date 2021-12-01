@@ -34,7 +34,7 @@
 
                 <h2 class="font-bold text-xl mb-4 mt-12"> All DNS records 
 
-                        <a v-if="records && records.length > 0" class="pr-4 cursor-pointer" @click="clearRecords()">
+                        <a id="clear-records" v-if="records && records.length > 0" class="pr-4 cursor-pointer" @click="clearRecords()">
                             (clear)
                         </a>
                 </h2>

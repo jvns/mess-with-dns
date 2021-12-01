@@ -78,6 +78,10 @@ const vm = new Vue({
                 fixRequest(data);
                 this.events.unshift(data);
             };
+            // reopen websocket on close
+            ws.onclose = () => {
+                this.openWebsocket();
+            };
         },
 
         updateHash: async function() {

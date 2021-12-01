@@ -8,6 +8,10 @@ a {
     color: red;
 }
 
+summary {
+    cursor: pointer;
+}
+
 li {
     margin: .5em 0;
     /* numbers */

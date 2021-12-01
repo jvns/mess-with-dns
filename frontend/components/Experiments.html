@@ -52,15 +52,15 @@
             </h3>
         </summary>
         <p>
-            Now, let's create a CNAME record that points at exactly the
+            Let's create a CNAME record that points at exactly the
             same orange IP address, but indirectly.
         </p>
         <ol>
-            <li>Configure a CNAME record for <domain-link :domain='domain' subdomain='fruit'> </domain-link> that points at <code>orange.messwithdns.com</code>, like this:
+            <li>Create a CNAME record with <br>
+                <strong>Name:</strong> fruit <br>
+                <strong>Target:</strong> <code>orange.messwithdns.com</code> <br>
+                <strong>TTL: </strong> 60  (TTLs are always in seconds on this page), like this:
                 <img src="/images/orange-cname.png">
-                <p class="mt-2">
-                Set the TTL to 60 seconds (TTLs are always in seconds on this page). Here's a screenshot:
-                </p>
             </li>
             <li> Click "Create" </li>
             <li>

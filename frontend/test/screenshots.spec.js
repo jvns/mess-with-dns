@@ -53,8 +53,8 @@ test('homepage snapshot, tablet', async ({ page }) => {
 test('records snapshot, desktop', async ({ page }) => {
     await loadRecords(page);
     await page.setViewportSize({
-        width: 1500,
-        height: 2000,
+        width: 1140,
+        height: 3000,
         deviceScaleFactor: 2
     });
     expect(await page.screenshot()).toMatchSnapshot('records-desktop.png');

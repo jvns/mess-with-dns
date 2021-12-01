@@ -34,6 +34,7 @@ const vm = new Vue({
         domain: undefined,
         requests: [],
         records: undefined,
+        ws: undefined,
         sidebar: true,
         websocketOpen: false,
     },
@@ -85,23 +86,24 @@ const vm = new Vue({
         openWebsocket: async function() {
             const ws = new WebSocket('ws://' + window.location.host + '/requeststream/' + this.domain);
             ws.addEventListener('open', () => {
-                this.websocketOpen = true;
-            }),
-            ws.onerror = () => {
-                // try to reconnect after 5 seconds
-                setTimeout(() => {
-                    this.openWebsocket();
-                }, 5000);
-            }
-            // reopen websocket on close
-            ws.onclose = () => {
-                this.websocketOpen = false;
-                this.openWebsocket();
-            };
+                    this.websocketOpen = true;
+            });
             ws.onmessage = (event) => {
                 const data = JSON.parse(event.data);
                 fixRequest(data);
                 this.requests.unshift(data);
+            };
+            ws.onclose = (e) => {
+                console.log('Websocket is closed. Reconnect will be attempted in 1 second.', e.reason);
+                this.websocketOpen = false;
+                setTimeout(() => {
+                    this.openWebsocket();
+                }, 1000);
+            };
+
+            ws.onerror = (err) => {
+                console.error('Socket encountered error: ', err.message, 'Closing socket');
+                ws.close();
             };
         },
 

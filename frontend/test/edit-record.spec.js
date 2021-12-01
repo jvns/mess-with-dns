@@ -12,7 +12,7 @@ test('Edit should open/close', async ({ page }) => {
     await setName(page);
     await page.type("[name='A']", '1.2.3.4')
     await page.click('#create')
-    const typeBox = page.locator('.view-type')
+    const typeBox = page.locator('.edit')
     await typeBox.click()
     const delButton = page.locator('.delete')
     await delButton.waitFor()
@@ -25,7 +25,7 @@ test('Cancel should close the edit form', async ({ page }) => {
     await setName(page);
     await page.type("[name='A']", '1.2.3.4')
     await page.click('#create')
-    await page.click('.view-type')
+    await page.click('.edit')
     const cancelButton = page.locator('.cancel')
     await cancelButton.click()
     await cancelButton.waitFor({state: 'detached'})
@@ -36,7 +36,7 @@ test('Save should update the record and close the form', async ({ page }) => {
     await setName(page);
     await page.type("[name='A']", '1.2.3.4')
     await page.click('#create')
-    await page.click('.view-type')
+    await page.click('.edit')
     await page.evaluate(() => {
         document.querySelector("#records [name='A']").value = ''
     })
@@ -50,7 +50,7 @@ test('Save should show an error if IP is invalid', async ({ page }) => {
     await setName(page);
     await page.type("[name='A']", '1.2.3.4')
     await page.click('#create')
-    await page.click('.view-type')
+    await page.click('.edit')
     await page.evaluate(() => {
         document.querySelector("#records [name='A']").value = ''
     })

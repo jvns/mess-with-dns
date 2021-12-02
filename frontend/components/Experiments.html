@@ -607,16 +607,16 @@ $ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep 
             In the previous experiments, we were looking at how
             DNS names are cached.
 
-            But you can always query the source of truth for a domain: the <strong> authoritative nameserver </strong> and get an uncached result. Let's
+            But you can always query the source of truth for a domain: the
+            <strong> authoritative nameserver </strong> and get an uncached
+            result. Let's:
+        </p>
         <ul class="pl-2 md:pl-8 steps">
             <li>Create a DNS record with a really long TTL (like 5 hours)</li>
             <li>See that it gets cached by your usual DNS server, but that when we query the authoritative server we get the up-to-date result</li>
         </ul>
-        But you can always query the source of truth for a domain: the <strong> authoritative nameserver </strong>.
-        </p>
 
 
-        <p>
         <ol>
             <li>
 
@@ -624,28 +624,30 @@ $ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep 
                 <ul class="record-expl">
                     <li><strong>Name:</strong> truth <br> </li>
                     <li><strong>IPv4 Address:</strong> <code>1.2.3.4</code> <br> </li>
-                    <li><strong>TTL:</strong> 5</li>
+                    <li><strong>TTL:</strong> 3600</li>
                 </ul>
-                Create an A record for <domain-link :domain='domain'> </domain-link> at <code>example.com</code>, like this:
-                <img src="/images/cname-screenshot.png" class="block border  border-dashed border-green-700 mb-4 mt-2">
+                <img src="/images/truth.png" class="block border  border-dashed border-green-700 mb-4 mt-2">
             </li>
             <li>
                 In your terminal, run
-                <pre>$ dig asdfasdfasdfadsf TODO
-                <pre>ns1.messwithdns.com.</pre>
+                <pre>dig +noall +answer {{currDomain()}}.messwithdns.com</pre>
+                to get the A record for your domain. Run it 5 times just to
+                make sure all of your resolver's servers cache it.
             </li>
             <li>
-                Run:
-                <pre>$ dig +short @ns1.messwithdns.com {{currDomain()}}.messwithdns.com</pre>
-                to get the A record for your domain
-
+                Edit the <code>truth</code> record to have the IP <code>5.6.7.8</code> instead.
             </li>
             <li>
-                Make some changes to your A record, run
-                <pre> dig +short @ns1.messwithdns.com {{currDomain()}}.messwithdns.com </pre> again, and notice the changes are always immediately reflected even if there's a very big TTL!
+                Now, run this command again:.
+                <pre>dig +noall +answer {{currDomain()}}.messwithdns.com</pre>
+                You should see the old IP address: <code>1.2.3.4</code>
+            </li>
+            <li>
+                Now, let's query the authoritative nameserver directly! Run this command:
+                <pre> dig +noall +answer @ns1.messwithdns.com {{currDomain()}}.messwithdns.com </pre>
+                Notice the changes are always immediately reflected even if there's a very big TTL!
             </li>
         </ol>
-        </p>
     </details>
     <details class="experiment">
         <summary>

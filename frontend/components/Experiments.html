@@ -18,36 +18,43 @@
             <span class="font-bold">Tutorial experiments:</span> These 4 experiments explain some DNS basics and how the site works
         </p>
         <details class="experiment">
-            <summary>
+            <summary @click="toggleExperiment()">
                 <h3>
                     1. Create an A record
                     <span class="category">
                         A records
                     </span>
                 </h3>
+                <div class="details-modal-overlay"> </div>
             </summary>
-            <p>
-                Let's create the most basic DNS record: an A record. For the IP address, we'll use an IP (213.188.218.160) I set up
-                for this project which just shows a picture of an orange.
-            </p>
-            <ol>
-                <li>
-                    Create a record with
-                    <ul class="record-expl">
-                        <li><strong>Name:</strong> orange <br> </li>
-                        <li><strong>Type:</strong> A <br> </li>
-                        <li><strong>IPv4 Address:</strong> <code>213.188.218.160</code> <br> </li>
-                        <li><strong>TTL: </strong> 60</li>
-                    </ul>
-                    <img src="/images/orange-a.png">
-                    TTLs are always in seconds on this page.
-                </li>
-                <li> Click "Create" </li>
-                <li>
-                    Go to <domain-link :domain='domain' subdomain='orange'> </domain-link> in your browser
-                </li>
-                <li> You should see a website with a picture of an orange! </li>
-            </ol>
+            <div class="details-modal">
+                <div class="details-modal-title"> 1. Create an A record </div>
+                <div class="details-modal-close"> </div>
+                <div class="details-modal-content">
+                    <p>
+                        Let's create the most basic DNS record: an A record. For the IP address, we'll use an IP (213.188.218.160) I set up
+                        for this project which just shows a picture of an orange.
+                    </p>
+                    <ol>
+                        <li>
+                            Create a record with
+                            <ul class="record-expl">
+                                <li><strong>Name:</strong> orange <br> </li>
+                                <li><strong>Type:</strong> A <br> </li>
+                                <li><strong>IPv4 Address:</strong> <code>213.188.218.160</code> <br> </li>
+                                <li><strong>TTL: </strong> 60</li>
+                            </ul>
+                            <img src="/images/orange-a.png">
+                            TTLs are always in seconds on this page.
+                        </li>
+                        <li> Click "Create" </li>
+                        <li>
+                            Go to <domain-link :domain='domain' subdomain='orange'> </domain-link> in your browser
+                        </li>
+                        <li> You should see a website with a picture of an orange! </li>
+                    </ol>
+                </div>
+            </div>
         </details>
         <details class="experiment">
             <summary>
@@ -57,6 +64,7 @@
                         CNAME records
                     </span>
                 </h3>
+                <div class="details-modal-overlay"> </div>
             </summary>
             <p>
                 Let's create a CNAME record that points at exactly the
@@ -87,6 +95,7 @@
                         requests
                     </span>
                 </h3>
+                <div class="details-modal-overlay"> </div>
             </summary>
             <p>
                 The "Requests" section at the bottom of this page lets you see all
@@ -123,6 +132,7 @@
                         caching
                     </span>
                 </h3>
+                <div class="details-modal-overlay"> </div>
             </summary>
 
             <p class="my-4">
@@ -173,6 +183,7 @@
                     <span class="text-green-700">
                         (click here to see the explanation)
                     </span>
+                    <div class="details-modal-overlay"> </div>
                 </summary>
                 <p>
                     Here's what happens with "visit-after", where everything's working as expected
@@ -211,6 +222,7 @@
                         caching
                     </span>
                 </h3>
+                <div class="details-modal-overlay"> </div>
             </summary>
             <p>
                 Setting a very long TTL (like 10 days) makes your life very
@@ -288,6 +300,7 @@
                     <span class="text-green-700">
                         (click here to see the explanation)
                     </span>
+                <div class="details-modal-overlay"> </div>
                 </summary>
 
                 <p>
@@ -338,6 +351,7 @@
                         A records
                     </span>
                 </h3>
+                <div class="details-modal-overlay"> </div>
             </summary>
             <p>
                 Did you know that if you point 2 different domains at the same IP
@@ -367,6 +381,7 @@
                     <span class="text-green-700">
                         (click here to see the explanation)
                     </span>
+                <div class="details-modal-overlay"> </div>
                 </summary>
                 <p>
                     Why do we get a 404? Well, when your browser requests a website, it
@@ -406,6 +421,7 @@
                         caching
                     </span>
                 </h3>
+                <div class="details-modal-overlay"> </div>
             </summary>
 
             <p class="my-4">
@@ -504,6 +520,7 @@ bad-ip.ionized-twig.messwithdns.com. 30	IN A	30.31.32.33
                         A records
                     </span>
                 </h3>
+                <div class="details-modal-overlay"> </div>
             </summary>
             Lots of domains have multiple IP addresses associated with them.
             Usually you don't notice because the two IP addresses serve the exact
@@ -605,6 +622,7 @@ $ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep 
                         authoritative nameserver
                     </span>
                 </h3>
+                <div class="details-modal-overlay"> </div>
             </summary>
 
             <p>
@@ -661,6 +679,7 @@ $ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep 
                         TXT records
                     </span>
                 </h3>
+                <div class="details-modal-overlay"> </div>
             </summary>
         </details>
 
@@ -672,6 +691,7 @@ $ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep 
                         MX records
                     </span>
                 </h3>
+                <div class="details-modal-overlay"> </div>
             </summary>
             <ol>
                 <li>
@@ -707,6 +727,7 @@ $ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep 
                         CNAME records
                     </span>
                 </h3>
+                <div class="details-modal-overlay"> </div>
             </summary>
         </details>
         <details class="experiment">
@@ -717,6 +738,7 @@ $ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep 
                         TXT records (SPF)
                     </span>
                 </h3>
+                <div class="details-modal-overlay"> </div>
             </summary>
         </details>
     </div>

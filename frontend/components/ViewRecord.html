@@ -33,42 +33,38 @@
       </button>
     </td>
   </tr>
-  <tr class="table-row md:hidden border border-gray-200 cursor-pointer">
-      <div class="p-2">
-          <div>
-              <strong>Name:</strong>
-              <span class="view-name">
-                  <a :href="'http://' + displayName()" target="_blank" @click="$event.stopPropagation()">{{ displayName() }}</a>
-              </span>
+  <tr class="table-row md:hidden border border-gray-200 cursor-pointer" v-if="!clicked">
+      <div class="p-2 flex">
+          <div class="flex-grow">
+              <div>
+                  <strong>Name:</strong>
+                  <span class="view-name">
+                      <a :href="'http://' + displayName()" target="_blank" @click="$event.stopPropagation()">{{ displayName() }}</a>
+                  </span>
+              </div>
+              <div>
+                  <strong>Type:</strong>
+                  <span class="view-type">{{ record.type }}</span>
+              </div>
+              <div>
+                  <strong>Content:</strong>
+                  <span class="view-content">{{ content() }}</span>
+              </div>
+              <div>
+                  <strong>TTL:</strong>
+                  <span class="view-ttl">{{ record.ttl }}</span>
+              </div>
+
+              <div class="delete pt-2 text-red-700 hover:text-red-500" @click="confirmDelete()">
+                  Delete
+              </div>
           </div>
-          <div>
-              <strong>Type:</strong>
-              <span class="view-type">{{ record.type }}</span>
-          </div>
-          <div>
-              <strong>Content:</strong>
-              <span class="view-content">{{ content() }}</span>
-          </div>
-          <div>
-              <strong>TTL:</strong>
-              <span class="view-ttl">{{ record.ttl }}</span>
-          </div>
-          <div>
-              <span class="view-edit text-right" @click="toggle()">
-                  <button class="edit hover:text-green-700 text-green-500 font-bold py-2 px-4 rounded">
+          <div class="flex flex-col justify-between">
+              <div class="view-edit text-left" @click="toggle()">
+                  <button class="edit hover:text-green-500 text-base text-green-700 font-bold py-2 px-4 rounded">
                       Edit
-                      <span v-if="clicked">
-                          <svg style="transform: rotate(90deg)" fill="currentColor" class="inline w-4" aria-label="caret-right" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
-                              <path d="M4.488 1.85l.854-.353 6.15 6.15v.707l-6.15 6.15-.854-.354V1.85z"></path>
-                          </svg>
-                      </span>
-                      <span v-else>
-                          <svg class="inline w-4" aria-label="caret-right" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
-                              <path d="M4.488 1.85l.854-.353 6.15 6.15v.707l-6.15 6.15-.854-.354V1.85z"></path>
-                          </svg>
-                      </span>
                   </button>
-              </span>
+              </div>
           </div>
       </div>
   </tr>
@@ -78,7 +74,8 @@
       <formulate-form v-model="updated_record" class="mt-2" @submit="updateRecord">
         <div class="md:flex">
         <formulate-input
-            element-class="border border-black rounded-lg mt-2 p-1"
+            element-class="border border-black rounded-lg mt-2 p-1 flex-grow"
+            wrapper-class="flex md:block"
           label="Name"
           name="subdomain"
           type="text"
@@ -103,16 +100,13 @@
           ></formulate-input>
         </div>
 
-        <div class="md:flex text-right mt-4 mb-2">
-          <button type="button" class="delete w-full text-center md:w-auto md:text-left block my-2 md:inline hover:bg-gray-400 mr-auto bg-gray-200 py-2 px-4 rounded " @click="confirmDelete()">
-            Delete
-          </button>
-          <button type="button" class="cancel w-full text-center md:w-auto md:text-left block my-2 md:inline hover:bg-gray-400 bg-gray-200 py-2 px-4 rounded" @click="clicked = false" >
+        <div class="flex justify-between mt-4 mb-2">
+          <button type="button" class="cancel text-center md:w-auto md:text-left block my-2 md:inline hover:bg-gray-400 bg-gray-200 py-2 px-4 rounded" @click="clicked = false" >
             Cancel
           </button>
 
           <formulate-input
-            element-class="save block my-2 w-full text-center md:w-auto md:text-left md:inline hover:bg-green-700 md:ml-4 bg-green-500 text-white py-2 px-4 rounded"
+            element-class="save block my-2 text-center md:w-auto md:text-left md:inline hover:bg-green-700 md:ml-4 bg-green-500 text-white py-2 px-4 rounded"
             type="submit"
             label="Save"
           ></formulate-input>

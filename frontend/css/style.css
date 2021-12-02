@@ -173,17 +173,20 @@ ul.explanation-list {
 }
 
 details.experiment {
-    position: relative;
     margin: 1em 0;
     padding: 1em;
     border: 1px solid #059669;
 }
 
+details.experiment summary {
+    position: relative;
+}
+
+/*
 details.experiment[open] {
     margin: 0;
     position: absolute;
     background-color: white;
-    z-index: 1;
     top: 0;
     left: 0;
     right: 0;
@@ -198,7 +201,6 @@ details.experiment[open]:after {
     left: 0;
     right: -2em;
     opacity: 0.9;
-    z-index: -1;
     background-color: white;
     height: 2000px;
 }
@@ -214,6 +216,7 @@ details.experiment[open] summary:after {
 #experiments details.experiment[open] .category {
     display: none;
 }
+*/
 
 #experiments ol {
     list-style-type: decimal;
@@ -224,8 +227,8 @@ details.experiment[open] summary:after {
 }
 
 #experiments .category {
-    top: -.8em;
-    right: 2em;
+    top: -1.8em;
+    right: -.25em;
     display: block; 
     position: absolute; 
     padding-left: 0.25rem;
@@ -261,4 +264,121 @@ details.experiment[open] summary:after {
 
 .create button:hover {
     background-color: #047857; 
+}
+
+/** details modal *//
+
+
+html {
+    box-sizing: border-box;
+}
+
+*,
+*:before,
+*:after {
+    box-sizing: border-box;
+}
+
+.details-modal {
+    background: #ffffff;
+    border-radius: 0.5em;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    pointer-events: none;
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    /*
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    max-height: 90vh;
+    */
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    z-index: 2;
+}
+
+.details-modal .details-modal-close {
+    align-items: center;
+    color: #111827;
+    display: flex;
+    background: url('/images/x.svg');
+    width: 1rem;
+    height: 1rem;
+    margin: 1.5rem 1rem;
+    background-size: cover;
+    justify-content: center;
+    pointer-events: none;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+.details-modal .details-modal-close svg {
+    display: block;
+}
+
+.details-modal .details-modal-title {
+    color: #111827;
+    padding: 1.5em 2em;
+    pointer-events: all;
+    position: relative;
+    width: calc(100% - 4.5em);
+}
+
+.details-modal .details-modal-title h1 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: normal;
+}
+
+.details-modal .details-modal-content {
+    border-top: 1px solid #e0e0e0;
+    padding: 2em;
+    pointer-events: all;
+    overflow: auto;
+}
+
+.details-modal-overlay {
+    transition: opacity 0.2s ease-out;
+    pointer-events: none;
+    background: white;
+    position: fixed;
+    opacity: 0;
+    bottom: 0;
+    right: 0;
+    left: 66%;
+    top: 0;
+}
+
+nav {
+    z-index: 10;
+}
+
+details[open] .details-modal-overlay {
+    pointer-events: all;
+    opacity: 0.9;
+    z-index: 2;
+}
+
+details summary {
+    list-style: none;
+}
+
+details summary:focus {
+    outline: none;
+}
+
+details summary::-webkit-details-marker {
+    display: none;
+}
+
+details .details-modal-close {
+}
+
+.details-modal-title {
+    font-size: 1rem;
+    font-weight: bold;
 }

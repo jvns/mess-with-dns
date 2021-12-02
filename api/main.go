@@ -151,6 +151,11 @@ func createRecord(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(errMsg))
 		return
 	}
+	parts := strings.Split(rr.Header().Name, ".")
+	domain := strings.Join(parts[:len(parts)-4], ".")
+	if !validateSubdomain(domain, w) {
+		return
+	}
 	InsertRecord(db, rr)
 }
 

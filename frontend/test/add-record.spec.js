@@ -171,5 +171,18 @@ test('server error message', async ({ page }) => {
     await expect(page.locator('.server-error')).toHaveText("Error parsing record: invalid IP address: asdf")
 })
 
+test('server error message: bad domain name', async ({ page }) => {
+    await page.goto('http://localhost:8080');
+    await page.click('#randomSubdomain');
+    await page.waitForSelector("[name='subdomain']")
+    await page.type("[name='ttl']", '30')
+
+    await page.type("[name='subdomain']", "banana^^");
+    await page.type("[name='A']", '1.2.3.4')
+    await page.click('#create')
+    await expect(page.locator('.server-error')).toHaveText("Subdomain 'banana^^' contains invalid character: ^")
+})
+
+
 
 });

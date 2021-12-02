@@ -120,6 +120,30 @@ test('SOA record should appear when added', async ({ page }) => {
     await createRecord(page, subdomain);
 });
 
+test('@ record works', async ({ page }) => {
+    const randstr = await randomString();
+    await page.goto('http://localhost:8080#' + randstr);
+    await page.waitForSelector("[name='subdomain']")
+    await page.type("[name='ttl']", '30')
+    await page.type("[name='subdomain']", "@");
+    await page.type("[name='A']", '1.2.3.4')
+    await page.click('#create')
+    await expect(page.locator('.view-name')).toContainText(randstr + ".messwithdns.com");
+    page.on('dialog', dialog => dialog.accept());
+    await page.click('.edit')
+    // I don't know why, but this test is flaky if we only delete once :(
+    await page.waitForSelector(".delete")
+    const delButton = page.locator(".delete")
+    delButton.click()
+    // I really don't know why these extra clicks are required,
+    // but they seem to make the test less flaky :(
+    delButton.click({force: true})
+    delButton.click({force: true})
+    await page.locator('#records').waitFor({state: 'detached'})
+})
+
+
+
 /********************
  * error message tests
  ******************/

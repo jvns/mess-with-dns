@@ -188,6 +188,19 @@ details.experiment[open] {
     left: 0;
     right: 0;
     padding-bottom: 4em;
+    border: .25em solid #059669;
+}
+
+details.experiment[open]:after {
+    content: ' ';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    opacity: 0.7;
+    z-index: -1;
+    background-color: white;
+    height: 3000px;
 }
 
 details.experiment[open] summary:after {

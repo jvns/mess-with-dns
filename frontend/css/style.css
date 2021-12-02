@@ -74,6 +74,10 @@ input[type=number] {
 
 /***************** experiments */
 
+#experiments {
+    position: relative;
+}
+
 #experiments h3 {
     font-weight: bold;
     margin: 2em 0;
@@ -168,11 +172,34 @@ ul.explanation-list {
     padding: 0 .25em;
 }
 
-.experiment {
+details.experiment {
     position: relative;
     margin: 1em 0;
     padding: 1em;
     border: 1px solid #059669;
+}
+
+details.experiment[open] {
+    margin: 0;
+    position: absolute;
+    background-color: white;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding-bottom: 4em;
+}
+
+details.experiment[open] summary:after {
+    content: "✕ close experiment ✕";
+    position: absolute;
+    bottom: .5rem;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#experiments details.experiment[open] .category {
+    display: none;
 }
 
 #experiments ol {

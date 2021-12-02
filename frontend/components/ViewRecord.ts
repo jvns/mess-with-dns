@@ -1,7 +1,7 @@
 import {
     updateRecord,
     deleteRecord,
-    fullName
+    displayName
 } from '../common';
 
 import * as schemas from '../schemas.json';
@@ -24,8 +24,8 @@ export default {
             }
             this.clicked = !this.clicked;
         },
-        fullName: function() {
-            return fullName(this.record)
+        displayName: function() {
+            return displayName(this.record)
         },
         content: function() {
             let content = "";

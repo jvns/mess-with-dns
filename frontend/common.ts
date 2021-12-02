@@ -31,6 +31,14 @@ for (const key in rrTypes) {
     rrTypesReverse[rrTypes[key]] = key;
 }
 
+export function displayName(record: Record) {
+    if (record.subdomain == '@') {
+        return record.domain + ".messwithdns.com";
+    } else {
+        return record.subdomain + '.' + record.domain + ".messwithdns.com";
+    }
+}
+
 export function fullName(record: Record) {
     if (record.subdomain == '@') {
         return record.domain + ".messwithdns.com.";

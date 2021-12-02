@@ -1,7 +1,7 @@
 <tbody>
   <tr class="border border-gray-200 cursor-pointer" >
     <td class="px-4 py-2 view-name">
-      <a :href="'http://' + fullName()" target="_blank" @click="$event.stopPropagation()">{{ fullName() }}</a>
+      <a :href="'http://' + displayName()" target="_blank" @click="$event.stopPropagation()">{{ displayName() }}</a>
     </td>
     <td class="px-4 py-2 view-type">{{ record.type }}</td>
     <td class="view-content">{{ content() }}</td>

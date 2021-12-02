@@ -196,11 +196,11 @@ details.experiment[open]:after {
     position: absolute;
     top: 0;
     left: 0;
-    right: 0;
-    opacity: 0.7;
+    right: -2em;
+    opacity: 0.9;
     z-index: -1;
     background-color: white;
-    height: 3000px;
+    height: 2000px;
 }
 
 details.experiment[open] summary:after {

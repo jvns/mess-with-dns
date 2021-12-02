@@ -27,6 +27,14 @@ type RecordRequest struct {
 
 var soaSerial uint32
 
+var disallowedDomains = map[string]bool{
+	"ns1":    true,
+	"ns2":    true,
+	"orange": true,
+	"purple": true,
+	"www":    true,
+}
+
 func getSOA() *dns.SOA {
 	var soa = dns.SOA{
 		Hdr: dns.RR_Header{
@@ -156,6 +164,13 @@ func createRecord(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	if !validateSubdomain(domain, w) {
 		return
 	}
+	if disallowedDomains[domain] {
+		errMsg := fmt.Sprintf("Domain '%s' is not allowed", domain)
+		fmt.Println(errMsg)
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(errMsg))
+		return
+	}
 	InsertRecord(db, rr)
 }
 
@@ -280,6 +295,45 @@ func specialHandler(db *sql.DB, name string, qtype uint16) []dns.RR {
 					Ttl:    3600,
 				},
 				A: net.ParseIP("1.2.3.4"),
+			},
+		}
+	}
+	if name == "orange.messwithdns.com." && qtype == dns.TypeA {
+		return []dns.RR{
+			&dns.A{
+				Hdr: dns.RR_Header{
+					Name:   name,
+					Rrtype: dns.TypeA,
+					Class:  dns.ClassINET,
+					Ttl:    3600,
+				},
+				A: net.ParseIP("213.188.218.160"),
+			},
+		}
+	}
+	if name == "purple.messwithdns.com." && qtype == dns.TypeA {
+		return []dns.RR{
+			&dns.A{
+				Hdr: dns.RR_Header{
+					Name:   name,
+					Rrtype: dns.TypeA,
+					Class:  dns.ClassINET,
+					Ttl:    3600,
+				},
+				A: net.ParseIP("213.188.209.192"),
+			},
+		}
+	}
+	if name == "www.messwithdns.com." && qtype == dns.TypeA {
+		return []dns.RR{
+			&dns.CNAME{
+				Hdr: dns.RR_Header{
+					Name:   name,
+					Rrtype: dns.TypeCNAME,
+					Class:  dns.ClassINET,
+					Ttl:    3600,
+				},
+				Target: "mess-with-dns.fly.dev.",
 			},
 		}
 	}

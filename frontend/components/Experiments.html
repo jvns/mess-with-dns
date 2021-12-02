@@ -350,7 +350,7 @@ Let's start with the short TTL!
         </p>
         <ol>
             <li> Visit <a href="https://example.com">example.com</a> in your browser. Notice that you don't get a 404 error.</li>
-            <li> Find the IP address for <code>example.com</code>. You can do this by running <code> dig example.com</code> in your terminal. Or you can just pretend you did it, the IP is <code>93.184.216.34</code> :). </li>
+            <li> Find the IP address for <code>example.com</code>. You can do this by running <code> dig +short example.com</code> in your terminal. Or you can just pretend you did it, the IP is <code>93.184.216.34</code> :). </li>
             <li> 
                 Create an A record with
                 <ul class="record-expl">
@@ -442,7 +442,7 @@ Let's start with the short TTL!
             </li>
             <li>
                 In your terminal, run
-                <pre>$ dig @8.8.8.8 3-ips.{{domain}}.messwithdns.com</pre>
+                <pre>$ dig +noall +answer @8.8.8.8 3-ips.{{domain}}.messwithdns.com</pre>
                 Run it 10 times just to be safe. Google has many DNS servers, so we want to hit most of them.
             </li>
             <li>
@@ -450,7 +450,7 @@ Let's start with the short TTL!
             </li>
             <li>
                 Time to tell Cloudflare about the domain! In your terminal, run
-                <pre>$ dig @1.1.1.1 3-ips.{{domain}}.messwithdns.com</pre>
+                <pre>$ dig +noall +answer @1.1.1.1 3-ips.{{domain}}.messwithdns.com</pre>
                 Run it a few times.
             </li>
             <li>
@@ -459,17 +459,17 @@ Let's start with the short TTL!
             </li>
             <li>
                 Now we'll tell Quad9 about the domain. In your terminal, run
-                <pre>$ dig @9.9.9.9 3-ips.{{domain}}.messwithdns.com</pre>
+                <pre>$ dig +noall +answer @9.9.9.9 3-ips.{{domain}}.messwithdns.com</pre>
             </li>
             <li>
                 Now, let's ask all 3 providers what they think our IP address is. Here's what I see:
 
                 <pre>
-$ dig @8.8.8.8 3-ips.{{domain}}.messwithdns.com
+$ dig +noall +answer @8.8.8.8 3-ips.{{domain}}.messwithdns.com
 bad-ip.ionized-twig.messwithdns.com. 30	IN A	10.11.12.13
-$ dig @1.1.1.1 3-ips.{{domain}}.messwithdns.com
+$ dig +noall +answer @1.1.1.1 3-ips.{{domain}}.messwithdns.com
 bad-ip.ionized-twig.messwithdns.com. 30	IN A	20.21.22.23
-$ dig @9.9.9.9 3-ips.{{domain}}.messwithdns.com
+$ dig +noall +answer @9.9.9.9 3-ips.{{domain}}.messwithdns.com
 bad-ip.ionized-twig.messwithdns.com. 30	IN A	30.31.32.33
 </pre>
                 All of the 3 DNS servers have different opinion about what our IP address is! Mischief managed.
@@ -637,13 +637,13 @@ $ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep 
             </li>
             <li>
                 Run:
-                <pre>$ dig @ns1.messwithdns.com {{currDomain()}}.messwithdns.com</pre>
+                <pre>$ dig +short @ns1.messwithdns.com {{currDomain()}}.messwithdns.com</pre>
                 to get the A record for your domain
 
             </li>
             <li>
                 Make some changes to your A record, run
-                <pre> dig @ns1.messwithdns.com {{currDomain()}}.messwithdns.com </pre> again, and notice the changes are always immediately reflected even if there's a very big TTL!
+                <pre> dig +short @ns1.messwithdns.com {{currDomain()}}.messwithdns.com </pre> again, and notice the changes are always immediately reflected even if there's a very big TTL!
             </li>
         </ol>
         </p>

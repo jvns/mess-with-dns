@@ -188,7 +188,7 @@ details.experiment[open] {
     left: 0;
     right: 0;
     padding-bottom: 4em;
-    border: .25em solid #059669;
+    outline: .25em solid #059669;
 }
 
 details.experiment[open]:after {

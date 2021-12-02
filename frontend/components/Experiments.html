@@ -65,8 +65,8 @@
         <ol>
             <li>Create a record with <br>
                 <ul class="record-expl">
-                    <li><strong>Name:</strong> fruit  </li>
-                    <li><strong>Type:</strong> CNAME  </li>
+                    <li><strong>Name:</strong> fruit </li>
+                    <li><strong>Type:</strong> CNAME </li>
                     <li><strong>Target:</strong> <code>orange.messwithdns.com</code> </li>
                     <li><strong>TTL: </strong> 60</li>
                 </ul>
@@ -90,20 +90,19 @@
         </summary>
         <p>
             The "Requests" section at the bottom of this page lets you see all
-            DNS requests being made for subdomains of <code
-                class="text-green-700">{{ domain}}.messwithdns.com</code>!
-            Let's look at the CNAME record we created in the previous experiment, to see how CNAME records work! 
+            DNS requests being made for subdomains of <code class="text-green-700">{{ domain}}.messwithdns.com</code>!
+            Let's look at the CNAME record we created in the previous experiment, to see how CNAME records work!
         </p>
         <ol>
             <li>Look in the "Requests" section at the bottom of the page. You should see a request for
                 <domain-link :domain='domain' subdomain='orange'> </domain-link>.
             </li>
-            <li> 
+            <li>
                 Look at the "Request source" on the request. Do you recognize
                 it? It might be your ISP, or a public DNS resolver like
-                Cloudflare or Google 
+                Cloudflare or Google
             </li>
-            <li> 
+            <li>
                 Look at the type of the request and response. You should see
                 that it's requesting an A record, but the DNS server responded
                 with a CNAME record.
@@ -126,16 +125,16 @@
 
         <p class="my-4">
             Did you know that just <span clas="font-bold">visiting</span> a
-            domain can make it not work? This is weird but true!  In this experiment, we'll:
-            <ul class="steps">
-                <li>Create a DNS record for a subdomain, and then visit it after (this will work!)</li>
-                <li>Visit a subdomain, and create the DNS record for it, and then visit it again (this <span class="wont">won't</span> work!)</li>
-            </ul>
-            Let's go!
+            domain can make it not work? This is weird but true! In this experiment, we'll:
+        <ul class="steps">
+            <li>Create a DNS record for a subdomain, and then visit it after (this will work!)</li>
+            <li>Visit a subdomain, and create the DNS record for it, and then visit it again (this <span class="wont">won't</span> work!)</li>
+        </ul>
+        Let's go!
         </p>
         <ol>
             <li>
-                Create a CNAME record with 
+                Create a CNAME record with
                 <ul class="record-expl">
                     <li><strong>Name:</strong> visit-after <br> </li>
                     <li><strong>Type:</strong> CNAME <br> </li>
@@ -175,15 +174,15 @@
             </summary>
             <p>
                 Here's what happens with "visit-after", where everything's working as expected
-                <ul class="explanation-list">
-                    <li class="you    "> You create the record </li>
-                    <li class="browser"> Browser asks: where's visit-after.{{domain}}.messwithdns.com? </li>
-                    <li class="server"> DNS server responds: success! </li>
-                </ul>
+            <ul class="explanation-list">
+                <li class="you    "> You create the record </li>
+                <li class="browser"> Browser asks: where's visit-after.{{domain}}.messwithdns.com? </li>
+                <li class="server"> DNS server responds: success! </li>
+            </ul>
             </p>
 
             <p>
-            With visit-before, it doesn't work because of something DNS resolvers do called <strong>negative caching</strong>, where they cache the <strong>absence</strong> of a record.
+                With visit-before, it doesn't work because of something DNS resolvers do called <strong>negative caching</strong>, where they cache the <strong>absence</strong> of a record.
 
             <ul class="explanation-list">
                 <li class="browser ">Browser: where's visit-before.{{domain}}.messwithdns.com? </li>
@@ -196,7 +195,7 @@
                 <li class="resolver">DNS resolver: doesn't exist </li>
                 <li class="you">You: :( :( :( IT EXISTS THOUGH </li>
                 <li class="you">You wait 1 hour and try again, everything works because the cache expired </li>
-                </ul>
+            </ul>
             </p>
         </details>
         </p>
@@ -212,16 +211,16 @@
             </h3>
         </summary>
         <p>
-        Setting a very long TTL (like 10 days) makes your life very
-        inconvenient: if you want to make a change, you need to wait up to 10
-        days for the change to happen! We'll:
-            <ul class="pl-2 md:pl-8 steps">
-                <li> Create a record with a <span class="font-bold">short</span> TTL, visit the page in our browser, change the record, and refresh the page. We'll see the change!</li>
-                <li> Create a record with a <span class="font-bold">long</span> TTL, visit the page in our browser, change the record, and refresh the page. We <span class="wont">won't</span> see the change!</li>
-            </ul>
+            Setting a very long TTL (like 10 days) makes your life very
+            inconvenient: if you want to make a change, you need to wait up to 10
+            days for the change to happen! We'll:
+        <ul class="pl-2 md:pl-8 steps">
+            <li> Create a record with a <span class="font-bold">short</span> TTL, visit the page in our browser, change the record, and refresh the page. We'll see the change!</li>
+            <li> Create a record with a <span class="font-bold">long</span> TTL, visit the page in our browser, change the record, and refresh the page. We <span class="wont">won't</span> see the change!</li>
+        </ul>
         </p>
         <p>
-Let's start with the short TTL! 
+            Let's start with the short TTL!
         </p>
         <ol>
             <li>
@@ -244,13 +243,13 @@ Let's start with the short TTL!
             </li>
             <li>
                 <p>
-                Go to <domain-link subdomain="short-ttl" :domain='domain'> </domain-link>
-                in your browser again. You might need to force-refresh with
-                Ctrl+Shift-R/Cmd+Shift+R, but you should see a purple site now.
-                The update worked!
+                    Go to <domain-link subdomain="short-ttl" :domain='domain'> </domain-link>
+                    in your browser again. You might need to force-refresh with
+                    Ctrl+Shift-R/Cmd+Shift+R, but you should see a purple site now.
+                    The update worked!
                 </p>
                 <p>
-                Now, let's see what happens if you set a long TTL.
+                    Now, let's see what happens if you set a long TTL.
                 </p>
             </li>
             <li>
@@ -289,42 +288,42 @@ Let's start with the short TTL!
                 </span>
             </summary>
 
-    <p>
-        When the TTL is 30 seconds, the second time you make the request, the
-        cache will have expired so you'll get the new version. Here's what that looks like in detail:
-    </p>
-    <ul class="explanation-list">
-        <li class="you ">You create a record</li>
-        <li class="browser ">Browser asks: where's short-ttl.{{domain}}.messwithdns.com? </li>
-        <li class="resolver action">Resolver doesn't have this in cache, so requests it</li>
-        <li class="server ">DNS server responds: Here's the IP! The TTL is 30 seconds!</li>
-        <li class="resolver action">Resolver caches the IP for 30 seconds</li>
-        <li class="resolver">Resolver responds: Here's the IP!</li>
-        <li class="action"> ... 30 seconds pass </li>
-        <li class="you ">You update the record</li>
-        <li class="browser ">Browser asks: where's short-ttl.{{domain}}.messwithdns.com? </li>
-        <li class="resolver action">Resolver notices that the cache expired, and requests it again</li>
-        <li class="server ">DNS server responds: Here's the IP!</li>
-        <li class="resolver action">Resolver caches the IP for 30 seconds</li>
-        <li class="resolver">Resolver responds: Here's the new IP!</li>
-    </ul>
+            <p>
+                When the TTL is 30 seconds, the second time you make the request, the
+                cache will have expired so you'll get the new version. Here's what that looks like in detail:
+            </p>
+            <ul class="explanation-list">
+                <li class="you ">You create a record</li>
+                <li class="browser ">Browser asks: where's short-ttl.{{domain}}.messwithdns.com? </li>
+                <li class="resolver action">Resolver doesn't have this in cache, so requests it</li>
+                <li class="server ">DNS server responds: Here's the IP! The TTL is 30 seconds!</li>
+                <li class="resolver action">Resolver caches the IP for 30 seconds</li>
+                <li class="resolver">Resolver responds: Here's the IP!</li>
+                <li class="action"> ... 30 seconds pass </li>
+                <li class="you ">You update the record</li>
+                <li class="browser ">Browser asks: where's short-ttl.{{domain}}.messwithdns.com? </li>
+                <li class="resolver action">Resolver notices that the cache expired, and requests it again</li>
+                <li class="server ">DNS server responds: Here's the IP!</li>
+                <li class="resolver action">Resolver caches the IP for 30 seconds</li>
+                <li class="resolver">Resolver responds: Here's the new IP!</li>
+            </ul>
 
-    <p>
-    And when the TTL is a big number like 10 days, the cache never expires, so you can't get the updated site. Here's what that looks like:
-    </p>
+            <p>
+                And when the TTL is a big number like 10 days, the cache never expires, so you can't get the updated site. Here's what that looks like:
+            </p>
 
-    <ul class="explanation-list">
-        <li class="you ">You create a record</li>
-        <li class="browser ">Browser asks: where's long-ttl.{{domain}}.messwithdns.com? </li>
-        <li class="resolver action">Resolver doesn't have this in cache, so requests it</li>
-        <li class="server ">DNS server responds: Here's the IP! The TTL is 10 days!</li>
-        <li class="resolver action">Resolver caches the IP for 10 days</li>
-        <li class="resolver">Resolver responds: Here's the IP!</li>
-        <li class="action"> ... 30 seconds pass </li>
-        <li class="you ">You update the record</li>
-        <li class="browser ">Browser asks: where's long-ttl.{{domain}}.messwithdns.com? </li>
-        <li class="resolver">Resolver responds: I have that cached! Here's the IP!</li>
-    </ul>
+            <ul class="explanation-list">
+                <li class="you ">You create a record</li>
+                <li class="browser ">Browser asks: where's long-ttl.{{domain}}.messwithdns.com? </li>
+                <li class="resolver action">Resolver doesn't have this in cache, so requests it</li>
+                <li class="server ">DNS server responds: Here's the IP! The TTL is 10 days!</li>
+                <li class="resolver action">Resolver caches the IP for 10 days</li>
+                <li class="resolver">Resolver responds: Here's the IP!</li>
+                <li class="action"> ... 30 seconds pass </li>
+                <li class="you ">You update the record</li>
+                <li class="browser ">Browser asks: where's long-ttl.{{domain}}.messwithdns.com? </li>
+                <li class="resolver">Resolver responds: I have that cached! Here's the IP!</li>
+            </ul>
         </details>
         </p>
     </details>
@@ -339,8 +338,8 @@ Let's start with the short TTL!
             </h3>
         </summary>
         <p>
-        Did you know that if you point 2 different domains at the same IP
-        address, you can get different webpages when you visit the 2 domains? We're going to
+            Did you know that if you point 2 different domains at the same IP
+            address, you can get different webpages when you visit the 2 domains? We're going to
         <ul class="steps">
             <li>Point your domain at the same IP as a <a href="https://example.com">example.com</a></li>
             <li>Get a 404 error (which is different from what happens when you visit example.com)</li>
@@ -351,7 +350,7 @@ Let's start with the short TTL!
         <ol>
             <li> Visit <a href="https://example.com">example.com</a> in your browser. Notice that you don't get a 404 error.</li>
             <li> Find the IP address for <code>example.com</code>. You can do this by running <code> dig +short example.com</code> in your terminal. Or you can just pretend you did it, the IP is <code>93.184.216.34</code> :). </li>
-            <li> 
+            <li>
                 Create an A record with
                 <ul class="record-expl">
                     <li><strong>Name:</strong> bad-ip <br> </li>
@@ -506,7 +505,7 @@ bad-ip.ionized-twig.messwithdns.com. 30	IN A	30.31.32.33
         </summary>
         Lots of domains have multiple IP addresses associated with them.
         Usually you don't notice because the two IP addresses serve the exact
-        same webpage. But we can see more easily how this works by using two IPs which are totally different websites. 
+        same webpage. But we can see more easily how this works by using two IPs which are totally different websites.
         <ul class="steps">
             <li> Create 2 records that point to different webpages (one orange and one purple) </li>
             <li> Use curl to repeatedly request the same domain, and see what happens!</li>
@@ -527,7 +526,7 @@ bad-ip.ionized-twig.messwithdns.com. 30	IN A	30.31.32.33
                     <li><strong>IPv4 Address:</strong> <code>213.188.209.192</code> <br> </li>
                     <li><strong>TTL:</strong> 5</li>
                 </ul>
-                
+
             </li>
             <li>
                 In your terminal, run
@@ -553,40 +552,40 @@ $ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep 
 &lt;title&gt;purple&lt;/title&gt;
 </pre>
             </li>
-            </ol>
-            It can't make up its mind what website it is!
-            <p class="my-4">
-            <details>
-                <summary>
-                    <span class="text-green-700">
-                        (click here to see the explanation)
-                    </span>
-                </summary>
-                <p>
-                    The weird thing about this experiment is actually that I've seen 3
-                    different results from different people I've tested it with, even though
-                    everyone was using the same version of curl. So, why do different people see
-                    different behaviour? Let's start by thinking about what happens when you run <code>curl</code>.
-                </p>
-                <ul class="explanation-list">
-                    <li class="you    "> You create 2 records </li>
-                    <li class="you"> You run <code>curl conflict.{{domain}}.messwithdns.com</code></li>
-                    <li class="you"> You run <code>curl conflict.{{domain}}.messwithdns.com</code> again, it gets sent to your resolver</li>
-                    <li class="resolver">Resolver has the 2 records cached, and returns them</li>
-                </ul>
-
-                Your resolver now has 2 records, and it needs to decide what order to return them in. It might do any of:
-                <ul class="normal-list">
-                    <li>Return the records in the same order it received them</li>
-                    <li>Change the order every time it receives a request (this is what mine does!)</li>
-                    <li>Pick an order at random</li>
-                    <li>Maybe do something else that I haven't listed here! I don't know!</li>
-                </ul>
-
-                curl will then pick the first record returned, but which one that is depends on the order that the resolver picked.
-
-            </details>
+        </ol>
+        It can't make up its mind what website it is!
+        <p class="my-4">
+        <details>
+            <summary>
+                <span class="text-green-700">
+                    (click here to see the explanation)
+                </span>
+            </summary>
+            <p>
+                The weird thing about this experiment is actually that I've seen 3
+                different results from different people I've tested it with, even though
+                everyone was using the same version of curl. So, why do different people see
+                different behaviour? Let's start by thinking about what happens when you run <code>curl</code>.
             </p>
+            <ul class="explanation-list">
+                <li class="you    "> You create 2 records </li>
+                <li class="you"> You run <code>curl conflict.{{domain}}.messwithdns.com</code></li>
+                <li class="you"> You run <code>curl conflict.{{domain}}.messwithdns.com</code> again, it gets sent to your resolver</li>
+                <li class="resolver">Resolver has the 2 records cached, and returns them</li>
+            </ul>
+
+            Your resolver now has 2 records, and it needs to decide what order to return them in. It might do any of:
+            <ul class="normal-list">
+                <li>Return the records in the same order it received them</li>
+                <li>Change the order every time it receives a request (this is what mine does!)</li>
+                <li>Pick an order at random</li>
+                <li>Maybe do something else that I haven't listed here! I don't know!</li>
+            </ul>
+
+            curl will then pick the first record returned, but which one that is depends on the order that the resolver picked.
+
+        </details>
+        </p>
     </details>
 
 
@@ -606,14 +605,14 @@ $ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep 
 
         <p>
             In the previous experiments, we were looking at how
-            DNS names are cached. 
+            DNS names are cached.
 
             But you can always query the source of truth for a domain: the <strong> authoritative nameserver </strong> and get an uncached result. Let's
-            <ul class="pl-2 md:pl-8 steps">
-                <li>Create a DNS record with a really long TTL (like 5 hours)</li>
-                <li>See that it gets cached by your usual DNS server, but that when we query the authoritative server we get the up-to-date result</li>
-            </ul>
-            But you can always query the source of truth for a domain: the <strong> authoritative nameserver </strong>.
+        <ul class="pl-2 md:pl-8 steps">
+            <li>Create a DNS record with a really long TTL (like 5 hours)</li>
+            <li>See that it gets cached by your usual DNS server, but that when we query the authoritative server we get the up-to-date result</li>
+        </ul>
+        But you can always query the source of truth for a domain: the <strong> authoritative nameserver </strong>.
         </p>
 
 
@@ -683,7 +682,7 @@ $ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep 
             </li>
             <li>
                 Add another MX record with
-<ul class="record-expl">
+                <ul class="record-expl">
                     <li><strong>Name:</strong> @ <br> </li>
                     <li><strong>Preference:</strong> <code>20</code> <br> </li>
                     <li><strong>Target:</strong> <code>ns2.messagingengine.com</code> <br> </li>

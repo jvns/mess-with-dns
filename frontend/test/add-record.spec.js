@@ -207,6 +207,16 @@ test('server error message: bad domain name', async ({ page }) => {
     await expect(page.locator('.server-error')).toHaveText("Subdomain 'banana^^' contains invalid character: ^")
 })
 
+test('no changes to www', async ({ page }) => {
+    await page.goto('http://localhost:8080#www');
+    await page.waitForSelector("[name='subdomain']")
+    await page.type("[name='ttl']", '30')
+    await page.type("[name='subdomain']", "banana");
+    await page.type("[name='A']", '1.2.3.4')
+    await page.click('#create')
+    await expect(page.locator('.server-error')).toHaveText("Sorry, you're not allowed to make changes to 'www' :)")
+})
+
 
 
 });

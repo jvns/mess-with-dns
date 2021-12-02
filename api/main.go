@@ -164,9 +164,8 @@ func createRecord(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	if !validateSubdomain(domain, w) {
 		return
 	}
-	if disallowedDomains[domain] {
-		errMsg := fmt.Sprintf("Domain '%s' is not allowed", domain)
-		fmt.Println(errMsg)
+	if disallowedDomains[parts[len(parts)-4]] {
+		errMsg := fmt.Sprintf("Sorry, you're not allowed to make changes to '%s' :)", parts[len(parts)-4])
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(errMsg))
 		return

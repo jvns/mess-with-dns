@@ -207,3 +207,18 @@ ul.explanation-list {
     padding: 0;
     margin: 0;
 }
+
+/* button */
+.create button {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem; 
+    padding-left: 1rem;
+    padding-right: 1rem; 
+    background-color: #10B981; 
+    color: #ffffff; 
+    border-radius: 0.25rem; 
+}
+
+.create button:hover {
+    background-color: #047857; 
+}

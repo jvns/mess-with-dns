@@ -128,7 +128,7 @@ test('@ record works', async ({ page }) => {
     await page.type("[name='subdomain']", "@");
     await page.type("[name='A']", '1.2.3.4')
     await page.click('#create')
-    await expect(page.locator('.view-name')).toContainText(randstr + ".messwithdns.com");
+    await expect(page.locator('.view-name')).toHaveText(randstr + ".messwithdns.com");
     page.on('dialog', dialog => dialog.accept());
     await page.click('.edit')
     // I don't know why, but this test is flaky if we only delete once :(

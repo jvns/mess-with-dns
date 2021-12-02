@@ -66,26 +66,32 @@
                 </h3>
                 <div class="details-modal-overlay"> </div>
             </summary>
-            <p>
-                Let's create a CNAME record that points at exactly the
-                same orange IP address, but indirectly.
-            </p>
-            <ol>
-                <li>Create a record with <br>
-                    <ul class="record-expl">
-                        <li><strong>Name:</strong> fruit </li>
-                        <li><strong>Type:</strong> CNAME </li>
-                        <li><strong>Target:</strong> <code>orange.messwithdns.com</code> </li>
-                        <li><strong>TTL: </strong> 60</li>
-                    </ul>
-                    <img src="/images/orange-cname.png">
-                </li>
-                <li> Click "Create" </li>
-                <li>
-                    Go to <domain-link :domain='domain' subdomain='fruit'> </domain-link> in your browser.
-                </li>
-                <li> You should see a website with a picture of an orange! </li>
-            </ol>
+            <div class="details-modal">
+                <div class="details-modal-title">2. Create a CNAME record</div>
+                <div class="details-modal-close"> </div>
+                <div class="details-modal-content">
+                    <p>
+                        Let's create a CNAME record that points at exactly the
+                        same orange IP address, but indirectly.
+                    </p>
+                    <ol>
+                        <li>Create a record with <br>
+                            <ul class="record-expl">
+                                <li><strong>Name:</strong> fruit </li>
+                                <li><strong>Type:</strong> CNAME </li>
+                                <li><strong>Target:</strong> <code>orange.messwithdns.com</code> </li>
+                                <li><strong>TTL: </strong> 60</li>
+                            </ul>
+                            <img src="/images/orange-cname.png">
+                        </li>
+                        <li> Click "Create" </li>
+                        <li>
+                            Go to <domain-link :domain='domain' subdomain='fruit'> </domain-link> in your browser.
+                        </li>
+                        <li> You should see a website with a picture of an orange! </li>
+                    </ol>
+                </div>
+            </div>
         </details>
         <details class="experiment">
             <summary>
@@ -134,84 +140,89 @@
                 </h3>
                 <div class="details-modal-overlay"> </div>
             </summary>
+            <div class="details-modal">
+                <div class="details-modal-title"> 1. Visit a domain before creating its DNS record </div>
+                <div class="details-modal-close"> </div>
+                <div class="details-modal-content">
 
-            <p class="my-4">
-                Did you know that just <span clas="font-bold">visiting</span> a
-                domain can make it not work? This is weird but true! In this experiment, we'll:
-            <ul class="steps">
-                <li>Create a DNS record for a subdomain, and then visit it after (this will work!)</li>
-                <li>Visit a subdomain, and create the DNS record for it, and then visit it again (this <span class="wont">won't</span> work!)</li>
-            </ul>
-            Let's go!
-            </p>
-            <ol>
-                <li>
-                    Create a CNAME record with
-                    <ul class="record-expl">
-                        <li><strong>Name:</strong> visit-after <br> </li>
-                        <li><strong>Type:</strong> CNAME <br> </li>
-                        <li><strong>Target:</strong> <code>orange.messwithdns.com</code> <br> </li>
-                        <li><strong>TTL: </strong> 3600</li>
+                    <p class="my-4">
+                        Did you know that just <span clas="font-bold">visiting</span> a
+                        domain can make it not work? This is weird but true! In this experiment, we'll:
+                    <ul class="steps">
+                        <li>Create a DNS record for a subdomain, and then visit it after (this will work!)</li>
+                        <li>Visit a subdomain, and create the DNS record for it, and then visit it again (this <span class="wont">won't</span> work!)</li>
                     </ul>
-                </li>
-                <li>
-                    Go to <domain-link subdomain="visit-after" :domain='domain'> </domain-link>
-                    in your browser. You should see an orange site -- everything works!
-                </li>
-                <li>
-                    Now, go to <domain-link subdomain="visit-before" :domain='domain'> </domain-link>
-                    in your browser. You should get an error like "Server Not
-                    Found", since we haven't created the record yet.
-                </li>
-                <li>
-                    Create a CNAME record with:
-                    <ul class="record-expl">
-                        <li><strong>Name:</strong> visit-before <br> </li>
-                        <li><strong>Type:</strong> CNAME <br> </li>
-                        <li><strong>Target:</strong> <code>orange.messwithdns.com</code> <br> </li>
-                        <li><strong>TTL: </strong> 3600</li>
-                    </ul>
-                </li>
-                <li>
-                    Go to <domain-link subdomain="visit-before" :domain='domain'> </domain-link> in your browser again. You should get the same "Server Not Found" error as before. Even if you force reload the page!
-                </li>
-            </ol>
+                    Let's go!
+                    </p>
+                    <ol>
+                        <li>
+                            Create a CNAME record with
+                            <ul class="record-expl">
+                                <li><strong>Name:</strong> visit-after <br> </li>
+                                <li><strong>Type:</strong> CNAME <br> </li>
+                                <li><strong>Target:</strong> <code>orange.messwithdns.com</code> <br> </li>
+                                <li><strong>TTL: </strong> 3600</li>
+                            </ul>
+                        </li>
+                        <li>
+                            Go to <domain-link subdomain="visit-after" :domain='domain'> </domain-link>
+                            in your browser. You should see an orange site -- everything works!
+                        </li>
+                        <li>
+                            Now, go to <domain-link subdomain="visit-before" :domain='domain'> </domain-link>
+                            in your browser. You should get an error like "Server Not
+                            Found", since we haven't created the record yet.
+                        </li>
+                        <li>
+                            Create a CNAME record with:
+                            <ul class="record-expl">
+                                <li><strong>Name:</strong> visit-before <br> </li>
+                                <li><strong>Type:</strong> CNAME <br> </li>
+                                <li><strong>Target:</strong> <code>orange.messwithdns.com</code> <br> </li>
+                                <li><strong>TTL: </strong> 3600</li>
+                            </ul>
+                        </li>
+                        <li>
+                            Go to <domain-link subdomain="visit-before" :domain='domain'> </domain-link> in your browser again. You should get the same "Server Not Found" error as before. Even if you force reload the page!
+                        </li>
+                    </ol>
 
-            <p class="my-4">
-            <details>
-                <summary>
-                    <span class="text-green-700">
-                        (click here to see the explanation)
-                    </span>
-                    <div class="details-modal-overlay"> </div>
-                </summary>
-                <p>
-                    Here's what happens with "visit-after", where everything's working as expected
-                <ul class="explanation-list">
-                    <li class="you    "> You create the record </li>
-                    <li class="browser"> Browser asks: where's visit-after.{{domain}}.messwithdns.com? </li>
-                    <li class="server"> DNS server responds: success! </li>
-                </ul>
-                </p>
+                    <p class="my-4">
+                    <details>
+                        <summary>
+                            <span class="text-green-700">
+                                (click here to see the explanation)
+                            </span>
+                        </summary>
+                        <p>
+                            Here's what happens with "visit-after", where everything's working as expected
+                        <ul class="explanation-list">
+                            <li class="you    "> You create the record </li>
+                            <li class="browser"> Browser asks: where's visit-after.{{domain}}.messwithdns.com? </li>
+                            <li class="server"> DNS server responds: success! </li>
+                        </ul>
+                        </p>
 
-                <p>
-                    With visit-before, it doesn't work because of something DNS resolvers do called <strong>negative caching</strong>, where they cache the <strong>absence</strong> of a record.
+                        <p>
+                            With visit-before, it doesn't work because of something DNS resolvers do called <strong>negative caching</strong>, where they cache the <strong>absence</strong> of a record.
 
-                <ul class="explanation-list">
-                    <li class="browser ">Browser: where's visit-before.{{domain}}.messwithdns.com? </li>
-                    <li class="server  ">DNS server: doesn't exist! </li>
-                    <li class="resolver no-arrow">DNS resolver: "oops it doesn't exist! Better cache that!" </li>
-                    <li class="resolver">DNS resolver: Doesn't exist</li>
-                    <li class="you">You create record </li>
-                    <li class="browser">Request: where's visit-before.{{domain}}.messwithdns.com? </li>
-                    <li class="resolver no-arrow">DNS resolver: "I saw this before!! It doesn't exist!" </li>
-                    <li class="resolver">DNS resolver: doesn't exist </li>
-                    <li class="you">You: :( :( :( IT EXISTS THOUGH </li>
-                    <li class="you">You wait 1 hour and try again, everything works because the cache expired </li>
-                </ul>
-                </p>
-            </details>
-            </p>
+                        <ul class="explanation-list">
+                            <li class="browser ">Browser: where's visit-before.{{domain}}.messwithdns.com? </li>
+                            <li class="server  ">DNS server: doesn't exist! </li>
+                            <li class="resolver no-arrow">DNS resolver: "oops it doesn't exist! Better cache that!" </li>
+                            <li class="resolver">DNS resolver: Doesn't exist</li>
+                            <li class="you">You create record </li>
+                            <li class="browser">Request: where's visit-before.{{domain}}.messwithdns.com? </li>
+                            <li class="resolver no-arrow">DNS resolver: "I saw this before!! It doesn't exist!" </li>
+                            <li class="resolver">DNS resolver: doesn't exist </li>
+                            <li class="you">You: :( :( :( IT EXISTS THOUGH </li>
+                            <li class="you">You wait 1 hour and try again, everything works because the cache expired </li>
+                        </ul>
+                        </p>
+                    </details>
+                    </p>
+                </div>
+            </div>
         </details>
 
         <details class="experiment">

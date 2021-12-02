@@ -46,7 +46,36 @@ func getSOA() *dns.SOA {
 	return &soa
 }
 
+func subdomainError(name string) error {
+	if strings.Contains(name, ".") {
+		return fmt.Errorf("Subdomain cannot contain a period: %s", name)
+	}
+	if len(name) > 63 {
+		return fmt.Errorf("Subdomain cannot be longer than 63 characters: %s", name)
+	}
+	// check for invalid characters
+	for _, c := range name {
+		if !((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '-') {
+			return fmt.Errorf("Subdomain '%s' contains invalid character: %s", name, string(c))
+		}
+	}
+	return nil
+}
+
+func validateSubdomain(name string, w http.ResponseWriter) bool {
+	if err := subdomainError(name); err != nil {
+		fmt.Println("Error validating subdomain: ", err.Error())
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(err.Error()))
+		return false
+	}
+	return true
+}
+
 func deleteRequests(db *sql.DB, name string, w http.ResponseWriter, r *http.Request) {
+	if !validateSubdomain(name, w) {
+		return
+	}
 	domain := name + ".messwithdns.com."
 	err := DeleteRequestsForDomain(db, domain)
 	if err != nil {
@@ -57,6 +86,9 @@ func deleteRequests(db *sql.DB, name string, w http.ResponseWriter, r *http.Requ
 }
 
 func getRequests(db *sql.DB, name string, w http.ResponseWriter, r *http.Request) {
+	if !validateSubdomain(name, w) {
+		return
+	}
 	domain := name + ".messwithdns.com."
 	requests, err := GetRequests(db, domain)
 	if err != nil {
@@ -75,6 +107,9 @@ func getRequests(db *sql.DB, name string, w http.ResponseWriter, r *http.Request
 }
 
 func streamRequests(db *sql.DB, name string, w http.ResponseWriter, r *http.Request) {
+	if !validateSubdomain(name, w) {
+		return
+	}
 	// create websocket connection
 	conn, err := websocket.Upgrade(w, r, nil, 1024, 1024)
 	if err != nil {
@@ -156,6 +191,9 @@ func updateRecord(db *sql.DB, id string, w http.ResponseWriter, r *http.Request)
 }
 
 func getDomains(db *sql.DB, domain string, w http.ResponseWriter, r *http.Request) {
+	if !validateSubdomain(domain, w) {
+		return
+	}
 	// read body from json request
 	records, err := GetRecordsForName(db, domain+".messwithdns.com.")
 	if err != nil {

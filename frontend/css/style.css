@@ -175,23 +175,23 @@ ul.explanation-list {
 details.experiment {
     margin: 1em 0;
     padding: 1em;
-    border: 1px solid #059669;
+    border-radius: 5px;
+}
+
+.tutorial details.experiment {
+    background-color: rgba(251, 207, 232, 0.7);
+}
+
+.weird details.experiment {
+    background-color: rgba(221, 214, 254, 0.7);
+}
+
+.useful details.experiment {
+    background-color: rgba(191, 219, 254, 0.7);
 }
 
 details.experiment summary {
     position: relative;
-}
-
-/*
-details.experiment[open] {
-    margin: 0;
-    position: absolute;
-    background-color: white;
-    top: 0;
-    left: 0;
-    right: 0;
-    padding-bottom: 4em;
-    outline: .25em solid #059669;
 }
 
 details.experiment[open]:after {
@@ -216,7 +216,6 @@ details.experiment[open] summary:after {
 #experiments details.experiment[open] .category {
     display: none;
 }
-*/
 
 #experiments ol {
     list-style-type: decimal;
@@ -230,6 +229,7 @@ details.experiment[open] summary:after {
     top: -1.8em;
     right: -.25em;
     display: block; 
+    display: none; /* todo: maybe put back */
     position: absolute; 
     padding-left: 0.25rem;
     padding-right: 0.25rem; 
@@ -288,12 +288,6 @@ html {
     left: 0;
     top: 0;
     right: 0;
-    /*
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    max-height: 90vh;
-    */
     text-align: left;
     display: flex;
     flex-direction: column;
@@ -304,11 +298,11 @@ html {
     align-items: center;
     color: #111827;
     display: flex;
+    width: 4.5rem;
+    height: 4.5rem;
     background: url('/images/x.svg');
-    width: 1rem;
-    height: 1rem;
-    margin: 1.5rem 1rem;
-    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: 2.5rem center; 
     justify-content: center;
     pointer-events: none;
     position: absolute;
@@ -361,18 +355,6 @@ details[open] .details-modal-overlay {
     pointer-events: all;
     opacity: 0.9;
     z-index: 2;
-}
-
-details summary {
-    list-style: none;
-}
-
-details summary:focus {
-    outline: none;
-}
-
-details summary::-webkit-details-marker {
-    display: none;
 }
 
 details .details-modal-close {

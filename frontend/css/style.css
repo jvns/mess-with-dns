@@ -182,12 +182,24 @@ details.experiment {
     background-color: rgba(251, 207, 232, 0.7);
 }
 
+.tutorial .details-modal .details-modal-content {
+    border-top-color: rgba(251, 207, 232);
+}
+
 .weird details.experiment {
     background-color: rgba(221, 214, 254, 0.7);
 }
 
+.weird .details-modal .details-modal-content {
+    border-top-color: rgba(221, 214, 254);
+}
+
 .useful details.experiment {
     background-color: rgba(191, 219, 254, 0.7);
+}
+
+.useful .details-modal .details-modal-content {
+    border-top-color: rgba(191, 219, 254);
 }
 
 details.experiment summary {
@@ -329,7 +341,7 @@ html {
 }
 
 .details-modal .details-modal-content {
-    border-top: 1px solid #e0e0e0;
+    border-top: 4px solid #e0e0e0;
     padding: 1em 2em;
     pointer-events: all;
     overflow: auto;

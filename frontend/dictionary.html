@@ -18,13 +18,16 @@
                 </h1>
                 <div class="text-right mt-2"> a <a class="underline py-2" href="https://wizardzines.com">wizard zines</a> project</div>
             </div>
-        </div>
     </nav>
 <style>
 .word {
     font-weight: bold;
     vertical-align: top;
     white-space: nowrap;
+}
+
+li {
+    list-style-type: disc;
 }
 
 td {
@@ -58,6 +61,20 @@ td {
                 <td>
                     A common type of DNS record. It contains an hostname
                     address, like <code>example.com</code>. <a href="https://wizardzines.com/comics/cname">CNAME records comic</a>.
+                </td>
+            </tr>
+            <tr>
+                <td class="word">DNS name</td>
+                <td>
+                    Every time you type a domain, subdomain, or sub-sub-domain into your browser, that's a DNS name!
+                    A DNS name (like <code>bananas.prince.fruit.oops.pie.com.</code>) has to:
+                    <ul>
+                        <li> be less than 255 characters</li>
+                        <li> have less than 63 "<code>.</code>"s in it</li>
+                        <li> be composed of only a-z, A-Z, 0-9, and "-" characters</li>
+                        <li> and a couple of other rules </li>
+                    </ul>
+                    Other than that, DNS queries can contain any DNS name.
                 </td>
             </tr>
             <tr>

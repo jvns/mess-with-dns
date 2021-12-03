@@ -1,5 +1,6 @@
 <tbody>
-  <tr class="hidden md:table-row border border-gray-200" >
+  <!-- desktop version -->
+  <tr class="hidden lg:table-row border border-gray-200" >
     <td class="px-4 py-2 view-name">
       <a :href="'http://' + displayName()" target="_blank" @click="$event.stopPropagation()">{{ displayName() }}</a>
     </td>
@@ -33,7 +34,54 @@
       </button>
     </td>
   </tr>
-  <tr class="table-row md:hidden border border-gray-200 cursor-pointer" v-if="!clicked">
+  <tr class="hidden lg:table-row border border-gray-200" v-if="clicked">
+    <td colspan="5" class="pl-4 pl-8">
+      <formulate-form v-model="updated_record" class="mt-2" @submit="updateRecord">
+        <div class="flex">
+        <formulate-input
+            element-class="border border-black rounded-lg mt-2 p-1 flex-grow"
+            wrapper-class="block"
+          label="Name"
+          name="subdomain"
+          type="text"
+          ></formulate-input>
+        <formulate-input
+                element-class="border border-black rounded-lg mt-2 p-1"
+                class="ml-4"
+                name="type"
+                label="Type"
+                type="select"
+                :disabled="true"
+                :options="[record.type]"
+              ></formulate-input>
+
+
+          <formulate-input
+            class="ml-4"
+            element-class="border border-black rounded-lg mt-2 p-1"
+            v-for="item in schemas[record.type]"
+            :key="item.name"
+            v-bind="item"
+          ></formulate-input>
+        </div>
+
+        <div class="flex justify-between mt-4 mb-2">
+          <button type="button" class="cancel text-center w-auto text-left block my-2 inline hover:bg-gray-400 bg-gray-200 py-2 px-4 rounded" @click="clicked = false" >
+            Cancel
+          </button>
+
+          <formulate-input
+            element-class="save block my-2 text-center w-auto text-left inline hover:bg-green-700 ml-4 bg-green-500 text-white py-2 px-4 rounded"
+            type="submit"
+            label="Save"
+          ></formulate-input>
+        </div>
+      </formulate-form>
+    </td>
+  </tr>
+
+  <!-- tablet version -->
+  <tr class="table-row lg:hidden border border-gray-200 cursor-pointer" v-if="!clicked">
       <div class="p-2 flex">
           <div class="flex-grow">
               <div>
@@ -69,49 +117,22 @@
       </div>
   </tr>
 
-  <tr class="border border-gray-200" v-if="clicked">
-    <td colspan="5" class="pl-4 md:pl-8">
-      <formulate-form v-model="updated_record" class="mt-2" @submit="updateRecord">
-        <div class="md:flex">
-        <formulate-input
-            element-class="border border-black rounded-lg mt-2 p-1 flex-grow"
-            wrapper-class="flex md:block"
-          label="Name"
-          name="subdomain"
-          type="text"
-          ></formulate-input>
-        <formulate-input
-                element-class="border border-black rounded-lg mt-2 p-1"
-                class="md:ml-4"
-                name="type"
-                label="Type"
-                type="select"
-                :disabled="true"
-                :options="[record.type]"
-              ></formulate-input>
+  <tr class="lg:hidden table-row border border-gray-200" v-if="clicked">
+      <td colspan="5">
+          <div class="p-2">
+              <formulate-form v-model="updated_record" class="mt-2" @submit="updateRecord">
+                  <formulate-input element-class="border border-black rounded-lg ml-2 p-1 flex-grow" label-class="font-bold" wrapper-class="flex flex-row justify-end items-center" label="Name: " name="subdomain" type="text"></formulate-input>
+                  <formulate-input element-class="border border-black rounded-lg ml-2 p-1 flex-grow" label-class="font-bold" wrapper-class="mt-2 flex flex-row justify-end items-center" name="type" label="Type" type="select" :disabled="true" :options="[record.type]"></formulate-input>
+                  <formulate-input element-class="border border-black rounded-lg ml-2 p-1 flex-grow" label-class="font-bold" wrapper-class="mt-2 flex flex-row justify-end items-center" v-for="item in schemas[record.type]" :key="item.name" v-bind="item"></formulate-input>
+                  <div class="flex justify-between mt-4">
+                      <button type="button" class="cancel text-center block my-2 hover:bg-gray-400 bg-gray-200 py-2 px-4 rounded" @click="clicked = false">
+                          Cancel
+                      </button>
 
-
-          <formulate-input
-            class="md:ml-4"
-            element-class="border border-black rounded-lg mt-2 p-1"
-            v-for="item in schemas[record.type]"
-            :key="item.name"
-            v-bind="item"
-          ></formulate-input>
-        </div>
-
-        <div class="flex justify-between mt-4 mb-2">
-          <button type="button" class="cancel text-center md:w-auto md:text-left block my-2 md:inline hover:bg-gray-400 bg-gray-200 py-2 px-4 rounded" @click="clicked = false" >
-            Cancel
-          </button>
-
-          <formulate-input
-            element-class="save block my-2 text-center md:w-auto md:text-left md:inline hover:bg-green-700 md:ml-4 bg-green-500 text-white py-2 px-4 rounded"
-            type="submit"
-            label="Save"
-          ></formulate-input>
-        </div>
-      </formulate-form>
-    </td>
+                      <formulate-input element-class="save block my-2 text-center  hover:bg-green-700 bg-green-500 text-white py-2 px-4 rounded" type="submit" label="Save"></formulate-input>
+                  </div>
+              </formulate-form>
+          </div>
+      </td>
   </tr>
 </tbody>

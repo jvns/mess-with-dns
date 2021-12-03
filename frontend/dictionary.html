@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title> mess with dns </title>
+    <link rel="stylesheet" type="text/css" href="css/tailwind.min.css" />
+    <link rel="stylesheet" type="text/css" href="css/squiggle.css" />
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
+</head>
+
+<body class="relative">
+    <nav id="nav" class="py-8 squiggle-bottom bg-green-600 text-white" role="navigation">
+        <div class="flex">
+            <div class="m-auto">
+                <h1 class="text-4xl">
+                    <a href="/" class="no-underline">★ mess with dns ★</a>
+                </h1>
+                <div class="text-right mt-2"> a <a class="underline py-2" href="https://wizardzines.com">wizard zines</a> project</div>
+            </div>
+        </div>
+    </nav>
+<style>
+.word {
+    font-weight: bold;
+    vertical-align: top;
+    white-space: nowrap;
+}
+
+td {
+    padding: .5em;
+}
+</style>
+
+    <div style="max-width: 600px" class="m-auto dictionary p-4">
+        <h1 class="text-3xl mt-8 mb-8 text-center"> DNS dictionary</h1>
+
+        <p class="my-4"> Here are a few quick definitions to get you started: </p>
+
+        <table>
+            <tr>
+                <td class="word">A record</td>
+                <td>A very common type of DNS record. It contains an IPv4 address, like <code>1.2.3.4</code></td>
+            </tr>
+            <tr>
+                <td class="word">Authoritative DNS server</td>
+                <td>
+                    This is one type of DNS server. Every domain has an
+                    authoritative DNS server assigned to it.
+                    The way DNS requests generally flow is:
+<pre>you -&gt; DNS resolver -&gt; authoritative
+                         DNS server
+</pre>
+            </td>
+            </tr>
+            <tr>
+                <td class="word">CNAME record</td>
+                <td>
+                    A common type of DNS record. It contains an hostname
+                    address, like <code>example.com</code>. <a href="https://wizardzines.com/comics/cname">CNAME records comic</a>.
+                </td>
+            </tr>
+            <tr>
+                <td class="word">DNS record</td>
+                <td>
+                    When you make a DNS query, you get 0 or more records in response. Every record has at least 4 fields: the <strong>name</strong>, the <strong>TTL</strong>, the <strong>type</strong>, and one or more <strong>content</strong> fields. For example the IP address in an A record is its content.
+                </td>
+            </tr>
+            <tr>
+                <td class="word">DNS resolver</td>
+                <td>This is one type of DNS server. A resolver takes your request, sends it to the right authoritative DNS server, and caches the result. You might be using a resolver run by Google, Cloudflare, or your ISP. </td>
+            </tr>
+            <tr>
+                <td class="word">DNS query</td>
+                <td>
+                    A DNS query is a request that you send to a DNS server. It contains 2 fields: the name (like example.com), and the type (like "A").
+                </td>
+            </tr>
+            <tr>
+                <td class="word">TTL</td>
+                <td>Stands for <strong>Time To Live</strong>.  This is a DNS record field. It's an number of seconds. DNS resolvers use it to decide how long to cache the record.</td>
+            </tr>
+        </table>
+    </div>
+</body>

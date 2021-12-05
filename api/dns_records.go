@@ -15,26 +15,26 @@ func lookupRecords(db *sql.DB, name string, qtype uint16) ([]dns.RR, error) {
 	return GetRecords(db, name, qtype)
 }
 
-func errorResponse(request *dns.Msg) *dns.Msg {
+func emptyMessage(request *dns.Msg) *dns.Msg {
 	msg := dns.Msg{}
 	msg.SetReply(request)
 	msg.Authoritative = true
-	msg.SetRcode(nil, dns.RcodeServerFailure)
 	msg.Ns = []dns.RR{
 		getSOA(soaSerial),
 	}
 	return &msg
 }
 
+func errorResponse(request *dns.Msg) *dns.Msg {
+	msg := emptyMessage(request)
+	msg.SetRcode(request, dns.RcodeServerFailure)
+	return msg
+}
+
 func successResponse(request *dns.Msg, records []dns.RR) *dns.Msg {
-	msg := dns.Msg{}
-	msg.SetReply(request)
-	msg.Authoritative = true
+	msg := emptyMessage(request)
 	msg.Answer = records
-	msg.Ns = []dns.RR{
-		getSOA(soaSerial),
-	}
-	return &msg
+	return msg
 }
 
 var records = map[string]dns.RR{

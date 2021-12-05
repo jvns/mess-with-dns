@@ -55,10 +55,6 @@ type handler struct {
 	ipRanges *Ranges
 }
 
-type RecordRequest struct {
-	Domain string
-}
-
 var soaSerial uint32
 
 func getSOA(serial uint32) *dns.SOA {
@@ -258,111 +254,6 @@ func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func specialHandler(db *sql.DB, name string, qtype uint16) []dns.RR {
-	if name == "messwithdns.com." && qtype == dns.TypeSOA {
-		return []dns.RR{
-			getSOA(soaSerial),
-		}
-	}
-	nameservers := []string{
-		"213.188.214.254",
-		"213.188.214.237",
-	}
-	if name == "fly-test." && qtype == dns.TypeA {
-		return []dns.RR{
-			&dns.A{
-				Hdr: dns.RR_Header{
-					Name:   name,
-					Rrtype: dns.TypeA,
-					Class:  dns.ClassINET,
-					Ttl:    3600,
-				},
-				A: net.ParseIP("1.2.3.4"),
-			},
-		}
-	}
-	if name == "orange.messwithdns.com." && qtype == dns.TypeA {
-		return []dns.RR{
-			&dns.A{
-				Hdr: dns.RR_Header{
-					Name:   name,
-					Rrtype: dns.TypeA,
-					Class:  dns.ClassINET,
-					Ttl:    3600,
-				},
-				A: net.ParseIP("213.188.218.160"),
-			},
-		}
-	}
-	if name == "purple.messwithdns.com." && qtype == dns.TypeA {
-		return []dns.RR{
-			&dns.A{
-				Hdr: dns.RR_Header{
-					Name:   name,
-					Rrtype: dns.TypeA,
-					Class:  dns.ClassINET,
-					Ttl:    3600,
-				},
-				A: net.ParseIP("213.188.209.192"),
-			},
-		}
-	}
-	if name == "www.messwithdns.com." && qtype == dns.TypeA {
-		return []dns.RR{
-			&dns.CNAME{
-				Hdr: dns.RR_Header{
-					Name:   name,
-					Rrtype: dns.TypeCNAME,
-					Class:  dns.ClassINET,
-					Ttl:    3600,
-				},
-				Target: "mess-with-dns.fly.dev.",
-			},
-		}
-	}
-	if name == "ns1.messwithdns.com." && qtype == dns.TypeA {
-		return []dns.RR{
-			&dns.A{
-				Hdr: dns.RR_Header{
-					Name:   name,
-					Rrtype: dns.TypeA,
-					Class:  dns.ClassINET,
-					Ttl:    3600,
-				},
-				A: net.ParseIP(nameservers[0]),
-			},
-		}
-	}
-	if name == "ns2.messwithdns.com." && qtype == dns.TypeA {
-		return []dns.RR{
-			&dns.A{
-				Hdr: dns.RR_Header{
-					Name:   name,
-					Rrtype: dns.TypeA,
-					Class:  dns.ClassINET,
-					Ttl:    3600,
-				},
-				A: net.ParseIP(nameservers[1]),
-			},
-		}
-	}
-
-	return nil
-}
-
-func lookupHost(ranges *Ranges, host net.IP) string {
-	names, err := net.LookupAddr(host.String())
-	if err == nil && len(names) > 0 {
-		return names[0]
-	}
-	// otherwise search ASN database
-	r, err := ranges.FindASN(host)
-	if err != nil {
-		return ""
-	}
-	return r.Name
-}
-
 func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	// get time
 	start := time.Now()
@@ -406,4 +297,17 @@ func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	}
 	remote_addr := w.RemoteAddr().(*net.UDPAddr).IP
 	LogRequest(handle.db, r, &msg, remote_addr, lookupHost(handle.ipRanges, remote_addr))
+}
+
+func lookupHost(ranges *Ranges, host net.IP) string {
+	names, err := net.LookupAddr(host.String())
+	if err == nil && len(names) > 0 {
+		return names[0]
+	}
+	// otherwise search ASN database
+	r, err := ranges.FindASN(host)
+	if err != nil {
+		return ""
+	}
+	return r.Name
 }

@@ -7,6 +7,10 @@ import (
 	"github.com/miekg/dns"
 )
 
+type UnknownRequest struct {
+	Hdr dns.RR_Header
+}
+
 func ParseRecord(jsonString []byte) (dns.RR, error) {
 	rr, err := parseRecord(jsonString)
 	if err != nil {

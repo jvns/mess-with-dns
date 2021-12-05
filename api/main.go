@@ -424,10 +424,6 @@ func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	LogRequest(handle.db, r, &msg, remote_addr, lookupHost(handle.ipRanges, remote_addr))
 }
 
-type UnknownRequest struct {
-	Hdr dns.RR_Header
-}
-
 func main() {
 	db, err := connect()
 	if err != nil {

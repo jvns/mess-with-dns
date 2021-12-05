@@ -29,7 +29,6 @@ func errorResponse(request *dns.Msg) *dns.Msg {
 func successResponse(request *dns.Msg, records []dns.RR) *dns.Msg {
 	msg := dns.Msg{}
 	msg.SetReply(request)
-	msg.SetRcode(request, dns.RcodeServerFailure)
 	msg.Authoritative = true
 	msg.Answer = records
 	msg.Ns = []dns.RR{

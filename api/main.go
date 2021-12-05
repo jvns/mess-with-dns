@@ -57,8 +57,12 @@ type handler struct {
 
 var soaSerial uint32
 
+func makeDomain(name string) string {
+	return name + ".messwithdns.com."
+}
+
 func deleteRequests(db *sql.DB, name string, w http.ResponseWriter, r *http.Request) {
-	domain := name + ".messwithdns.com."
+	domain := makeDomain(name)
 	err := DeleteRequestsForDomain(db, domain)
 	if err != nil {
 		fmt.Println("Error deleting requests: ", err.Error())
@@ -68,7 +72,7 @@ func deleteRequests(db *sql.DB, name string, w http.ResponseWriter, r *http.Requ
 }
 
 func getRequests(db *sql.DB, name string, w http.ResponseWriter, r *http.Request) {
-	domain := name + ".messwithdns.com."
+	domain := makeDomain(name)
 	requests, err := GetRequests(db, domain)
 	if err != nil {
 		fmt.Println("Error getting requests: ", err.Error())
@@ -93,7 +97,7 @@ func streamRequests(db *sql.DB, name string, w http.ResponseWriter, r *http.Requ
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	domain := name + ".messwithdns.com."
+	domain := makeDomain(name)
 	stream := CreateStream(domain)
 	defer stream.Delete()
 	c := stream.Get()
@@ -117,13 +121,6 @@ func createRecord(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 		errMsg := fmt.Sprintf("Error parsing record: %s", err.Error())
 		fmt.Println(errMsg)
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(errMsg))
-		return
-	}
-	if !strings.HasSuffix(rr.Header().Name, ".messwithdns.com.") {
-		errMsg := fmt.Sprintf("Invalid domain: %s", rr.Header().Name)
-		fmt.Println(errMsg)
-		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(errMsg))
 		return
 	}
@@ -157,24 +154,18 @@ func updateRecord(db *sql.DB, id string, w http.ResponseWriter, r *http.Request)
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 	rr, err := ParseRecord(body)
-	// make sure update subdomain is valid
-	if !validateDomainName(rr.Header().Name, w) {
-		return
-	}
 	if err != nil {
 		fmt.Println("Error parsing record: ", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 	}
-	if !strings.HasSuffix(rr.Header().Name, ".messwithdns.com.") {
-		fmt.Println("Invalid domain: ", rr.Header().Name)
-		w.WriteHeader(http.StatusBadRequest)
+	if !validateDomainName(rr.Header().Name, w) {
 		return
 	}
 	UpdateRecord(db, idInt, rr)
 }
 
 func getDomains(db *sql.DB, name string, w http.ResponseWriter, r *http.Request) {
-	domain := name + ".messwithdns.com."
+	domain := makeDomain(name)
 	records, err := GetRecordsForName(db, domain)
 	if err != nil {
 		fmt.Println("Error getting records: ", err.Error())

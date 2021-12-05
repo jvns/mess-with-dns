@@ -57,25 +57,6 @@ type handler struct {
 
 var soaSerial uint32
 
-func getSOA(serial uint32) *dns.SOA {
-	var soa = dns.SOA{
-		Hdr: dns.RR_Header{
-			Name:   "messwithdns.com.",
-			Rrtype: dns.TypeSOA,
-			Class:  dns.ClassINET,
-			Ttl:    300, /* RFC 1035 says soa records always should have a ttl of 0 but cloudflare doesn't seem to do that*/
-		},
-		Ns:      "ns1.messwithdns.com.",
-		Mbox:    "julia.wizardzines.com.",
-		Serial:  serial,
-		Refresh: 3600,
-		Retry:   3600,
-		Expire:  7300,
-		Minttl:  3600, // MINIMUM is a lower bound on the TTL field for all RRs in a zone
-	}
-	return &soa
-}
-
 func deleteRequests(db *sql.DB, name string, w http.ResponseWriter, r *http.Request) {
 	domain := name + ".messwithdns.com."
 	err := DeleteRequestsForDomain(db, domain)
@@ -255,38 +236,17 @@ func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
-	// get time
 	start := time.Now()
-	msg := dns.Msg{}
-	msg.SetReply(r)
-	msg.Authoritative = true
 	fmt.Println("Received request: ", r.Question[0].String())
-	specialRecords := specialHandler(handle.db, r.Question[0].Name, r.Question[0].Qtype)
-	if len(specialRecords) > 0 {
-		msg.Answer = specialRecords
-	} else {
-		answer, err := GetRecords(handle.db, r.Question[0].Name, r.Question[0].Qtype)
-		if err != nil {
-			// internal server error
-			msg := dns.Msg{}
-			msg.SetRcode(r, dns.RcodeServerFailure)
-			w.WriteMsg(&msg)
-			fmt.Println("Error getting records:", err)
-			return
-		}
-		msg.Answer = answer
-	}
-	// add SOA record
-	msg.Ns = []dns.RR{
-		getSOA(soaSerial),
-	}
-	err := w.WriteMsg(&msg)
+
+	records, err := lookupRecords(handle.db, r.Question[0].Name, r.Question[0].Qtype)
 	if err != nil {
-		fmt.Println("Error writing response: ", err.Error())
+		msg := errorResponse(r)
+		fmt.Println("Error getting records:", err)
+		w.WriteMsg(msg)
 		return
 	}
-	// print response
-	// get time since start
+	msg := successResponse(r, records)
 	elapsed := time.Since(start)
 	if len(msg.Answer) > 0 {
 		fmt.Println("Response: ", msg.Answer[0].String(), elapsed)
@@ -295,8 +255,9 @@ func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 		fmt.Println("Response: (no records found)", elapsed)
 
 	}
+	w.WriteMsg(msg)
 	remote_addr := w.RemoteAddr().(*net.UDPAddr).IP
-	LogRequest(handle.db, r, &msg, remote_addr, lookupHost(handle.ipRanges, remote_addr))
+	LogRequest(handle.db, r, msg, remote_addr, lookupHost(handle.ipRanges, remote_addr))
 }
 
 func lookupHost(ranges *Ranges, host net.IP) string {

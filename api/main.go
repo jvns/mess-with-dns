@@ -150,7 +150,7 @@ func createRecord(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(errMsg))
 		return
 	}
-	if !validateSubdomain(rr.Header().Name, w) {
+	if !validateDomainName(rr.Header().Name, w) {
 		return
 	}
 	InsertRecord(db, rr)
@@ -181,7 +181,7 @@ func updateRecord(db *sql.DB, id string, w http.ResponseWriter, r *http.Request)
 	}
 	rr, err := ParseRecord(body)
 	// make sure update subdomain is valid
-	if !validateSubdomain(rr.Header().Name, w) {
+	if !validateDomainName(rr.Header().Name, w) {
 		return
 	}
 	if err != nil {
@@ -198,7 +198,6 @@ func updateRecord(db *sql.DB, id string, w http.ResponseWriter, r *http.Request)
 
 func getDomains(db *sql.DB, name string, w http.ResponseWriter, r *http.Request) {
 	domain := name + ".messwithdns.com."
-	// read body from json request
 	records, err := GetRecordsForName(db, domain)
 	if err != nil {
 		fmt.Println("Error getting records: ", err.Error())

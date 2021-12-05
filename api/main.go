@@ -16,6 +16,40 @@ import (
 	"github.com/miekg/dns"
 )
 
+func main() {
+	db, err := connect()
+	if err != nil {
+		panic(fmt.Sprintf("Error connecting to database: %s", err.Error()))
+	}
+	soaSerial, err = GetSerial(db)
+	if err != nil {
+		panic(fmt.Sprintf("Error getting SOA serial: %s", err.Error()))
+	}
+	defer db.Close()
+	ranges, err := ReadRanges()
+	if err != nil {
+		panic(fmt.Sprintf("Error reading ranges: %s", err.Error()))
+	}
+	handler := &handler{db: db, ipRanges: &ranges}
+	// udp port command line argument
+	port := ":53"
+	if len(os.Args) > 1 {
+		port = ":" + os.Args[1]
+	}
+	fmt.Println("Listening for UDP on port", port)
+	go func() {
+		srv := &dns.Server{Handler: handler, Addr: port, Net: "udp"}
+		if err := srv.ListenAndServe(); err != nil {
+			panic(fmt.Sprintf("Failed to set udp listener %s\n", err.Error()))
+		}
+	}()
+	fmt.Println("Listening on :8080")
+	err = (&http.Server{Addr: ":8080", Handler: handler}).ListenAndServe()
+	if err != nil {
+		panic(err)
+	}
+}
+
 type handler struct {
 	db       *sql.DB
 	ipRanges *Ranges
@@ -27,15 +61,7 @@ type RecordRequest struct {
 
 var soaSerial uint32
 
-var disallowedDomains = map[string]bool{
-	"ns1":    true,
-	"ns2":    true,
-	"orange": true,
-	"purple": true,
-	"www":    true,
-}
-
-func getSOA() *dns.SOA {
+func getSOA(serial uint32) *dns.SOA {
 	var soa = dns.SOA{
 		Hdr: dns.RR_Header{
 			Name:   "messwithdns.com.",
@@ -45,7 +71,7 @@ func getSOA() *dns.SOA {
 		},
 		Ns:      "ns1.messwithdns.com.",
 		Mbox:    "julia.wizardzines.com.",
-		Serial:  soaSerial,
+		Serial:  serial,
 		Refresh: 3600,
 		Retry:   3600,
 		Expire:  7300,
@@ -54,36 +80,7 @@ func getSOA() *dns.SOA {
 	return &soa
 }
 
-func subdomainError(name string) error {
-	if strings.Contains(name, ".") {
-		return fmt.Errorf("Subdomain cannot contain a period: %s", name)
-	}
-	if len(name) > 63 {
-		return fmt.Errorf("Subdomain cannot be longer than 63 characters: %s", name)
-	}
-	// check for invalid characters
-	for _, c := range name {
-		if !((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '-') {
-			return fmt.Errorf("Subdomain '%s' contains invalid character: %s", name, string(c))
-		}
-	}
-	return nil
-}
-
-func validateSubdomain(name string, w http.ResponseWriter) bool {
-	if err := subdomainError(name); err != nil {
-		fmt.Println("Error validating subdomain: ", err.Error())
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(err.Error()))
-		return false
-	}
-	return true
-}
-
 func deleteRequests(db *sql.DB, name string, w http.ResponseWriter, r *http.Request) {
-	if !validateSubdomain(name, w) {
-		return
-	}
 	domain := name + ".messwithdns.com."
 	err := DeleteRequestsForDomain(db, domain)
 	if err != nil {
@@ -94,9 +91,6 @@ func deleteRequests(db *sql.DB, name string, w http.ResponseWriter, r *http.Requ
 }
 
 func getRequests(db *sql.DB, name string, w http.ResponseWriter, r *http.Request) {
-	if !validateSubdomain(name, w) {
-		return
-	}
 	domain := name + ".messwithdns.com."
 	requests, err := GetRequests(db, domain)
 	if err != nil {
@@ -115,9 +109,6 @@ func getRequests(db *sql.DB, name string, w http.ResponseWriter, r *http.Request
 }
 
 func streamRequests(db *sql.DB, name string, w http.ResponseWriter, r *http.Request) {
-	if !validateSubdomain(name, w) {
-		return
-	}
 	// create websocket connection
 	conn, err := websocket.Upgrade(w, r, nil, 1024, 1024)
 	if err != nil {
@@ -159,15 +150,7 @@ func createRecord(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(errMsg))
 		return
 	}
-	parts := strings.Split(rr.Header().Name, ".")
-	domain := strings.Join(parts[:len(parts)-4], ".")
-	if !validateSubdomain(domain, w) {
-		return
-	}
-	if disallowedDomains[parts[len(parts)-4]] {
-		errMsg := fmt.Sprintf("Sorry, you're not allowed to make changes to '%s' :)", parts[len(parts)-4])
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(errMsg))
+	if !validateSubdomain(rr.Header().Name, w) {
 		return
 	}
 	InsertRecord(db, rr)
@@ -197,6 +180,10 @@ func updateRecord(db *sql.DB, id string, w http.ResponseWriter, r *http.Request)
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 	rr, err := ParseRecord(body)
+	// make sure update subdomain is valid
+	if !validateSubdomain(rr.Header().Name, w) {
+		return
+	}
 	if err != nil {
 		fmt.Println("Error parsing record: ", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
@@ -209,12 +196,10 @@ func updateRecord(db *sql.DB, id string, w http.ResponseWriter, r *http.Request)
 	UpdateRecord(db, idInt, rr)
 }
 
-func getDomains(db *sql.DB, domain string, w http.ResponseWriter, r *http.Request) {
-	if !validateSubdomain(domain, w) {
-		return
-	}
+func getDomains(db *sql.DB, name string, w http.ResponseWriter, r *http.Request) {
+	domain := name + ".messwithdns.com."
 	// read body from json request
-	records, err := GetRecordsForName(db, domain+".messwithdns.com.")
+	records, err := GetRecordsForName(db, domain)
 	if err != nil {
 		fmt.Println("Error getting records: ", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
@@ -277,7 +262,7 @@ func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func specialHandler(db *sql.DB, name string, qtype uint16) []dns.RR {
 	if name == "messwithdns.com." && qtype == dns.TypeSOA {
 		return []dns.RR{
-			getSOA(),
+			getSOA(soaSerial),
 		}
 	}
 	nameservers := []string{
@@ -403,7 +388,7 @@ func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	}
 	// add SOA record
 	msg.Ns = []dns.RR{
-		getSOA(),
+		getSOA(soaSerial),
 	}
 	err := w.WriteMsg(&msg)
 	if err != nil {
@@ -422,38 +407,4 @@ func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	}
 	remote_addr := w.RemoteAddr().(*net.UDPAddr).IP
 	LogRequest(handle.db, r, &msg, remote_addr, lookupHost(handle.ipRanges, remote_addr))
-}
-
-func main() {
-	db, err := connect()
-	if err != nil {
-		panic(fmt.Sprintf("Error connecting to database: %s", err.Error()))
-	}
-	soaSerial, err = GetSerial(db)
-	if err != nil {
-		panic(fmt.Sprintf("Error getting SOA serial: %s", err.Error()))
-	}
-	defer db.Close()
-	ranges, err := ReadRanges()
-	if err != nil {
-		panic(fmt.Sprintf("Error reading ranges: %s", err.Error()))
-	}
-	handler := &handler{db: db, ipRanges: &ranges}
-	// udp port command line argument
-	port := ":53"
-	if len(os.Args) > 1 {
-		port = ":" + os.Args[1]
-	}
-	fmt.Println("Listening for UDP on port", port)
-	go func() {
-		srv := &dns.Server{Handler: handler, Addr: port, Net: "udp"}
-		if err := srv.ListenAndServe(); err != nil {
-			panic(fmt.Sprintf("Failed to set udp listener %s\n", err.Error()))
-		}
-	}()
-	fmt.Println("Listening on :8080")
-	err = (&http.Server{Addr: ":8080", Handler: handler}).ListenAndServe()
-	if err != nil {
-		panic(err)
-	}
 }

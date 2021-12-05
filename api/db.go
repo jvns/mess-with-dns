@@ -32,15 +32,8 @@ func GetSerial(db *sql.DB) (uint32, error) {
 	return serial, nil
 }
 
-func IncrementSerial(db *sql.DB) error {
-	// increment serial and also get the new serial
-	// start transaction
-	tx, err := db.Begin()
-	if err != nil {
-		return err
-	}
-	// update serial
-	_, err = tx.Exec("UPDATE dns_serials SET serial = serial + 1")
+func IncrementSerial(tx *sql.Tx) error {
+	_, err := tx.Exec("UPDATE dns_serials SET serial = serial + 1")
 	if err != nil {
 		return err
 	}
@@ -60,38 +53,38 @@ func IncrementSerial(db *sql.DB) error {
 }
 
 func DeleteRecord(db *sql.DB, id int) error {
-	_, err := db.Exec("DELETE FROM dns_records WHERE id = ?", id)
+	tx, err := db.Begin()
+	_, err = tx.Exec("DELETE FROM dns_records WHERE id = ?", id)
 	if err != nil {
 		return err
 	}
-	IncrementSerial(db)
-	return nil
+	return IncrementSerial(tx)
 }
 
 func UpdateRecord(db *sql.DB, id int, record dns.RR) error {
+	tx, err := db.Begin()
 	jsonString, err := json.Marshal(record)
 	if err != nil {
 		return err
 	}
-	_, err = db.Exec("UPDATE dns_records SET name = ?, rrtype = ?, content = ? WHERE id = ?", record.Header().Name, record.Header().Rrtype, jsonString, id)
+	_, err = tx.Exec("UPDATE dns_records SET name = ?, rrtype = ?, content = ? WHERE id = ?", record.Header().Name, record.Header().Rrtype, jsonString, id)
 	if err != nil {
 		return err
 	}
-	IncrementSerial(db)
-	return nil
+	return IncrementSerial(tx)
 }
 
 func InsertRecord(db *sql.DB, record dns.RR) error {
+	tx, err := db.Begin()
 	jsonString, err := json.Marshal(record)
 	if err != nil {
 		return err
 	}
-	_, err = db.Exec("INSERT INTO dns_records (name, rrtype, content) VALUES (?, ?, ?)", record.Header().Name, record.Header().Rrtype, jsonString)
+	_, err = tx.Exec("INSERT INTO dns_records (name, rrtype, content) VALUES (?, ?, ?)", record.Header().Name, record.Header().Rrtype, jsonString)
 	if err != nil {
 		return err
 	}
-	IncrementSerial(db)
-	return nil
+	return IncrementSerial(tx)
 }
 
 func GetRecordsForName(db *sql.DB, name string) (map[int]dns.RR, error) {

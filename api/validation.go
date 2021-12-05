@@ -31,7 +31,7 @@ func subdomainError(domain string) error {
 	parts := strings.Split(name, ".")
 	subdomain := strings.ToLower(parts[len(parts)-1])
 	if _, ok := disallowedDomains[subdomain]; ok {
-		return fmt.Errorf("Sorry you're not allowed to make changes to '%s' :)", parts[len(parts)-1])
+		return fmt.Errorf("Sorry, you're not allowed to make changes to '%s' :)", parts[len(parts)-1])
 	}
 	if strings.Contains(name, "messwithdns") {
 		return fmt.Errorf("You tried to create a record for %s, you probably didn't want that.", domain)

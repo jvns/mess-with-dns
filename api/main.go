@@ -118,7 +118,12 @@ func createRecord(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	}
 	rr, err := ParseRecord(body)
 	if err != nil {
-		errMsg := fmt.Sprintf("Error parsing record: %s", err.Error())
+		var errMsg string
+		if strings.Contains(err.Error(), "Invalid RR") {
+			errMsg = "Oops, invalid domain name"
+		} else {
+			errMsg = fmt.Sprintf("Error parsing record: %s", err.Error())
+		}
 		fmt.Println(errMsg)
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(errMsg))

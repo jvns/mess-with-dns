@@ -39,7 +39,7 @@ func subdomainError(domain string) error {
 	return nil
 }
 
-func validateSubdomain(name string, w http.ResponseWriter) bool {
+func validateDomainName(name string, w http.ResponseWriter) bool {
 	if err := subdomainError(name); err != nil {
 		fmt.Println("Error validating subdomain: ", err.Error())
 		w.WriteHeader(http.StatusBadRequest)

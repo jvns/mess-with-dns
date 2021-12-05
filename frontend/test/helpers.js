@@ -27,7 +27,7 @@ async function setName(page) {
 
 async function createRecord(page, subdomain) {
     await page.click('#create')
-    await expect(page.locator('.view-name')).toContainText(subdomain);
+    await expect(page.locator('td.view-name')).toContainText(subdomain);
     page.on('dialog', dialog => dialog.accept());
     await page.click('.edit')
     // I don't know why, but this test is flaky if we only delete once :(

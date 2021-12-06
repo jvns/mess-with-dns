@@ -217,14 +217,6 @@ details.experiment[open]:after {
     height: 2000px;
 }
 
-details.experiment[open] summary:after {
-    content: "✕ close experiment ✕";
-    position: absolute;
-    bottom: .5rem;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-
 #experiments details.experiment[open] .category {
     display: none;
 }

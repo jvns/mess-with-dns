@@ -376,3 +376,29 @@ details .details-modal-close {
     font-size: 1rem;
     font-weight: bold;
 }
+
+@media screen and (max-width: 586px) {
+  #nav .nav-row {
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* titlebar link */
+.star-link {
+  position: relative;
+}
+
+.star-link .star {
+  position: relative;
+  display: inline-block;
+  transition: all 200ms ease;
+}
+
+.star-link:hover .star:nth-child(1) {
+  transform: rotate(-20deg) translateX(-2px) translateY(-4px);
+}
+
+.star-link:hover .star:nth-child(2) {
+  transform: rotate(20deg) translateX(2px) translateY(-4px);
+}

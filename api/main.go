@@ -71,9 +71,8 @@ func deleteRequests(db *sql.DB, name string, w http.ResponseWriter, r *http.Requ
 	}
 }
 
-func getRequests(db *sql.DB, name string, w http.ResponseWriter, r *http.Request) {
-	domain := makeDomain(name)
-	requests, err := GetRequests(db, domain)
+func getRequests(db *sql.DB, username string, w http.ResponseWriter, r *http.Request) {
+	requests, err := GetRequests(db, username)
 	if err != nil {
 		fmt.Println("Error getting requests: ", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
@@ -109,7 +108,7 @@ func streamRequests(db *sql.DB, name string, w http.ResponseWriter, r *http.Requ
 	}
 }
 
-func createRecord(db *sql.DB, w http.ResponseWriter, r *http.Request) {
+func createRecord(db *sql.DB, username string, w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		fmt.Println("Error reading body: ", err.Error())
@@ -129,7 +128,7 @@ func createRecord(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(errMsg))
 		return
 	}
-	if !validateDomainName(rr.Header().Name, w) {
+	if !validateDomainName(rr.Header().Name, username, w) {
 		return
 	}
 	InsertRecord(db, rr)
@@ -146,7 +145,7 @@ func deleteRecord(db *sql.DB, id string, w http.ResponseWriter, r *http.Request)
 	DeleteRecord(db, idInt)
 }
 
-func updateRecord(db *sql.DB, id string, w http.ResponseWriter, r *http.Request) {
+func updateRecord(db *sql.DB, username string, id string, w http.ResponseWriter, r *http.Request) {
 	idInt, err := strconv.Atoi(id)
 	if err != nil {
 		fmt.Println("Error parsing id: ", err.Error())
@@ -163,14 +162,14 @@ func updateRecord(db *sql.DB, id string, w http.ResponseWriter, r *http.Request)
 		fmt.Println("Error parsing record: ", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 	}
-	if !validateDomainName(rr.Header().Name, w) {
+	if !validateDomainName(rr.Header().Name, username, w) {
 		return
 	}
 	UpdateRecord(db, idInt, rr)
 }
 
-func getDomains(db *sql.DB, name string, w http.ResponseWriter, r *http.Request) {
-	domain := makeDomain(name)
+func getDomains(db *sql.DB, username string, w http.ResponseWriter, r *http.Request) {
+	domain := makeDomain(username)
 	records, err := GetRecordsForName(db, domain)
 	if err != nil {
 		fmt.Println("Error getting records: ", err.Error())
@@ -187,44 +186,76 @@ func getDomains(db *sql.DB, name string, w http.ResponseWriter, r *http.Request)
 	w.Write(jsonOutput)
 }
 
+func requireLogin(username string, w http.ResponseWriter) bool {
+	w.Header().Set("Cache-Control", "private, no-store")
+	if username == "" {
+		w.WriteHeader(http.StatusUnauthorized)
+		return false
+	}
+	return true
+}
+
 func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Request:", r.URL.Path)
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
 	w.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type")
+	username, _ := ReadSessionUsername(r)
 
 	p := strings.Split(r.URL.Path, "/")[1:]
 	n := len(p)
 	switch {
-	// GET /domain/test : get everything from test.messwithdns.com.
-	case r.Method == "GET" && n == 2 && p[0] == "domains":
-		// set cache control header
-		w.Header().Set("Cache-Control", "private, no-store")
-		getDomains(handle.db, p[1], w, r)
-	// GET /requests/test
-	case r.Method == "GET" && n == 2 && p[0] == "requests":
-		w.Header().Set("Cache-Control", "private, no-store")
-		getRequests(handle.db, p[1], w, r)
-	// DELETE /requests/test
-	case r.Method == "DELETE" && n == 2 && p[0] == "requests":
-		w.Header().Set("Cache-Control", "private, no-store")
-		deleteRequests(handle.db, p[1], w, r)
-	// GET /requeststream/test
-	case r.Method == "GET" && n == 2 && p[0] == "requeststream":
-		w.Header().Set("Cache-Control", "private, no-store")
-		streamRequests(handle.db, p[1], w, r)
+	// GET /domain: get everything from USERNAME.messwithdns.com.
+	case r.Method == "GET" && p[0] == "domains":
+		if !requireLogin(username, w) {
+			return
+		}
+		getDomains(handle.db, username, w, r)
+	// GET /requests
+	case r.Method == "GET" && p[0] == "requests":
+		if !requireLogin(username, w) {
+			return
+		}
+		getRequests(handle.db, username, w, r)
+	// DELETE /requests
+	case r.Method == "DELETE" && p[0] == "requests":
+		if !requireLogin(username, w) {
+			return
+		}
+		deleteRequests(handle.db, username, w, r)
+	// GET /requeststream
+	case r.Method == "GET" && p[0] == "requeststream":
+		if !requireLogin(username, w) {
+			return
+		}
+		streamRequests(handle.db, username, w, r)
 	// POST /record/new: add a new record
 	case r.Method == "POST" && n == 2 && p[0] == "record" && p[1] == "new":
-		w.Header().Set("Cache-Control", "private, no-store")
-		createRecord(handle.db, w, r)
+		if !requireLogin(username, w) {
+			return
+		}
+		createRecord(handle.db, username, w, r)
 	// DELETE /record/<ID>:
 	case r.Method == "DELETE" && n == 2 && p[0] == "record":
-		w.Header().Set("Cache-Control", "private, no-store")
+		if !requireLogin(username, w) {
+			return
+		}
+		// TODO: don't let people delete other people's records
 		deleteRecord(handle.db, p[1], w, r)
 	// POST /record/<ID>: updates a record
 	case r.Method == "POST" && n == 2 && p[0] == "record":
+		if !requireLogin(username, w) {
+			return
+		}
+		updateRecord(handle.db, username, p[1], w, r)
+	// POST /login
+	case r.Method == "GET" && n == 1 && p[0] == "login":
 		w.Header().Set("Cache-Control", "private, no-store")
-		updateRecord(handle.db, p[1], w, r)
+		githubOauth(w)
+	// GET /oauth-callback
+	case r.Method == "GET" && p[0] == "oauth-callback":
+		w.Header().Set("Cache-Control", "private, no-store")
+		oauthCallback(w, r)
 	default:
 		// serve static files
 		http.ServeFile(w, r, "./frontend/"+r.URL.Path)

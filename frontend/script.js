@@ -10,7 +10,8 @@ import {
     getRequests,
     deleteRequests,
     fixRequest,
-    deleteRecord
+    deleteRecord,
+    parseCookies
 } from './common.js';
 
 
@@ -27,6 +28,7 @@ Vue.component('domain-link', DomainLink);
 Vue.component('experiments', Experiments);
 
 
+
 const vm = new Vue({
     el: '#app',
     data: {
@@ -37,6 +39,15 @@ const vm = new Vue({
         ws: undefined,
         sidebar: true,
         websocketOpen: false,
+    },
+
+    mounted() {
+        const cookies = parseCookies();
+        const username = cookies['username'];
+        if (username) {
+            this.domain = username;
+            this.postLogin();
+        }
     },
 
     methods: {
@@ -77,14 +88,14 @@ const vm = new Vue({
             });
         },
         refreshRecords: async function() {
-            this.records = await getRecords(this.domain);
+            this.records = await getRecords();
         },
         refreshRequests: async function() {
-            this.requests = await getRequests(this.domain);
+            this.requests = await getRequests();
         },
 
         openWebsocket: async function() {
-            const ws = new WebSocket('ws://' + window.location.host + '/requeststream/' + this.domain);
+            const ws = new WebSocket('ws://' + window.location.host + '/requeststream');
             ws.addEventListener('open', () => {
                     this.websocketOpen = true;
             });
@@ -106,15 +117,7 @@ const vm = new Vue({
                 ws.close();
             };
         },
-
-        updateHash: async function() {
-            var hash = window.location.hash;
-            if (hash.length == 0) {
-                this.domain = undefined;
-                return;
-            }
-            var domain = hash.substring(1);
-            this.domain = domain;
+        postLogin: async function() {
             this.refreshRecords();
             // get past requests
             this.refreshRequests();
@@ -123,5 +126,3 @@ const vm = new Vue({
         },
     }
 });
-vm.updateHash();
-window.onhashchange = vm.updateHash;

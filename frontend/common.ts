@@ -162,8 +162,8 @@ export async function createRecord(record: Record) {
     return response;
 }
 
-export async function getRecords(domain) {
-    const response = await fetch('/domains/' + domain);
+export async function getRecords() {
+    const response = await fetch('/domains');
     const json = await response.json();
     // id is key, value is record
     const records = [];
@@ -175,8 +175,8 @@ export async function getRecords(domain) {
     return records;
 }
 
-export async function getRequests(domain) {
-    const response = await fetch('/requests/' + domain);
+export async function getRequests() {
+    const response = await fetch('/requests');
     const json = await response.json();
     for (const event of json) {
         fixRequest(event);
@@ -184,8 +184,8 @@ export async function getRequests(domain) {
     return json;
 }
 
-export async function deleteRequests(domain: string) {
-    const response = await fetch('/requests/' + domain, {
+export async function deleteRequests() {
+    const response = await fetch('/requests', {
         method: 'DELETE',
     });
     return response;
@@ -194,6 +194,17 @@ export async function deleteRequests(domain: string) {
 export async function fixRequest(event) {
     event.request = JSON.parse(event.request);
     event.response = JSON.parse(event.response);
+}
+
+export function parseCookies() {
+    const cookie = document.cookie;
+    const cookies = cookie.split(';');
+    const cookieObj = {};
+    for (const c of cookies) {
+        const cookie = c.split('=');
+        cookieObj[cookie[0].trim()] = cookie[1];
+    }
+    return cookieObj;
 }
 
 function getSchemaField(type, key) {

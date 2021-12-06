@@ -3,6 +3,18 @@ const {
 } = require('@playwright/test');
 
 
+async function goToUsername(page, name) {
+    // get context
+    const context = page.context();
+    // set cookie
+    await context.addCookies([{
+        name: 'username',
+        value: name,
+        url: 'http://localhost:8080',
+    }]);
+    await page.goto("http://localhost:8080/");
+}
+
 function randomString() {
     const length = 16;
     var result = '';
@@ -61,6 +73,7 @@ module.exports = {
     setName,
     createRecord,
     checkError,
-    clearRecords
+    clearRecords,
+    goToUsername
 }
 

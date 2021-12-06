@@ -55,19 +55,11 @@ input[type=number] {
     -moz-appearance: textfield;
 }
 
-.request-table thead {
-    background-color: #eee;
-    border: 1px solid #ccc;
-}
-
-.request-table th {
-    padding: .5em;
-    font-family: monospace;
-    font-size: 1rem;
+.request-table {
 }
 
 .request-table td {
-    padding: 5px .5rem;
+    vertical-align: top;
     font-family: monospace;
     font-size: 1rem;
 }

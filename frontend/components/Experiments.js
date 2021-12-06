@@ -18,7 +18,6 @@ export default {
                 </div>
             `;
         });
-        console.log('hi');
     },
     methods: {
         currDomain: function() {

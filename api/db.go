@@ -120,7 +120,8 @@ func LogRequest(db *sql.DB, request *dns.Msg, response *dns.Msg, src_ip net.IP, 
 		return err
 	}
 	name := request.Question[0].Name
-	_, err = db.Exec("INSERT INTO dns_requests (name, request, response, src_ip, src_host) VALUES (?, ?, ?, ?, ?)", name, jsonRequest, jsonResponse, src_ip.String(), src_host)
+	subdomain := getSubdomain(name)
+	_, err = db.Exec("INSERT INTO dns_requests (name, request, response, src_ip, src_host) VALUES (?, ?, ?, ?, ?)", subdomain, jsonRequest, jsonResponse, src_ip.String(), src_host)
 	if err != nil {
 		return err
 	}
@@ -155,16 +156,16 @@ func StreamRequest(name string, request []byte, response []byte, src_ip string, 
 	return nil
 }
 
-func DeleteRequestsForDomain(db *sql.DB, domain string) error {
-	_, err := db.Exec("DELETE FROM dns_requests WHERE name LIKE ?", "%"+domain)
+func DeleteRequestsForDomain(db *sql.DB, subdomain string) error {
+	_, err := db.Exec("DELETE FROM dns_requests WHERE name = ?", subdomain)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func GetRequests(db *sql.DB, domain string) ([]map[string]interface{}, error) {
-	rows, err := db.Query("SELECT id, created_at, request, response, src_ip, src_host FROM dns_requests WHERE name LIKE ? ORDER BY created_at DESC", "%"+domain)
+func GetRequests(db *sql.DB, subdomain string) ([]map[string]interface{}, error) {
+	rows, err := db.Query("SELECT id, created_at, request, response, src_ip, src_host FROM dns_requests WHERE name = ? ORDER BY created_at DESC", subdomain)
 	if err != nil {
 		return make([]map[string]interface{}, 0), err
 	}

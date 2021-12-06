@@ -1,62 +1,25 @@
 <tbody>
-  <tr @click="clicked = !clicked">
-    <td class="request-time">{{ localTime(request.created_at) }}</td>
-    <td class="request-host">{{request.src_host}}</td>
-    <td class="request-type">{{rrTypesReverse[request.request.Question[0].Qtype]}}</td>
-    <td class="request-name">{{request.request.Question[0].Name}}</td>
-    <td class="request-response bg-green-100 border-t border-green-300">
-      <div
-        class="flex justify-between"
-        v-if="request.response.Answer && request.response.Answer.length > 0"
-      >
-        <div>
-          <ul class="p-0 m-0">
-            <li v-for="answer in request.response.Answer">
-              {{formatFull(answer)}}
-            </li>
-          </ul>
-        </div>
-        <span v-if="clicked">
-          <svg
-            style="transform: rotate(90deg)"
-            fill="currentColor"
-            class="inline w-4"
-            aria-label="caret-right"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 16 16"
-          >
-            <path
-              d="M4.488 1.85l.854-.353 6.15 6.15v.707l-6.15 6.15-.854-.354V1.85z"
-            ></path>
-          </svg>
-        </span>
-        <span v-else>
-          <svg
-            class="inline w-4"
-            aria-label="caret-right"
-            fill="currentColor"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 16 16"
-          >
-            <path
-              d="M4.488 1.85l.854-.353 6.15 6.15v.707l-6.15 6.15-.854-.354V1.85z"
-            ></path>
-          </svg>
-        </span>
-      </div>
-      <span v-else> (0 records) </span>
-    </td>
-  </tr>
-  <tr v-if="clicked" class="expand-request">
-    <td colspan="4"></td>
-    <td colspan="1" class="bg-green-100 p-8 font-mono">
-      <ul class="p-0 m-0">
-        <li v-for="answer in request.response.Answer">
-          Type: {{rrTypesReverse[answer.Hdr.Rrtype]}}<br />
-          TTL: {{answer.Hdr.Ttl}}<br />
-          Content: {{formatContent(answer)}}
-        </li>
-      </ul>
-    </td>
-  </tr>
+    <!-- desktop -->
+    <tr class="py-2 lg:py-0 flex flex-col lg:table-row border-t border-b border-gray-200 font-mono text-sm">
+        <td class="lg:px-2 lg:py-4">
+            {{ localTime(request.created_at) }}
+        </td>
+        <td class="lg:px-2 lg:py-4">
+            <strong class="inline lg:hidden">Request:</strong>
+            <div class="border-l-4 pl-4 mb-4 border-green-200">
+                Name: {{request.request.Question[0].Name}} <br>
+                Type: {{rrTypesReverse[request.request.Question[0].Qtype]}} <br>
+                From: {{request.src_host}}
+            </div>
+        </td>
+        <td class="lg:px-2 lg:py-4">
+            <strong class="inline lg:hidden">Response:</strong> <span v-if="!request.response.Answer">no records</span>
+            <div class="border-l-4 pl-4 mb-4 border-pink-200" v-for="answer in request.response.Answer">
+                Type: {{rrTypesReverse[answer.Hdr.Rrtype]}} <br>
+                TTL: {{answer.Hdr.Ttl}} <br>
+                Content: {{formatContent(answer)}}
+            </div>
+        </td>
+    </tr>
 </tbody>
+

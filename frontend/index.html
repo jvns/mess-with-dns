@@ -32,7 +32,7 @@
     </nav>
 
     <div class="flex text-sm flex-wrap justify-start md:justify-end bg-white squiggle-top" id="app">
-        <div id="experiment-time" v-if="domain && domain != ''" class="flex flex-wrap p-8 left-0 bg-white w-full">
+        <div id="experiment-time" v-if="domain && domain != ''" class="flex p-8 left-0 bg-white w-full">
             <div class="md:w-1/2 lg:w-2/3 w-full mb-16 pr-8 xl:pl-32 xl:pr-16">
                 <h1 class="text-xl mb-8" id="subdomain-title">
                     Your subdomain is: <br><span class="font-bold text-green-700">{{ domain }}.messwithdns.com</span>
@@ -95,11 +95,9 @@
 
                 <table class="w-full request-table">
                     <thead>
-                        <tr>
-                            <th class="text-left"> Time </th>
-                            <th class="text-left"> Request source </th>
-                            <th class="text-left"> Request type </th>
-                            <th class="text-left"> Request name </th>
+                        <tr class="hidden lg:table-row bg-gray-100 border border-gray-300">
+                            <th class="text-left px-4 py-2"> Time </th>
+                            <th class="text-left"> Request </th>
                             <th class="text-left"> Response </th>
                         </tr>
                     </thead>
@@ -125,27 +123,11 @@
                 started.
             </p>
             <div class="">
-                <a id="randomSubdomain" class="no-underline bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-xl" :href="'/#' + randomSubdomain()">
-                    Get a random subdomain
+                <!-- login with github -->
+                <a class="no-underline bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-xl" href="/login">
+                    Login with GitHub
                 </a>
             </div>
-            <!-- existing subdomain -->
-            <p class="mt-12 mb-2 text-xl">
-                Or go to an existing subdomain:
-            </p>
-            <div>
-                <formulate-form @submit="setDomain" class="flex flex-wrap">
-                    <formulate-input name="domain" type="text" :placeholder="randomSubdomain()" outer-class="mt-4" element-class="border
-                                     border-green-700 rounded-lg p-1
-                                     h-full text-xl mr-4" required>
-                    </formulate-input>
-                    <formulate-input type="submit" value="Go" outer-class="mt-4" class="bg-green-600
-                                hover:bg-green-700 text-white font-bold
-                            py-2 px-4 rounded-lg
-                            text-xl"></formulate-input>
-                </formulate-form>
-            </div>
-
         </div>
     </div>
 </body>

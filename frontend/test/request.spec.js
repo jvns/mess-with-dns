@@ -4,7 +4,7 @@ const {
     expect
 } = require('@playwright/test');
 
-const { randomString, setName } = require('./helpers');
+const { randomString, setName, goToUsername } = require('./helpers');
 const { Resolver } = require('dns');
 const resolver = new Resolver();
 
@@ -53,7 +53,7 @@ test('clicking request expands it', async ({ page }) => {
 
 test('clearing requests works', async ({ page }) => {
     const name = randomString();
-    await page.goto('http://localhost:8080#' + name);
+    await goToUsername(page, name);
     const fullName = 'bananas.' + name + '.messwithdns.com.'
     await getIp(fullName);
     await expect(page.locator('.request-response')).toHaveText('(0 records)');

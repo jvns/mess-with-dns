@@ -62,8 +62,7 @@ func makeDomain(name string) string {
 }
 
 func deleteRequests(db *sql.DB, name string, w http.ResponseWriter, r *http.Request) {
-	domain := makeDomain(name)
-	err := DeleteRequestsForDomain(db, domain)
+	err := DeleteRequestsForDomain(db, name)
 	if err != nil {
 		fmt.Println("Error deleting requests: ", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)

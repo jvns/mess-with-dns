@@ -198,17 +198,6 @@ details.experiment summary {
     position: relative;
 }
 
-details.experiment[open]:after {
-    content: ' ';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: -2em;
-    opacity: 0.9;
-    background-color: white;
-    height: 2000px;
-}
-
 #experiments details.experiment[open] .category {
     display: none;
 }

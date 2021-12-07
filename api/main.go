@@ -257,6 +257,7 @@ func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		oauthCallback(w, r)
 	default:
 		// serve static files
+		w.Header().Set("Cache-Control", "public, max-age=120")
 		http.ServeFile(w, r, "./frontend/"+r.URL.Path)
 	}
 }

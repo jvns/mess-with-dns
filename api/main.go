@@ -186,7 +186,7 @@ func getDomains(db *sql.DB, username string, w http.ResponseWriter, r *http.Requ
 }
 
 func requireLogin(username string, w http.ResponseWriter) bool {
-	w.Header().Set("Cache-Control", "private, no-store")
+	w.Header().Set("Cache-Control", "no-store")
 	if username == "" {
 		w.WriteHeader(http.StatusUnauthorized)
 		return false
@@ -249,11 +249,11 @@ func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		updateRecord(handle.db, username, p[1], w, r)
 	// POST /login
 	case r.Method == "GET" && n == 1 && p[0] == "login":
-		w.Header().Set("Cache-Control", "private, no-store")
+		w.Header().Set("Cache-Control", "no-store")
 		githubOauth(w)
 	// GET /oauth-callback
 	case r.Method == "GET" && p[0] == "oauth-callback":
-		w.Header().Set("Cache-Control", "private, no-store")
+		w.Header().Set("Cache-Control", "no-store")
 		oauthCallback(w, r)
 	default:
 		// serve static files

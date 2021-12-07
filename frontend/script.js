@@ -51,12 +51,10 @@ const vm = new Vue({
     },
 
     methods: {
-        clearRecords: function() {
+        clearRecords: async function() {
             if (confirm('Are you sure you want to delete all records?')) {
-                for (var record of this.records) {
-                    deleteRecord(record);
-                }
-                this.refreshRecords();
+                await Promise.all(this.records.map(deleteRecord));
+                await this.refreshRecords();
             }
         },
         clearRequests: function() {

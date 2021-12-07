@@ -57,10 +57,10 @@ const vm = new Vue({
                 await this.refreshRecords();
             }
         },
-        clearRequests: function() {
+        clearRequests: async function() {
             if (confirm('Are you sure you want to delete all requests?')) {
-                deleteRequests(this.domain);
-                this.refreshRequests();
+                await deleteRequests(this.domain);
+                await this.refreshRequests();
             }
         },
 
@@ -92,8 +92,14 @@ const vm = new Vue({
             this.requests = await getRequests();
         },
 
-        openWebsocket: async function() {
-            const ws = new WebSocket('ws://' + window.location.host + '/requeststream');
+        openWebsocket: function() {
+            // use insecure socket on localhost
+            var ws;
+            if (window.location.hostname === 'localhost') {
+                ws = new WebSocket('ws://localhost:8080/requeststream');
+            } else {
+                ws = new WebSocket('wss://' + window.location.host + '/requeststream');
+            }
             ws.addEventListener('open', () => {
                     this.websocketOpen = true;
             });
@@ -116,9 +122,11 @@ const vm = new Vue({
             };
         },
         postLogin: async function() {
-            this.refreshRecords();
-            // get past requests
-            this.refreshRequests();
+            // refresh records and requests
+            await Promise.all([
+                this.refreshRecords(),
+                this.refreshRequests()
+            ]);
             // subscribe to stream for future requests
             this.openWebsocket();
         },

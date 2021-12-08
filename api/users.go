@@ -9,14 +9,6 @@ import (
 	"net/http"
 )
 
-/*
-
-CREATE TABLE subdomains (
-  name VARCHAR(255) PRIMARY KEY,
-  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-*/
-
 func getExistingSubdomains(db *sql.DB, word string) ([]string, error) {
 	var subdomains []string
 	rows, err := db.Query("SELECT name FROM subdomains WHERE name LIKE ?", word+"%")

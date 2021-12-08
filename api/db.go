@@ -61,6 +61,22 @@ func DeleteRecord(db *sql.DB, id int) error {
 	return IncrementSerial(tx)
 }
 
+func DeleteOldRecords(db *sql.DB) {
+	// delete records where created_at timestamp is more than a week old
+	_, err := db.Exec("DELETE FROM dns_records WHERE created_at < NOW() - interval 1 week")
+	if err != nil {
+		panic(err)
+	}
+}
+
+func DeleteOldRequests(db *sql.DB) {
+	// delete requests where created_at timestamp is more than a day
+	_, err := db.Exec("DELETE FROM dns_requests WHERE created_at < NOW() - interval 1 day")
+	if err != nil {
+		panic(err)
+	}
+}
+
 func UpdateRecord(db *sql.DB, id int, record dns.RR) error {
 	tx, err := db.Begin()
 	jsonString, err := json.Marshal(record)

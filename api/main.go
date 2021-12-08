@@ -30,6 +30,7 @@ func main() {
 		sentry.CaptureMessage("It works!")
 	}
 	db, err := connect()
+	go cleanup(db)
 	if err != nil {
 		panic(fmt.Sprintf("Error connecting to database: %s", err.Error()))
 	}
@@ -298,6 +299,15 @@ func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	w.WriteMsg(msg)
 	remote_addr := w.RemoteAddr().(*net.UDPAddr).IP
 	LogRequest(handle.db, r, msg, remote_addr, lookupHost(handle.ipRanges, remote_addr))
+}
+
+func cleanup(db *sql.DB) {
+	for {
+		fmt.Println("Deleting old requests...")
+		DeleteOldRequests(db)
+		DeleteOldRecords(db)
+		time.Sleep(time.Minute * 15)
+	}
 }
 
 func lookupHost(ranges *Ranges, host net.IP) string {

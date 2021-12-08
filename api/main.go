@@ -27,7 +27,6 @@ func main() {
 			log.Fatalf("sentry.Init: %s", err)
 		}
 		defer sentry.Recover()
-		sentry.CaptureMessage("It works!")
 	}
 	db, err := connect()
 	go cleanup(db)
@@ -74,11 +73,17 @@ func makeDomain(name string) string {
 	return name + ".messwithdns.com."
 }
 
+func returnError(w http.ResponseWriter, err error, status int) {
+	fmt.Printf("Error [%d]: %s\n", status, err.Error())
+	sentry.CaptureException(err)
+	http.Error(w, err.Error(), status)
+}
+
 func deleteRequests(db *sql.DB, name string, w http.ResponseWriter, r *http.Request) {
 	err := DeleteRequestsForDomain(db, name)
 	if err != nil {
-		fmt.Println("Error deleting requests: ", err.Error())
-		w.WriteHeader(http.StatusInternalServerError)
+		err := fmt.Errorf("Error deleting requests: %s", err.Error())
+		returnError(w, err, http.StatusInternalServerError)
 		return
 	}
 }
@@ -86,14 +91,14 @@ func deleteRequests(db *sql.DB, name string, w http.ResponseWriter, r *http.Requ
 func getRequests(db *sql.DB, username string, w http.ResponseWriter, r *http.Request) {
 	requests, err := GetRequests(db, username)
 	if err != nil {
-		fmt.Println("Error getting requests: ", err.Error())
-		w.WriteHeader(http.StatusInternalServerError)
+		err := fmt.Errorf("Error getting requests: %s", err.Error())
+		returnError(w, err, http.StatusInternalServerError)
 		return
 	}
 	jsonOutput, err := json.Marshal(requests)
 	if err != nil {
-		fmt.Println("Error marshalling json: ", err.Error())
-		w.WriteHeader(http.StatusInternalServerError)
+		err := fmt.Errorf("Error marshalling json: %s", err.Error())
+		returnError(w, err, http.StatusInternalServerError)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
@@ -104,8 +109,8 @@ func streamRequests(db *sql.DB, name string, w http.ResponseWriter, r *http.Requ
 	// create websocket connection
 	conn, err := websocket.Upgrade(w, r, nil, 1024, 1024)
 	if err != nil {
-		fmt.Println("Error upgrading websocket: ", err.Error())
-		w.WriteHeader(http.StatusInternalServerError)
+		err := fmt.Errorf("Error creating websocket connection: %s", err.Error())
+		returnError(w, err, http.StatusInternalServerError)
 		return
 	}
 	domain := makeDomain(name)
@@ -123,8 +128,8 @@ func streamRequests(db *sql.DB, name string, w http.ResponseWriter, r *http.Requ
 func createRecord(db *sql.DB, username string, w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		fmt.Println("Error reading body: ", err.Error())
-		w.WriteHeader(http.StatusInternalServerError)
+		err := fmt.Errorf("Error reading body: %s", err.Error())
+		returnError(w, err, http.StatusInternalServerError)
 		return
 	}
 	rr, err := ParseRecord(body)
@@ -135,12 +140,11 @@ func createRecord(db *sql.DB, username string, w http.ResponseWriter, r *http.Re
 		} else {
 			errMsg = fmt.Sprintf("Error parsing record: %s", err.Error())
 		}
-		fmt.Println(errMsg)
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(errMsg))
+		returnError(w, fmt.Errorf(errMsg), http.StatusBadRequest)
 		return
 	}
-	if !validateDomainName(rr.Header().Name, username, w) {
+	if err = validateDomainName(rr.Header().Name, username); err != nil {
+		returnError(w, err, http.StatusBadRequest)
 		return
 	}
 	InsertRecord(db, rr)
@@ -150,8 +154,8 @@ func deleteRecord(db *sql.DB, id string, w http.ResponseWriter, r *http.Request)
 	// parse int from id
 	idInt, err := strconv.Atoi(id)
 	if err != nil {
-		fmt.Println("Error parsing id: ", err.Error())
-		w.WriteHeader(http.StatusBadRequest)
+		err := fmt.Errorf("Error parsing id: %s", err.Error())
+		returnError(w, err, http.StatusBadRequest)
 		return
 	}
 	DeleteRecord(db, idInt)
@@ -160,21 +164,21 @@ func deleteRecord(db *sql.DB, id string, w http.ResponseWriter, r *http.Request)
 func updateRecord(db *sql.DB, username string, id string, w http.ResponseWriter, r *http.Request) {
 	idInt, err := strconv.Atoi(id)
 	if err != nil {
-		fmt.Println("Error parsing id: ", err.Error())
-		w.WriteHeader(http.StatusBadRequest)
+		returnError(w, fmt.Errorf("Error parsing id: %s", err.Error()), http.StatusBadRequest)
 		return
 	}
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		fmt.Println("Error reading body: ", err.Error())
-		w.WriteHeader(http.StatusInternalServerError)
+		returnError(w, fmt.Errorf("Error reading body: %s", err.Error()), http.StatusInternalServerError)
+		return
 	}
 	rr, err := ParseRecord(body)
 	if err != nil {
-		fmt.Println("Error parsing record: ", err.Error())
-		w.WriteHeader(http.StatusInternalServerError)
+		returnError(w, fmt.Errorf("Error parsing record: %s", err.Error()), http.StatusBadRequest)
+		return
 	}
-	if !validateDomainName(rr.Header().Name, username, w) {
+	if err = validateDomainName(rr.Header().Name, username); err != nil {
+		returnError(w, err, http.StatusBadRequest)
 		return
 	}
 	UpdateRecord(db, idInt, rr)
@@ -184,14 +188,12 @@ func getDomains(db *sql.DB, username string, w http.ResponseWriter, r *http.Requ
 	domain := makeDomain(username)
 	records, err := GetRecordsForName(db, domain)
 	if err != nil {
-		fmt.Println("Error getting records: ", err.Error())
-		w.WriteHeader(http.StatusInternalServerError)
+		returnError(w, fmt.Errorf("Error getting records: %s", err.Error()), http.StatusInternalServerError)
 		return
 	}
 	jsonOutput, err := json.Marshal(records)
 	if err != nil {
-		fmt.Println("Error marshalling json: ", err.Error())
-		w.WriteHeader(http.StatusInternalServerError)
+		returnError(w, fmt.Errorf("Error marshalling json: %s", err.Error()), http.StatusInternalServerError)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")

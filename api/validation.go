@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"net/http"
 	"strings"
 
 	"github.com/miekg/dns"
@@ -28,7 +27,7 @@ func getSubdomain(domain string) string {
 	return strings.ToLower(parts[len(parts)-2])
 }
 
-func subdomainError(domain string, username string) error {
+func validateDomainName(domain string, username string) error {
 	if !strings.HasSuffix(domain, ".") {
 		return fmt.Errorf("Domain must end with a period")
 	}
@@ -51,14 +50,4 @@ func subdomainError(domain string, username string) error {
 		return fmt.Errorf("You tried to create a record for %s, you probably didn't want that.", domain)
 	}
 	return nil
-}
-
-func validateDomainName(name string, username string, w http.ResponseWriter) bool {
-	if err := subdomainError(name, username); err != nil {
-		fmt.Println("Error validating subdomain: ", err.Error())
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(err.Error()))
-		return false
-	}
-	return true
 }

@@ -603,4 +603,4 @@ unique = set(t for t in things if len(t) <= 7)
 # print to stderr
 print(len(unique), file=sys.stderr)
 
-print(json.dumps(sorted(list(unique))))
+print(json.dumps(sorted(list(unique)), indent=2))

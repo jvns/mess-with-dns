@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net"
 	"net/http"
 	"os"
@@ -12,11 +13,22 @@ import (
 	"strings"
 	"time"
 
+	"github.com/getsentry/sentry-go"
 	"github.com/gorilla/websocket"
 	"github.com/miekg/dns"
 )
 
 func main() {
+	if env := os.Getenv("SENTRY_DSN"); env != "" {
+		err := sentry.Init(sentry.ClientOptions{
+			Dsn: env,
+		})
+		if err != nil {
+			log.Fatalf("sentry.Init: %s", err)
+		}
+		defer sentry.Recover()
+		sentry.CaptureMessage("It works!")
+	}
 	db, err := connect()
 	if err != nil {
 		panic(fmt.Sprintf("Error connecting to database: %s", err.Error()))
@@ -195,6 +207,7 @@ func requireLogin(username string, w http.ResponseWriter) bool {
 }
 
 func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	defer sentry.Recover()
 	fmt.Println("Request:", r.URL.Path)
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
@@ -250,7 +263,7 @@ func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// POST /login
 	case r.Method == "GET" && n == 1 && p[0] == "login":
 		w.Header().Set("Cache-Control", "no-store")
-		githubOauth(w)
+		loginRandom(handle.db, w, r)
 	// GET /oauth-callback
 	case r.Method == "GET" && p[0] == "oauth-callback":
 		w.Header().Set("Cache-Control", "no-store")

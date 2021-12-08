@@ -51,6 +51,15 @@ const vm = new Vue({
     },
 
     methods: {
+        logout: function() {
+            // clear cookies
+            document.cookie = 'username=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+            this.domain = undefined;
+            this.requests = [];
+            this.records = undefined;
+            this.ws.close();
+            this.websocketOpen = false;
+        },
         clearRecords: async function() {
             if (confirm('Are you sure you want to delete all records?')) {
                 await Promise.all(this.records.map(deleteRecord));

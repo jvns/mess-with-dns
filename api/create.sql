@@ -26,4 +26,9 @@ CREATE TABLE dns_requests
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE subdomains (
+  name VARCHAR(255) PRIMARY KEY,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE INDEX dns_requests_name_uindex ON dns_requests (name);

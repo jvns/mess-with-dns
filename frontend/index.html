@@ -37,6 +37,10 @@
                 <h1 class="text-xl mb-8" id="subdomain-title">
                     Your subdomain is: <br><span class="font-bold text-green-700">{{ domain }}.messwithdns.com</span>
                 </h1>
+                <div>
+                    <span @click="logout" class="text-red-700 cursor-pointer">Logout</span>
+                </div>
+
 
                 <h2 class="font-bold text-base mt-4 add-record"> Add a record </h2>
 
@@ -114,18 +118,17 @@
             </h1>
             <p class="mt-8 mb-4 text-xl">
                 I think the most fun way to learn is by experimenting and
-                breaking things. But experimenting with DNS can be scary -- you
-                don't want to break your domain!
+                breaking things.
             </p>
             <p class="mb-8 text-xl">
-                This is a playground where you can do weird DNS
-                experiments and break things on a subdomain of <code>messwithdns.com</code>. Click the button below to get
-                started.
+                This is a playground where you can do weird DNS experiments
+                with no consequences if you mess something up. Click the button
+                below to get started.
             </p>
-            <div class="">
+            <div class="text-center">
                 <!-- login with github -->
                 <a class="no-underline bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-xl" href="/login">
-                    Login with GitHub
+                    Start experimenting
                 </a>
             </div>
         </div>

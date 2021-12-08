@@ -69,9 +69,17 @@ func oauthCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// create a secure cookie
+	setCookie(w, r, user.Login)
+
+	// redirect to index
+	http.Redirect(w, r, "/", http.StatusFound)
+
+}
+
+func setCookie(w http.ResponseWriter, r *http.Request, subdomain string) {
 	sc := getSecureCookie()
 	encoded, err := sc.Encode("session", UserCookie{
-		User: user.Login,
+		User: subdomain,
 	})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -90,21 +98,21 @@ func oauthCallback(w http.ResponseWriter, r *http.Request) {
 	// set a regular username cookie for use in JS
 	http.SetCookie(w, &http.Cookie{
 		Name:  "username",
-		Value: user.Login,
+		Value: subdomain,
 		Path:  "/",
 		// 2 weeks
 		MaxAge:   24 * 60 * 60 * 14,
 		SameSite: http.SameSiteStrictMode,
 	})
-	// redirect to index
-	http.Redirect(w, r, "/", http.StatusFound)
-
 }
 
 func ReadSessionUsername(r *http.Request) (string, error) {
 	// in the test environment , don't check secure cookie
 	if r.Host == "localhost:8080" {
 		cookie, err := r.Cookie("username")
+		if cookie == nil || err != nil {
+			return "", fmt.Errorf("no username cookie")
+		}
 		return cookie.Value, err
 	}
 	sc := getSecureCookie()

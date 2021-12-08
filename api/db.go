@@ -63,7 +63,7 @@ func DeleteRecord(db *sql.DB, id int) error {
 
 func DeleteOldRecords(db *sql.DB) {
 	// delete records where created_at timestamp is more than a week old
-	_, err := db.Exec("DELETE FROM dns_records WHERE created_at < NOW() - interval 1 week")
+	_, err := db.Exec("DELETE FROM dns_records WHERE created_at < NOW() - interval 1 week LIMIT 20000")
 	if err != nil {
 		panic(err)
 	}
@@ -71,7 +71,8 @@ func DeleteOldRecords(db *sql.DB) {
 
 func DeleteOldRequests(db *sql.DB) {
 	// delete requests where created_at timestamp is more than a day
-	_, err := db.Exec("DELETE FROM dns_requests WHERE created_at < NOW() - interval 1 day")
+	// if we don't put the limit I get a "resources exhausted" error
+	_, err := db.Exec("DELETE FROM dns_requests WHERE created_at < NOW() - interval 1 day LIMIT 20000")
 	if err != nil {
 		panic(err)
 	}

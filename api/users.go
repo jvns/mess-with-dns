@@ -96,17 +96,26 @@ func insertAvailableSubdomain(db *sql.DB) (string, error) {
 func createAvailableSubdomain(db *sql.DB) (string, error) {
 	var err error
 	// try 3 times before giving up
-	for i := 0; i < 3; i++ {
-		subdomain, err := insertAvailableSubdomain(db)
-		if err == nil {
-			return subdomain, nil
-		}
+	// this is a hack to make sure we don't randomly get a subdomain that's
+	// already taken
+	subdomain, err := insertAvailableSubdomain(db)
+	if err == nil {
+		return subdomain, nil
+	}
+	subdomain, err = insertAvailableSubdomain(db)
+	if err == nil {
+		return subdomain, nil
+	}
+	subdomain, err = insertAvailableSubdomain(db)
+	if err == nil {
+		return subdomain, nil
 	}
 	return "", err
 }
 
 func loginRandom(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	subdomain, err := createAvailableSubdomain(db)
+
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

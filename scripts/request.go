@@ -10,9 +10,12 @@ import (
 func makeRequest() {
 	// timeout after 1 second
 	client := NewTimeoutClient(1*time.Second, 1*time.Second)
-	resp, err := client.Get("http://messwithdns.com")
+	resp, err := client.Get("http://mess-with-dns.fly.dev/bundle.js")
+	// print time (not date)
+	fmt.Print(time.Now().Format("15:04:05 "))
 	if err != nil {
 		fmt.Println(err)
+		return
 	}
 	fmt.Println(resp.Status)
 }

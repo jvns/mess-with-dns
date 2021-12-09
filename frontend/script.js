@@ -46,8 +46,10 @@ const vm = new Vue({
         const username = cookies['username'];
         if (username) {
             this.domain = username;
-            this.postLogin();
+            await this.postLogin();
         }
+        // add 'mounted' class to app element
+        document.getElementById('app').classList.add('mounted');
     },
 
     methods: {

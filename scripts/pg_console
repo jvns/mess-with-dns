@@ -1,0 +1,3 @@
+#!/bin/bash
+
+fly ssh console -C "connect" --app mess-with-dns-pg

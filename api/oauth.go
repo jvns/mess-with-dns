@@ -43,21 +43,21 @@ func oauthCallback(w http.ResponseWriter, r *http.Request) {
 	// get code from query
 	code := r.URL.Query().Get("code")
 	if code == "" {
-		http.Error(w, "Code not found", http.StatusBadRequest)
+		returnError(w, fmt.Errorf("Code not found"), http.StatusBadRequest)
 		return
 	}
 	conf := oauthConfig()
 	// exchange code for token
 	token, err := conf.Exchange(oauth2.NoContext, code)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		returnError(w, err, http.StatusInternalServerError)
 		return
 	}
 	// get user name
 	client := conf.Client(oauth2.NoContext, token)
 	resp, err := client.Get("https://api.github.com/user")
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		returnError(w, err, http.StatusInternalServerError)
 		return
 	}
 
@@ -65,7 +65,7 @@ func oauthCallback(w http.ResponseWriter, r *http.Request) {
 	var user GithubUser
 	err = json.NewDecoder(resp.Body).Decode(&user)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		returnError(w, err, http.StatusInternalServerError)
 		return
 	}
 	// create a secure cookie
@@ -82,7 +82,7 @@ func setCookie(w http.ResponseWriter, r *http.Request, subdomain string) {
 		User: subdomain,
 	})
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		returnError(w, err, http.StatusInternalServerError)
 		return
 	}
 	// write secure cookie
@@ -147,8 +147,8 @@ func oauthConfig() *oauth2.Config {
 	}
 }
 
-func githubOauth(w http.ResponseWriter) {
+func githubOauth(w http.ResponseWriter, r *http.Request) {
 	conf := oauthConfig()
-	w.Header().Set("Location", conf.AuthCodeURL("state", oauth2.AccessTypeOffline))
-	w.WriteHeader(http.StatusTemporaryRedirect)
+	url := conf.AuthCodeURL("state", oauth2.AccessTypeOffline)
+	http.Redirect(w, r, url, http.StatusFound)
 }

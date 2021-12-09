@@ -201,7 +201,7 @@ func getDomains(db *sql.DB, username string, w http.ResponseWriter, r *http.Requ
 func requireLogin(username string, w http.ResponseWriter) bool {
 	w.Header().Set("Cache-Control", "no-store")
 	if username == "" {
-		w.WriteHeader(http.StatusUnauthorized)
+		returnError(w, fmt.Errorf("You must be logged in to access this page"), http.StatusUnauthorized)
 		return false
 	}
 	return true

@@ -81,6 +81,11 @@ async function clearRecords(page) {
     }
 }
 
+async function getSubdomain(page) {
+    const cookies = await page.context().cookies();
+    return cookies.find(c => c.name === 'username').value;
+}
+
 
 
 module.exports = {
@@ -89,6 +94,7 @@ module.exports = {
     createRecord,
     checkError,
     clearRecords,
-    goToUsername
+    goToUsername,
+    getSubdomain,
 }
 

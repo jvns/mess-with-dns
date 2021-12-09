@@ -4,7 +4,7 @@ const {
     expect
 } = require('@playwright/test');
 
-const { randomString, setName, goToUsername } = require('./helpers');
+const { randomString, getSubdomain, setName, goToUsername } = require('./helpers');
 const { Resolver } = require('dns');
 const resolver = new Resolver();
 
@@ -25,38 +25,37 @@ function getIp(hostname) {
 test.describe.parallel('suite', () => {
 
 test('empty dns request gets streamed', async ({ page }) => {
-    const name = randomString();
-    await page.goto('http://localhost:8080#' + name);
-    const fullName = 'duckface.' + name + '.messwithdns.com.'
+    await page.goto('http://localhost:8080');
+    await page.click('#start-experimenting');
+    const subdomain = await getSubdomain(page);
+    const fullName = 'bookface.' + subdomain + '.messwithdns.com.'
     await getIp(fullName);
     page.on('dialog', dialog => dialog.accept());
     await expect(page.locator('.request-name')).toHaveText(fullName);
     await expect(page.locator('.request-host')).toHaveText('localhost.lan.');
-    await expect(page.locator('.request-response')).toHaveText('(0 records)');
+    await expect(page.locator('.request-response')).toHaveText('Response: no records ');
 });
 
-test('clicking request expands it', async ({ page }) => {
-    const name = randomString();
-    await page.goto('http://localhost:8080#' + name);
-    await page.type("[name='A']", '1.2.3.4')
-    await page.type("[name='ttl']", '30')
-    await page.type("[name='subdomain']", 'bananas');
-    await page.click('#create')
-    const fullName = 'bananas.' + name + '.messwithdns.com.'
+test('response content is printed', async ({ page }) => {
+    await setName(page, 'bananas');
+    const name = await getSubdomain(page);
+    await page.type("[name='A']", '1.2.3.4');
+    await page.click('#create');
+    await page.locator('td.view-name');
+    // wait 50ms
+    await new Promise(resolve => setTimeout(resolve, 50));
+    const fullName = 'bananas.' + name + '.messwithdns.com.';
     await getIp(fullName);
-    await expect(page.locator('.request-response')).toHaveText('A 1.2.3.4');
-    await page.click('.request-response');
-    await page.waitForSelector('.expand-request');
-    await page.click('.request-response');
-    await page.waitForSelector('.expand-request', {state: 'detached'});
+    await expect(page.locator('.request-response')).toContainText('Content: 1.2.3.4')
 });
 
 test('clearing requests works', async ({ page }) => {
-    const name = randomString();
-    await goToUsername(page, name);
-    const fullName = 'bananas.' + name + '.messwithdns.com.'
+    await page.goto('http://localhost:8080');
+    await page.click('#start-experimenting');
+    const subdomain = await getSubdomain(page);
+    const fullName = 'bananas.' + subdomain + '.messwithdns.com.'
     await getIp(fullName);
-    await expect(page.locator('.request-response')).toHaveText('(0 records)');
+    await expect(page.locator('.request-response')).toHaveText('Response: no records ');
     page.on('dialog', dialog => dialog.accept());
     await page.click('#clear-requests');
     await page.waitForSelector('.request-response', {state: 'detached'});

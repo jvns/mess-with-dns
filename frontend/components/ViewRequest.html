@@ -7,12 +7,12 @@
         <td class="lg:px-2 lg:py-4">
             <strong class="inline lg:hidden">Request:</strong>
             <div class="border-l-4 pl-4 mb-4 border-green-200">
-                Name: {{request.request.Question[0].Name}} <br>
+                Name: <span class="request-name">{{request.request.Question[0].Name}}</span> <br>
                 Type: {{rrTypesReverse[request.request.Question[0].Qtype]}} <br>
-                From: {{request.src_host}}
+                From: <span class="request-host">{{request.src_host}}</span>
             </div>
         </td>
-        <td class="lg:px-2 lg:py-4">
+        <td class="lg:px-2 lg:py-4 request-response">
             <strong class="inline lg:hidden">Response:</strong> <span v-if="!request.response.Answer">no records</span>
             <div class="border-l-4 pl-4 mb-4 border-pink-200" v-for="answer in request.response.Answer">
                 Type: {{rrTypesReverse[answer.Hdr.Rrtype]}} <br>

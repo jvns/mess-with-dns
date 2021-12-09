@@ -4,7 +4,7 @@ const {
     expect
 } = require('@playwright/test');
 
-const {randomString, setName, createRecord, checkError} = require('./helpers');
+const {randomString, setName, createRecord, checkError, getSubdomain} = require('./helpers');
 
 
 test.describe.parallel('suite', () => {
@@ -124,8 +124,7 @@ test('@ record works', async ({ page }) => {
     await setName(page, '@');
     await page.type("[name='A']", '1.2.3.4')
     await page.click('#create')
-    const cookies = await page.context().cookies();
-    const subdomain = cookies.find(c => c.name === 'username').value;
+    const subdomain = await getSubdomain(page);
     await expect(page.locator('.desktop .view-name')).toHaveText(subdomain + ".messwithdns.com");
     page.on('dialog', dialog => dialog.accept());
     const delButton = page.locator(".desktop .delete")
@@ -178,8 +177,6 @@ test("name can't be blank", async ({ page }) => {
     await page.type("[name='ttl']", '30')
     await checkError(page, "Example: bananas")
 })
-
-
 
 test('server error message', async ({ page }) => {
     await setName(page);

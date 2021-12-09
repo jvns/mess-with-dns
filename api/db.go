@@ -234,14 +234,14 @@ func DeleteRequestsForDomain(db *sql.DB, subdomain string) error {
 }
 
 func GetRequests(db *sql.DB, subdomain string) ([]map[string]interface{}, error) {
-	rows, err := db.Query("SELECT id, created_at, request, response, src_ip, src_host FROM dns_requests WHERE name = $1 ORDER BY created_at DESC", subdomain)
+	rows, err := db.Query("SELECT id, extract(epoch from created_at), request, response, src_ip, src_host FROM dns_requests WHERE name = $1 ORDER BY created_at DESC", subdomain)
 	if err != nil {
 		return make([]map[string]interface{}, 0), err
 	}
 	requests := make([]map[string]interface{}, 0)
 	for rows.Next() {
 		var id int
-		var created_at string
+		var created_at float32
 		var request []byte
 		var response []byte
 		var src_ip string
@@ -250,14 +250,13 @@ func GetRequests(db *sql.DB, subdomain string) ([]map[string]interface{}, error)
 		if err != nil {
 			return make([]map[string]interface{}, 0), err
 		}
-		// parse created at to unix time
-		created_time, err := time.Parse("2006-01-02 15:04:05", created_at)
+		created_time := time.Unix(int64(created_at), 0)
 		if err != nil {
 			return make([]map[string]interface{}, 0), err
 		}
 		x := map[string]interface{}{
 			"id":         id,
-			"created_at": created_time.Unix(),
+			"created_at": created_time,
 			"request":    string(request),
 			"response":   string(response),
 			"src_ip":     src_ip,

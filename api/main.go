@@ -73,7 +73,7 @@ type handler struct {
 var soaSerial uint32
 
 func makeDomain(name string) string {
-	return name + ".messwithdns.com."
+	return name + ".messwithdns.net."
 }
 
 func returnError(w http.ResponseWriter, err error, status int) {
@@ -220,7 +220,7 @@ func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	p := strings.Split(r.URL.Path, "/")[1:]
 	n := len(p)
 	switch {
-	// GET /domain: get everything from USERNAME.messwithdns.com.
+	// GET /domain: get everything from USERNAME.messwithdns.net.
 	case r.Method == "GET" && p[0] == "domains":
 		if !requireLogin(username, w) {
 			return

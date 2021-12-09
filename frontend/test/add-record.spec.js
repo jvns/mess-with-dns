@@ -125,7 +125,7 @@ test('@ record works', async ({ page }) => {
     await page.type("[name='A']", '1.2.3.4')
     await page.click('#create')
     const subdomain = await getSubdomain(page);
-    await expect(page.locator('.desktop .view-name')).toHaveText(subdomain + ".messwithdns.com");
+    await expect(page.locator('.desktop .view-name')).toHaveText(subdomain + ".messwithdns.net");
     page.on('dialog', dialog => dialog.accept());
     const delButton = page.locator(".desktop .delete")
     delButton.click()

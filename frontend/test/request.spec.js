@@ -28,7 +28,7 @@ test('empty dns request gets streamed', async ({ page }) => {
     await page.goto('http://localhost:8080');
     await page.click('#start-experimenting');
     const subdomain = await getSubdomain(page);
-    const fullName = 'bookface.' + subdomain + '.messwithdns.com.'
+    const fullName = 'bookface.' + subdomain + '.messwithdns.net.'
     await getIp(fullName);
     page.on('dialog', dialog => dialog.accept());
     await expect(page.locator('.request-name')).toHaveText(fullName);
@@ -44,7 +44,7 @@ test('response content is printed', async ({ page }) => {
     await page.locator('td.view-name');
     // wait 50ms
     await new Promise(resolve => setTimeout(resolve, 50));
-    const fullName = 'bananas.' + name + '.messwithdns.com.';
+    const fullName = 'bananas.' + name + '.messwithdns.net.';
     await getIp(fullName);
     await expect(page.locator('.request-response')).toContainText('Content: 1.2.3.4')
 });
@@ -53,7 +53,7 @@ test('clearing requests works', async ({ page }) => {
     await page.goto('http://localhost:8080');
     await page.click('#start-experimenting');
     const subdomain = await getSubdomain(page);
-    const fullName = 'bananas.' + subdomain + '.messwithdns.com.'
+    const fullName = 'bananas.' + subdomain + '.messwithdns.net.'
     await getIp(fullName);
     await expect(page.locator('.request-response')).toHaveText('Response: no records ');
     page.on('dialog', dialog => dialog.accept());

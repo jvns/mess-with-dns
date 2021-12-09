@@ -33,17 +33,17 @@ for (const key in rrTypes) {
 
 export function displayName(record: Record) {
     if (record.subdomain == '@') {
-        return record.domain + ".messwithdns.com";
+        return record.domain + ".messwithdns.net";
     } else {
-        return record.subdomain + '.' + record.domain + ".messwithdns.com";
+        return record.subdomain + '.' + record.domain + ".messwithdns.net";
     }
 }
 
 export function fullName(record: Record) {
     if (record.subdomain == '@') {
-        return record.domain + ".messwithdns.com.";
+        return record.domain + ".messwithdns.net.";
     } else {
-        return record.subdomain + '.' + record.domain + ".messwithdns.com.";
+        return record.subdomain + '.' + record.domain + ".messwithdns.net.";
     }
 }
 
@@ -51,7 +51,7 @@ function convertRecord(record: Record): GoRecord {
     // convert to api format
     // { "type": "A", "name": "example", "A": "93.184.216.34" }
     // =>
-    // { "Hdr": { "Name": "example.messwithdns.com.", "Rrtype": 1, "Class": 1, "Ttl": 5, "Rdlength": 0 }, "A": "93.184.216.34" }
+    // { "Hdr": { "Name": "example.messwithdns.net.", "Rrtype": 1, "Class": 1, "Ttl": 5, "Rdlength": 0 }, "A": "93.184.216.34" }
     const domainName = fullName(record);
     const newRecord: GoRecord = {
         Hdr: {
@@ -103,7 +103,7 @@ function parseName(name: string): [string, string] {
 }
 
 function transformRecord(id: string, record: GoRecord): Record {
-    // { "Hdr": { "Name": "example.messwithdns.com.", "Rrtype": 1, "Class": 1, "Ttl": 5, "Rdlength": 0 }, "A": "
+    // { "Hdr": { "Name": "example.messwithdns.net.", "Rrtype": 1, "Class": 1, "Ttl": 5, "Rdlength": 0 }, "A": "
     // =>
     // { ttl: 5, name: "example", type: 'A' }
     const [subdomain, domain] = parseName(record.Hdr.Name)

@@ -16,7 +16,7 @@ func lookupRecords(db *sql.DB, name string, qtype uint16) ([]dns.RR, error) {
 }
 
 func emptyMessage(request *dns.Msg) *dns.Msg {
-	msg := dns.Msg{}
+	msg := dns.Msg{Compress: true}
 	msg.SetReply(request)
 	msg.Authoritative = true
 	msg.Ns = []dns.RR{

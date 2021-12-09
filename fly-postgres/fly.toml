@@ -1,0 +1,19 @@
+app = "mess-with-dns-db"
+
+[experimental]
+private_network = true
+
+[build]
+image = "postgres:14.1"
+
+[mount]
+source      = "postgres"
+destination = "/var/lib/postgresql/"
+
+[[services]]
+internal_port = 5432
+protocol      = "tcp"
+
+  [[services.tcp_checks]]
+  interval = 10000
+  timeout  = 2000

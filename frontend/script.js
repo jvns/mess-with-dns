@@ -41,7 +41,7 @@ const vm = new Vue({
         websocketOpen: false,
     },
 
-    mounted() {
+    async mounted() {
         const cookies = parseCookies();
         const username = cookies['username'];
         if (username) {

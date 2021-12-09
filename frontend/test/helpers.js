@@ -26,13 +26,15 @@ function randomString() {
     return result;
 }
 
-async function setName(page) {
+async function setName(page, subdomain) {
     // set name and TTL
     await page.goto('http://localhost:8080');
-    await page.click('#randomSubdomain');
+    await page.click('#start-experimenting');
     await page.waitForSelector("[name='subdomain']")
     await page.type("[name='ttl']", '30')
-    const subdomain = 'test-' + randomString();
+    if (subdomain === undefined) {
+        subdomain = 'test-' + randomString();
+    }
     await page.type("[name='subdomain']", subdomain);
     return subdomain;
 }
@@ -41,14 +43,10 @@ async function createRecord(page, subdomain) {
     await page.click('#create')
     await expect(page.locator('td.view-name')).toContainText(subdomain);
     page.on('dialog', dialog => dialog.accept());
-    await page.click('.edit')
-    // I don't know why, but this test is flaky if we only delete once :(
-    await page.waitForSelector(".delete")
-    const delButton = page.locator(".delete")
+    const delButton = page.locator(".desktop .delete")
     delButton.click()
     // I really don't know why these extra clicks are required,
     // but they seem to make the test less flaky :(
-    delButton.click({force: true})
     delButton.click({force: true})
     await page.locator('#records').waitFor({state: 'detached'})
 }

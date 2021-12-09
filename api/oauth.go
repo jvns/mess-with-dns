@@ -107,14 +107,6 @@ func setCookie(w http.ResponseWriter, r *http.Request, subdomain string) {
 }
 
 func ReadSessionUsername(r *http.Request) (string, error) {
-	// in the test environment , don't check secure cookie
-	if r.Host == "localhost:8080" {
-		cookie, err := r.Cookie("username")
-		if cookie == nil || err != nil {
-			return "", fmt.Errorf("no username cookie")
-		}
-		return cookie.Value, err
-	}
 	sc := getSecureCookie()
 	var user UserCookie
 	// get session cookie

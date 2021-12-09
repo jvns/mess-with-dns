@@ -121,23 +121,17 @@ test('SOA record should appear when added', async ({ page }) => {
 });
 
 test('@ record works', async ({ page }) => {
-    const randstr = await randomString();
-    await page.goto('http://localhost:8080#' + randstr);
-    await page.waitForSelector("[name='subdomain']")
-    await page.type("[name='ttl']", '30')
-    await page.type("[name='subdomain']", "@");
+    await setName(page, '@');
     await page.type("[name='A']", '1.2.3.4')
     await page.click('#create')
-    await expect(page.locator('.desktop .view-name')).toHaveText(randstr + ".messwithdns.com");
+    const cookies = await page.context().cookies();
+    const subdomain = cookies.find(c => c.name === 'username').value;
+    await expect(page.locator('.desktop .view-name')).toHaveText(subdomain + ".messwithdns.com");
     page.on('dialog', dialog => dialog.accept());
-    await page.click('.edit')
-    // I don't know why, but this test is flaky if we only delete once :(
-    await page.waitForSelector(".delete")
-    const delButton = page.locator(".delete")
+    const delButton = page.locator(".desktop .delete")
     delButton.click()
     // I really don't know why these extra clicks are required,
     // but they seem to make the test less flaky :(
-    delButton.click({force: true})
     delButton.click({force: true})
     await page.locator('#records').waitFor({state: 'detached'})
 })
@@ -170,7 +164,7 @@ test('CNAME record error message', async ({ page }) => {
 
 test('ttl error message', async ({ page }) => {
     await page.goto('http://localhost:8080');
-    await page.click('#randomSubdomain');
+    await page.click('#start-experimenting');
     const subdomain = 'test-' + randomString();
     await page.type("[name='subdomain']", subdomain);
     await page.type("[name='A']", '1.2.3.4')
@@ -179,7 +173,7 @@ test('ttl error message', async ({ page }) => {
 
 test("name can't be blank", async ({ page }) => {
     await page.goto('http://localhost:8080');
-    await page.click('#randomSubdomain');
+    await page.click('#start-experimenting');
     await page.type("[name='A']", '1.2.3.4')
     await page.type("[name='ttl']", '30')
     await checkError(page, "Example: bananas")
@@ -197,7 +191,7 @@ test('server error message', async ({ page }) => {
 
 test('server error message: bad domain name', async ({ page }) => {
     await page.goto('http://localhost:8080');
-    await page.click('#randomSubdomain');
+    await page.click('#start-experimenting');
     await page.waitForSelector("[name='subdomain']")
     await page.type("[name='ttl']", '30')
 
@@ -206,17 +200,6 @@ test('server error message: bad domain name', async ({ page }) => {
     await page.click('#create')
     await expect(page.locator('.server-error')).toHaveText("Oops, invalid domain name")
 })
-
-test('no changes to www', async ({ page }) => {
-    await page.goto('http://localhost:8080#www');
-    await page.waitForSelector("[name='subdomain']")
-    await page.type("[name='ttl']", '30')
-    await page.type("[name='subdomain']", "banana");
-    await page.type("[name='A']", '1.2.3.4')
-    await page.click('#create')
-    await expect(page.locator('.server-error')).toHaveText("Sorry, you're not allowed to make changes to 'www' :)")
-})
-
 
 
 });

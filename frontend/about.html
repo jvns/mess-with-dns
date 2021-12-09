@@ -1,0 +1,109 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title> mess with dns </title>
+    <link rel="stylesheet" type="text/css" href="css/tailwind.min.css" />
+    <link rel="stylesheet" type="text/css" href="css/squiggle.css" />
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
+<style> 
+.main h3 {
+    font-weight: bold;
+    margin: 1.5em 0 .3em;
+}
+
+p {
+    margin: .5em 0;
+}
+</style>
+</head>
+
+<body class="relative">
+    <nav id="nav" class="squiggle-bottom bg-green-600 text-white" role="navigation">
+        <div>
+            <div class="nav-row px-8 flex flex-wrap justify-center lg:justify-between items-center">
+                <h3 class="xl:pl-32 text-center my-8">
+                    <a href="/" class="text-3xl star-link font-bold no-underline">
+                        <span class="star text-xl">★</span>
+                        mess with dns
+                        <span class="star text-xl">★</span>
+                    </a>
+                    <div class="text-normal"> a wizard zines project</div>
+                </h3>
+                <div class="w-full lg:w-0"> </div> <!-- ugly hack to make it wrap ugh ugh -->
+                <div class="mr-4 lg:mb-0 mb-8 font-bold">
+                    <a class="no-underline mx-4" href="/about.html"> About </a>
+                    <a class="no-underline mx-4" href="/dictionary.html">DNS dictionary</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div style="max-width: 600px" class="m-auto p-4 main">
+        <h1 class="text-3xl mt-8 mb-8 text-center">About</h1>
+        <h2 class="text-2xl mt-8 mb-8">Why did you build this?</h1>
+
+        <p>
+        This site exists because I (Julia) was writing a zine about DNS. At the
+        end of many of my zines, I say "the best way to learn is to experiment!
+        Do weird DNS experiments and see how it works". But I realized that
+        most people, even if they have a domain, probably aren't comfortalbe
+        doing weird DNS experiments on a domain that's important to
+        them.
+        </p>
+        <p>
+        So I figured I'd create a domain that's just for playing around
+        (<code>messwithdns.net</code>) and let anyone set DNS records on it.
+        </p>
+
+        <p>
+        This project was built by <a href="https://jvns.ca">Julia Evans</a> and 
+        <a href="https://marieflanagan.com/">Marie Claire LeBlanc Flanagan</a>.
+        </p>
+
+        <h1 class="text-2xl mt-8 mb-8">How does it work?</h1>
+
+        Here are a few notes on how Mess With DNS is implemented, in question/answer form.
+
+        <h3>How do you parse DNS queries?</h3>
+        <p>
+        It's written in Go and it uses the <a href="https://pkg.go.dev/github.com/miekg/dns">github.com/miekg/dns</a>
+        library for all if its DNS query parsing and for formatting the replies.
+        </p>
+
+        <h3>Will my records get deleted?</h3>
+        <p>
+        Yes, records get deleted after a week. This is to heavily discourage
+        anyone from relying on this for anything real. It's just for learning.
+        </p>
+
+        <h3>Where are the records stored?</h3>
+        <p>
+        They're in a small PostgreSQL database. It contains the records and
+        every DNS response that's it's served in the last 24 hours.
+        </p>
+
+        <h3>What's the difference between messwithdns.com and messwithdns.net?</h3>
+        <p>
+        The <code>.com</code> version is for serving the website, the
+        <code>.net</code> version is where you're allowed to set DNS records.
+        They're separate because it makes the site faster, more secure, and
+        more reliable (I can use a "real" DNS server for messwithdns.com).
+        </p>
+
+        <h3>Does it really support setting all DNS record types</h3>
+
+        <p>
+        Technically the API does allow setting any DNS record type you want,
+        but I've only built the UI for a few types. In particular I haven't set
+        up DNSSEC yet so there's no UI for setting DNSSEC records.
+        </p>
+
+        <h3>Can I get any subdomain I want?</h3>
+        <p>
+        No, I got worried about phishing so you can only get a randomly generated subdomain, like <code>banana17</code>
+        </p>
+    </div>
+</body>

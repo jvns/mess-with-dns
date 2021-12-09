@@ -10,14 +10,24 @@
 </head>
 
 <body class="relative">
-    <nav id="nav" class="py-8 squiggle-bottom bg-green-600 text-white" role="navigation">
-        <div class="flex">
-            <div class="m-auto">
-                <h1 class="text-4xl">
-                    <a href="/" class="no-underline">★ mess with dns ★</a>
-                </h1>
-                <div class="text-right mt-2"> a <a class="underline py-2" href="https://wizardzines.com">wizard zines</a> project</div>
+    <nav id="nav" class="squiggle-bottom bg-green-600 text-white" role="navigation">
+        <div>
+            <div class="nav-row px-8 flex flex-wrap justify-center lg:justify-between items-center">
+                <h3 class="xl:pl-32 text-center my-8">
+                    <a href="/" class="text-3xl star-link font-bold no-underline">
+                        <span class="star text-xl">★</span>
+                        mess with dns
+                        <span class="star text-xl">★</span>
+                    </a>
+                    <div class="text-normal"> a wizard zines project</div>
+                </h3>
+                <div class="w-full lg:w-0"> </div> <!-- ugly hack to make it wrap ugh ugh -->
+                <div class="mr-4 lg:mb-0 mb-8 font-bold">
+                    <a class="no-underline mx-4" href="/about.html"> About </a>
+                    <a class="no-underline mx-4" href="/dictionary.html">DNS dictionary</a>
+                </div>
             </div>
+        </div>
     </nav>
 <style>
 .word {

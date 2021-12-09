@@ -36,6 +36,8 @@ COPY --from=go /app/mess-with-dns /usr/bin/mess-with-dns
 
 WORKDIR /app
 COPY ./frontend/index.html /app/frontend/index.html
+COPY ./frontend/dictionary.html /app/frontend/dictionary.html
+COPY ./frontend/about.html /app/frontend/about.html
 COPY ./frontend/css /app/frontend/css
 COPY ./frontend/images /app/frontend/images
 COPY --from=node /app/bundle.js /app/frontend/bundle.js

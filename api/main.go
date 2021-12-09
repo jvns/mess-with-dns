@@ -26,13 +26,16 @@ func main() {
 		if err != nil {
 			log.Fatalf("sentry.Init: %s", err)
 		}
-		defer sentry.Recover()
 	}
 	db, err := connect()
-	go cleanup(db)
 	if err != nil {
 		panic(fmt.Sprintf("Error connecting to database: %s", err.Error()))
 	}
+	err = createTables(db)
+	if err != nil {
+		panic(fmt.Sprintf("Error creating tables: %s", err.Error()))
+	}
+	go cleanup(db)
 	soaSerial, err = GetSerial(db)
 	if err != nil {
 		panic(fmt.Sprintf("Error getting SOA serial: %s", err.Error()))
@@ -58,7 +61,7 @@ func main() {
 	fmt.Println("Listening on :8080")
 	err = (&http.Server{Addr: ":8080", Handler: handler}).ListenAndServe()
 	if err != nil {
-		panic(err)
+		panic(fmt.Sprintf("Failed to start http listener %s\n", err.Error()))
 	}
 }
 
@@ -208,7 +211,6 @@ func requireLogin(username string, w http.ResponseWriter) bool {
 }
 
 func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	defer sentry.Recover()
 	fmt.Println("Request:", r.URL.Path)
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")

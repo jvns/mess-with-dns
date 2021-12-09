@@ -1,2 +1,1 @@
-run.sh
-secrets.sh
+scripts/secrets.sh

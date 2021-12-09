@@ -4,23 +4,74 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net"
 	"os"
 	"strings"
 	"time"
 
-	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/lib/pq"
 	"github.com/miekg/dns"
 )
 
 // connect to planetscale
 func connect() (*sql.DB, error) {
 	// get connection string from environment
-	db, err := sql.Open("mysql", os.Getenv("PLANETSCALE_CONNECTION_STRING"))
+	connStr := os.Getenv("POSTGRES_CONNECTION_STRING")
+	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		return nil, err
 	}
 	return db, nil
+}
+
+func createTables(db *sql.DB) error {
+	if os.Getenv("DEV") == "true" {
+		fmt.Println("creating tables...")
+		err := loadSQLFile(db, "api/create.sql")
+		if err != nil {
+			return err
+		}
+		// initialize the serials table
+		// check if serials table has anything in it
+		rows, err := db.Query("SELECT * FROM dns_serials")
+		if err != nil {
+			return err
+		}
+		if rows.Next() {
+			// if it has something in it, we don't need to do anything
+			return nil
+		}
+		_, err = db.Exec("INSERT INTO dns_serials (serial) VALUES (10)")
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func loadSQLFile(db *sql.DB, sqlFile string) error {
+	file, err := ioutil.ReadFile(sqlFile)
+	if err != nil {
+		return err
+	}
+	tx, err := db.Begin()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		tx.Rollback()
+	}()
+	for _, q := range strings.Split(string(file), ";") {
+		q := strings.TrimSpace(q)
+		if q == "" {
+			continue
+		}
+		if _, err := tx.Exec(q); err != nil {
+			return err
+		}
+	}
+	return tx.Commit()
 }
 
 func GetSerial(db *sql.DB) (uint32, error) {
@@ -54,7 +105,7 @@ func IncrementSerial(tx *sql.Tx) error {
 
 func DeleteRecord(db *sql.DB, id int) error {
 	tx, err := db.Begin()
-	_, err = tx.Exec("DELETE FROM dns_records WHERE id = ?", id)
+	_, err = tx.Exec("DELETE FROM dns_records WHERE id = $1", id)
 	if err != nil {
 		return err
 	}
@@ -63,7 +114,7 @@ func DeleteRecord(db *sql.DB, id int) error {
 
 func DeleteOldRecords(db *sql.DB) {
 	// delete records where created_at timestamp is more than a week old
-	_, err := db.Exec("DELETE FROM dns_records WHERE created_at < NOW() - interval 1 week LIMIT 20000")
+	_, err := db.Exec("DELETE FROM dns_records WHERE created_at < NOW() - '1 week'::interval")
 	if err != nil {
 		panic(err)
 	}
@@ -72,7 +123,8 @@ func DeleteOldRecords(db *sql.DB) {
 func DeleteOldRequests(db *sql.DB) {
 	// delete requests where created_at timestamp is more than a day
 	// if we don't put the limit I get a "resources exhausted" error
-	_, err := db.Exec("DELETE FROM dns_requests WHERE created_at < NOW() - interval 1 day LIMIT 20000")
+	// 1 day ago, postgres
+	_, err := db.Exec("DELETE FROM dns_requests WHERE created_at < NOW() - '1 day'::interval")
 	if err != nil {
 		panic(err)
 	}
@@ -84,7 +136,7 @@ func UpdateRecord(db *sql.DB, id int, record dns.RR) error {
 	if err != nil {
 		return err
 	}
-	_, err = tx.Exec("UPDATE dns_records SET name = ?, rrtype = ?, content = ? WHERE id = ?", record.Header().Name, record.Header().Rrtype, jsonString, id)
+	_, err = tx.Exec("UPDATE dns_records SET name = $1, rrtype = $2, content = $3 WHERE id = $4", record.Header().Name, record.Header().Rrtype, jsonString, id)
 	if err != nil {
 		return err
 	}
@@ -97,7 +149,7 @@ func InsertRecord(db *sql.DB, record dns.RR) error {
 	if err != nil {
 		return err
 	}
-	_, err = tx.Exec("INSERT INTO dns_records (name, rrtype, content) VALUES (?, ?, ?)", record.Header().Name, record.Header().Rrtype, jsonString)
+	_, err = tx.Exec("INSERT INTO dns_records (name, rrtype, content) VALUES ($1, $2, $3)", record.Header().Name, record.Header().Rrtype, jsonString)
 	if err != nil {
 		return err
 	}
@@ -106,7 +158,7 @@ func InsertRecord(db *sql.DB, record dns.RR) error {
 
 func GetRecordsForName(db *sql.DB, name string) (map[int]dns.RR, error) {
 	fmt.Println(name)
-	rows, err := db.Query("SELECT id, content FROM dns_records WHERE name LIKE ?", "%"+name)
+	rows, err := db.Query("SELECT id, content FROM dns_records WHERE name LIKE $1", "%"+name)
 	if err != nil {
 		return nil, err
 	}
@@ -138,7 +190,7 @@ func LogRequest(db *sql.DB, request *dns.Msg, response *dns.Msg, src_ip net.IP, 
 	}
 	name := request.Question[0].Name
 	subdomain := getSubdomain(name)
-	_, err = db.Exec("INSERT INTO dns_requests (name, request, response, src_ip, src_host) VALUES (?, ?, ?, ?, ?)", subdomain, jsonRequest, jsonResponse, src_ip.String(), src_host)
+	_, err = db.Exec("INSERT INTO dns_requests (name, request, response, src_ip, src_host) VALUES ($1, $2, $3, $4, $5)", subdomain, jsonRequest, jsonResponse, src_ip.String(), src_host)
 	if err != nil {
 		return err
 	}
@@ -174,7 +226,7 @@ func StreamRequest(name string, request []byte, response []byte, src_ip string, 
 }
 
 func DeleteRequestsForDomain(db *sql.DB, subdomain string) error {
-	_, err := db.Exec("DELETE FROM dns_requests WHERE name = ?", subdomain)
+	_, err := db.Exec("DELETE FROM dns_requests WHERE name = $1", subdomain)
 	if err != nil {
 		return err
 	}
@@ -182,7 +234,7 @@ func DeleteRequestsForDomain(db *sql.DB, subdomain string) error {
 }
 
 func GetRequests(db *sql.DB, subdomain string) ([]map[string]interface{}, error) {
-	rows, err := db.Query("SELECT id, created_at, request, response, src_ip, src_host FROM dns_requests WHERE name = ? ORDER BY created_at DESC", subdomain)
+	rows, err := db.Query("SELECT id, created_at, request, response, src_ip, src_host FROM dns_requests WHERE name = $1 ORDER BY created_at DESC", subdomain)
 	if err != nil {
 		return make([]map[string]interface{}, 0), err
 	}
@@ -218,7 +270,7 @@ func GetRequests(db *sql.DB, subdomain string) ([]map[string]interface{}, error)
 
 func GetRecords(db *sql.DB, name string, rrtype uint16) ([]dns.RR, error) {
 	// return cname records if they exist
-	rows, err := db.Query("SELECT content FROM dns_records WHERE name = ? AND (rrtype = ? OR rrtype = 5)", name, rrtype)
+	rows, err := db.Query("SELECT content FROM dns_records WHERE name = $1 AND (rrtype = $2 OR rrtype = 5)", name, rrtype)
 	if err != nil {
 		return make([]dns.RR, 0), err
 	}

@@ -11,7 +11,7 @@ import (
 
 func getExistingSubdomains(db *sql.DB, word string) ([]string, error) {
 	var subdomains []string
-	rows, err := db.Query("SELECT name FROM subdomains WHERE name LIKE ?", word+"%")
+	rows, err := db.Query("SELECT name FROM subdomains WHERE name LIKE $1", word+"%")
 	if err != nil {
 		return subdomains, err
 	}
@@ -78,7 +78,7 @@ func insertAvailableSubdomain(db *sql.DB) (string, error) {
 		return "", err
 	}
 	subdomain := smallestMissing(prefix, existing)
-	_, err = db.Exec("INSERT INTO subdomains (name) VALUES (?)", subdomain)
+	_, err = db.Exec("INSERT INTO subdomains (name) VALUES ($1)", subdomain)
 	if err != nil {
 		return "", err
 	}

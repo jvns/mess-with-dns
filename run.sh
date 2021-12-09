@@ -1,11 +1,9 @@
 #!/bin/bash
-source secrets.sh
 set -eu
 
-pscale connect messwithdns development &
-find . -name '*.go'| entr -r bash -c 'cd api; go build && cd .. && PLANETSCALE_CONNECTION_STRING="root:@tcp(localhost:3306)/messwithdns" ./api/mess-with-dns 5353' &
+ls api/*.go api/go* scripts/* run.sh | entr -r bash scripts/run_go.sh &
 cd frontend
-ls *.js *.ts components/* | entr bash esbuild.sh &
+ls ./*.js ./*.ts components/* | grep -v bundle | entr bash esbuild.sh &
 
 trap 'kill $(jobs -p)' SIGINT SIGTERM
 

@@ -47,7 +47,16 @@ async function createRecord(page, subdomain) {
     delButton.click()
     // I really don't know why these extra clicks are required,
     // but they seem to make the test less flaky :(
-    delButton.click({force: true})
+    try {
+        await delButton.click({force: true, timeout: 200});
+    } catch (e) {
+        // ignore
+    }
+    try {
+        await delButton.click({force: true, timeout: 200});
+    } catch (e) {
+        // ignore
+    }
     await page.locator('#records').waitFor({state: 'detached'})
 }
 
@@ -59,9 +68,17 @@ async function checkError(page, msg) {
 async function clearRecords(page) {
     page.on('dialog', dialog => dialog.accept());
     const clearAll = page.locator('#clear-records');
-    await clearAll.click();
-    await clearAll.click({force: true});
-    await clearAll.click({force: true});
+    await clearAll.click({timeout: 500});
+    try {
+        await clearAll.click({force: true, timeout: 200});
+    } catch (e) {
+        // ignore
+    }
+    try {
+        await clearAll.click({force: true, timeout: 200});
+    } catch (e) {
+        // ignore
+    }
 }
 
 

@@ -8,7 +8,8 @@ test.describe.parallel('suite', () => {
 
 test('all the modals open', async ({ page }) => {
     // wait for everything to be mounted
-    await page.goto('http://localhost:8080#reptile-brain');
+    await page.goto('http://localhost:8080');
+    await page.click('#start-experimenting');
     await page.waitForSelector('.details-modal-close', {state: 'attached'});
     // select all the modals
     const experiments = await page.$$('.experiment');

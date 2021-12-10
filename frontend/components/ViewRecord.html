@@ -128,8 +128,8 @@
                   <formulate-input element-class="border border-black rounded-lg ml-2 p-1 flex-grow" label-class="w-24 text-right font-bold" wrapper-class="flex flex-row justify-end items-center" label="Name " name="subdomain" type="text"></formulate-input>
                   <formulate-input element-class="border border-black rounded-lg ml-2 p-1 flex-grow" label-class="w-24 text-right font-bold" wrapper-class="mt-2 flex flex-row justify-end items-center" name="type" label="Type" type="select" :disabled="true" :options="[record.type]"></formulate-input>
                   <formulate-input element-class="border border-black rounded-lg ml-2 p-1 flex-grow" label-class="w-24 text-right font-bold" wrapper-class="mt-2 flex flex-row justify-end items-center" v-for="item in schemas[record.type]" :key="item.name" v-bind="item"></formulate-input>
-                  <div class="flex justify-between mt-4">
-                      <button type="button" class="cancel text-center block my-2 hover:bg-gray-400 bg-gray-200 py-2 px-4 rounded" @click="clicked = false">
+                  <div class="flex justify-end mt-4">
+                      <button type="button" class="cancel mr-4 text-center block my-2 hover:bg-gray-400 bg-gray-200 py-2 px-4 rounded" @click="clicked = false">
                           Cancel
                       </button>
 

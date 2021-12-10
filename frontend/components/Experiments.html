@@ -165,7 +165,7 @@
                 <details>
                     <summary>
                         <span class="text-green-700">
-                            (click here to see the explanation)
+                            Why do I get a "server not found" error?
                         </span>
                     </summary>
                     <p>
@@ -192,6 +192,19 @@
                         <li class="you">You: :( :( :( IT EXISTS THOUGH </li>
                         <li class="you">You wait 1 hour and try again, everything works because the cache expired </li>
                     </ul>
+                    </p>
+                </details>
+
+                <details>
+                    <summary>
+                        <span class="text-green-700">
+                            I didn't get a "server not found" error at the end...
+                        </span>
+                    </summary>
+                    <p>
+                    Not all DNS resolvers do negative DNS caching! For example,
+                    Cloudflare doesn't, so this experiment won't work for you
+                    if you're using Cloudflare DNS!
                     </p>
                 </details>
                 </p>
@@ -279,7 +292,7 @@
                 <details>
                     <summary>
                         <span class="text-green-700">
-                            (click here to see the explanation)
+                            What's happening behind the scenes when I set a long/short TTL?
                         </span>
                     </summary>
 
@@ -357,12 +370,12 @@
                 <details class="my-4">
                     <summary>
                         <span class="text-green-700">
-                            (click here to see the explanation)
+                            Why do I get a 404 error?
                         </span>
                     </summary>
-                    <div class="details-modal">
+                    <div>
                         <p>
-                            Why do we get a 404? Well, when your browser requests a website, it
+                            When your browser requests a website, it
                             sends a <code>Host</code> header with the name of the domain you typed in.
                             If the server (like Apache/nginx) doesn't recognize that name, it'll often
                             return a 404. Here's more detail about how that works.
@@ -473,7 +486,7 @@ bad-ip.ionized-twig.messwithdns.net. 30	IN A	30.31.32.33
                 <details>
                     <summary>
                         <span class="text-green-700">
-                            (click here to see the explanation)
+                            Why does this work?
                         </span>
                     </summary>
                     <p>
@@ -483,6 +496,21 @@ bad-ip.ionized-twig.messwithdns.net. 30	IN A	30.31.32.33
                         world who's ever made a request for bad-ip.{{domain}}.messwithdns.net,
                         you have total control over when they learn about the domain for the first
                         time.
+                    </p>
+                </details>
+                <details>
+                    <summary>
+                        <span class="text-green-700">
+                            I got 30.31.32.33 from Google at the end, not 10.11.12.13. Why?
+                        </span>
+                    </summary>
+                    <p>
+                    8.8.8.8 isn't one server, it's many DNS servers. What
+                    probably happened is that when you queried 8.8.8.8 the first
+                    time, you missed some of its servers. And then at the end,
+                    you reached a new server that hadn't cached the record yet.
+                    (this is why it says "query 10 times", but sometimes 10
+                    times isn't enough)
                     </p>
                 </details>
                 </p>

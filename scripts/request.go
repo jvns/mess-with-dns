@@ -10,7 +10,7 @@ import (
 func makeRequest() {
 	// timeout after 1 second
 	client := NewTimeoutClient(1*time.Second, 1*time.Second)
-	resp, err := client.Get("http://mess-with-dns.fly.dev/bundle.js")
+	resp, err := client.Get("http://messwithdns.com/bundle.js")
 	// print time (not date)
 	fmt.Print(time.Now().Format("15:04:05 "))
 	if err != nil {
@@ -23,7 +23,7 @@ func makeRequest() {
 func main() {
 	for {
 		makeRequest()
-		time.Sleep(1 * time.Second)
+		time.Sleep(5 * time.Second)
 	}
 }
 func TimeoutDialer(cTimeout time.Duration, rwTimeout time.Duration) func(net, addr string) (c net.Conn, err error) {

@@ -251,7 +251,7 @@ func GetRequests(db *sql.DB, subdomain string) ([]map[string]interface{}, error)
 	if err != nil {
 		return nil, err
 	}
-	rows, err := tx.Query("SELECT id, extract(epoch from created_at), request, response, src_ip, src_host FROM dns_requests WHERE name = $1 ORDER BY created_at DESC", subdomain)
+	rows, err := tx.Query("SELECT id, extract(epoch from created_at), request, response, src_ip, src_host FROM dns_requests WHERE name = $1 ORDER BY created_at DESC LIMIT 30", subdomain)
 	if err != nil {
 		return make([]map[string]interface{}, 0), err
 	}

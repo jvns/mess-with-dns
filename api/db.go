@@ -156,8 +156,21 @@ func InsertRecord(db *sql.DB, record dns.RR) error {
 	return IncrementSerial(tx)
 }
 
+func uncommittedTransation(db *sql.DB) (*sql.Tx, error) {
+	tx, err := db.Begin()
+	if err != nil {
+		return nil, err
+	}
+	_, err = tx.Exec("SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED")
+	if err != nil {
+		return nil, err
+	}
+	return tx, nil
+}
+
 func GetRecordsForName(db *sql.DB, name string) (map[int]dns.RR, error) {
-	fmt.Println(name)
+	// we're stricter about the isolation level here because it's weird if you delete a record
+	// but it still exists after
 	rows, err := db.Query("SELECT id, content FROM dns_records WHERE name LIKE $1", "%"+name)
 	if err != nil {
 		return nil, err
@@ -234,7 +247,11 @@ func DeleteRequestsForDomain(db *sql.DB, subdomain string) error {
 }
 
 func GetRequests(db *sql.DB, subdomain string) ([]map[string]interface{}, error) {
-	rows, err := db.Query("SELECT id, extract(epoch from created_at), request, response, src_ip, src_host FROM dns_requests WHERE name = $1 ORDER BY created_at DESC", subdomain)
+	tx, err := uncommittedTransation(db)
+	if err != nil {
+		return nil, err
+	}
+	rows, err := tx.Query("SELECT id, extract(epoch from created_at), request, response, src_ip, src_host FROM dns_requests WHERE name = $1 ORDER BY created_at DESC", subdomain)
 	if err != nil {
 		return make([]map[string]interface{}, 0), err
 	}
@@ -264,12 +281,17 @@ func GetRequests(db *sql.DB, subdomain string) ([]map[string]interface{}, error)
 		}
 		requests = append(requests, x)
 	}
+	tx.Commit()
 	return requests, nil
 }
 
 func GetRecords(db *sql.DB, name string, rrtype uint16) ([]dns.RR, error) {
+	tx, err := uncommittedTransation(db)
+	if err != nil {
+		return nil, err
+	}
 	// return cname records if they exist
-	rows, err := db.Query("SELECT content FROM dns_records WHERE name = $1 AND (rrtype = $2 OR rrtype = 5)", name, rrtype)
+	rows, err := tx.Query("SELECT content FROM dns_records WHERE name = $1 AND (rrtype = $2 OR rrtype = 5)", name, rrtype)
 	if err != nil {
 		return make([]dns.RR, 0), err
 	}
@@ -286,5 +308,6 @@ func GetRecords(db *sql.DB, name string, rrtype uint16) ([]dns.RR, error) {
 		}
 		records = append(records, record)
 	}
+	tx.Commit()
 	return records, nil
 }

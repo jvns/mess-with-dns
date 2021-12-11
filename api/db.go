@@ -285,29 +285,50 @@ func GetRequests(db *sql.DB, subdomain string) ([]map[string]interface{}, error)
 	return requests, nil
 }
 
-func GetRecords(db *sql.DB, name string, rrtype uint16) ([]dns.RR, error) {
+func GetRecords(db *sql.DB, name string, rrtype uint16) ([]dns.RR, int, error) {
 	tx, err := uncommittedTransation(db)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
-	// return cname records if they exist
-	rows, err := tx.Query("SELECT content FROM dns_records WHERE name = $1 AND (rrtype = $2 OR rrtype = 5)", name, rrtype)
+	// first get all the records
+	rows, err := tx.Query("SELECT content FROM dns_records WHERE name = $1", name)
 	if err != nil {
-		return make([]dns.RR, 0), err
+		return nil, 0, err
 	}
+	// next parse them
 	var records []dns.RR
 	for rows.Next() {
 		var content []byte
 		err = rows.Scan(&content)
 		if err != nil {
-			return make([]dns.RR, 0), err
+			return nil, 0, err
 		}
 		record, err := ParseRecord(content)
 		if err != nil {
-			return make([]dns.RR, 0), err
+			return nil, 0, err
 		}
 		records = append(records, record)
 	}
+	// now filter them
+	filtered := make([]dns.RR, 0)
+	for _, record := range records {
+		if shouldReturn(rrtype, record.Header().Rrtype) {
+			filtered = append(filtered, record)
+		}
+	}
 	tx.Commit()
-	return records, nil
+	return filtered, len(records), nil
+}
+
+func shouldReturn(queryType uint16, recordType uint16) bool {
+	if queryType == recordType {
+		return true
+	}
+	if recordType == dns.TypeCNAME {
+		return true
+	}
+	if queryType == dns.TypeHTTPS && (recordType == dns.TypeA || recordType == dns.TypeAAAA) {
+		return true
+	}
+	return false
 }

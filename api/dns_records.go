@@ -2,17 +2,31 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"net"
 
 	"github.com/miekg/dns"
 )
 
-func lookupRecords(db *sql.DB, name string, qtype uint16) ([]dns.RR, error) {
+func lookupRecords(db *sql.DB, name string, qtype uint16) ([]dns.RR, int, error) {
 	records := specialRecords(name, qtype)
 	if len(records) > 0 {
-		return records, nil
+		return records, len(records), nil
 	}
 	return GetRecords(db, name, qtype)
+}
+
+func dnsResponse(db *sql.DB, request *dns.Msg) *dns.Msg {
+	records, totalRecords, err := lookupRecords(db, request.Question[0].Name, request.Question[0].Qtype)
+	if err != nil {
+		msg := errorResponse(request)
+		fmt.Println("Error getting records:", err)
+		return msg
+	}
+	if totalRecords == 0 {
+		return nxDomainResponse(request)
+	}
+	return successResponse(request, records)
 }
 
 func emptyMessage(request *dns.Msg) *dns.Msg {
@@ -28,6 +42,12 @@ func emptyMessage(request *dns.Msg) *dns.Msg {
 func errorResponse(request *dns.Msg) *dns.Msg {
 	msg := emptyMessage(request)
 	msg.SetRcode(request, dns.RcodeServerFailure)
+	return msg
+}
+
+func nxDomainResponse(request *dns.Msg) *dns.Msg {
+	msg := emptyMessage(request)
+	msg.SetRcode(request, dns.RcodeNameError)
 	return msg
 }
 

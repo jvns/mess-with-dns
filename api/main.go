@@ -285,15 +285,9 @@ func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	start := time.Now()
 	fmt.Println("Received request: ", r.Question[0].String())
-
-	records, err := lookupRecords(handle.db, r.Question[0].Name, r.Question[0].Qtype)
-	if err != nil {
-		msg := errorResponse(r)
-		fmt.Println("Error getting records:", err)
-		w.WriteMsg(msg)
-		return
-	}
-	msg := successResponse(r, records)
+	msg := dnsResponse(handle.db, r)
+	w.WriteMsg(msg)
+	// everything after this is just logging
 	elapsed := time.Since(start)
 	if len(msg.Answer) > 0 {
 		fmt.Println("Response: ", msg.Answer[0].String(), elapsed)
@@ -302,7 +296,6 @@ func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 		fmt.Println("Response: (no records found)", elapsed)
 
 	}
-	w.WriteMsg(msg)
 	remote_addr := w.RemoteAddr().(*net.UDPAddr).IP
 	LogRequest(handle.db, r, msg, remote_addr, lookupHost(handle.ipRanges, remote_addr))
 }

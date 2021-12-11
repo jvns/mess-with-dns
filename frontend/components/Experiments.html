@@ -64,7 +64,7 @@
                         <ul class="record-expl">
                             <li><strong>Name:</strong> fruit </li>
                             <li><strong>Type:</strong> CNAME </li>
-                            <li><strong>Target:</strong> <code>orange.messwithdns.net</code> </li>
+                            <li><strong>Target:</strong> <code>orange.messwithdns.com</code> </li>
                             <li><strong>TTL: </strong> 60</li>
                         </ul>
                         <img src="/images/orange-cname.png">
@@ -86,7 +86,7 @@
             <div class="details-modal">
                 <p>
                     The "Requests" section at the bottom of this page lets you see all
-                    DNS requests being made for subdomains of <code class="text-green-700">{{ domain}}.messwithdns.net</code>!
+                    DNS requests being made for subdomains of <code class="text-green-700">{{ domain}}.messwithdns.com</code>!
                     Let's look at the CNAME record we created in the previous experiment, to see how CNAME records work!
                 </p>
                 <ol>
@@ -134,7 +134,7 @@
                         <ul class="record-expl">
                             <li><strong>Name:</strong> visit-after <br> </li>
                             <li><strong>Type:</strong> CNAME <br> </li>
-                            <li><strong>Target:</strong> <code>orange.messwithdns.net</code> <br> </li>
+                            <li><strong>Target:</strong> <code>orange.messwithdns.com</code> <br> </li>
                             <li><strong>TTL: </strong> 3600</li>
                         </ul>
                     </li>
@@ -152,7 +152,7 @@
                         <ul class="record-expl">
                             <li><strong>Name:</strong> visit-before <br> </li>
                             <li><strong>Type:</strong> CNAME <br> </li>
-                            <li><strong>Target:</strong> <code>orange.messwithdns.net</code> <br> </li>
+                            <li><strong>Target:</strong> <code>orange.messwithdns.com</code> <br> </li>
                             <li><strong>TTL: </strong> 3600</li>
                         </ul>
                     </li>
@@ -172,7 +172,7 @@
                         Here's what happens with "visit-after", where everything's working as expected
                     <ul class="explanation-list">
                         <li class="you    "> You create the record </li>
-                        <li class="browser"> Browser asks: where's visit-after.{{domain}}.messwithdns.net? </li>
+                        <li class="browser"> Browser asks: where's visit-after.{{domain}}.messwithdns.com? </li>
                         <li class="server"> DNS server responds: success! </li>
                     </ul>
                     </p>
@@ -181,12 +181,12 @@
                         With visit-before, it doesn't work because of something DNS resolvers do called <strong>negative caching</strong>, where they cache the <strong>absence</strong> of a record.
 
                     <ul class="explanation-list">
-                        <li class="browser ">Browser: where's visit-before.{{domain}}.messwithdns.net? </li>
+                        <li class="browser ">Browser: where's visit-before.{{domain}}.messwithdns.com? </li>
                         <li class="server  ">DNS server: doesn't exist! </li>
                         <li class="resolver no-arrow">DNS resolver: "oops it doesn't exist! Better cache that!" </li>
                         <li class="resolver">DNS resolver: Doesn't exist</li>
                         <li class="you">You create record </li>
-                        <li class="browser">Request: where's visit-before.{{domain}}.messwithdns.net? </li>
+                        <li class="browser">Request: where's visit-before.{{domain}}.messwithdns.com? </li>
                         <li class="resolver no-arrow">DNS resolver: "I saw this before!! It doesn't exist!" </li>
                         <li class="resolver">DNS resolver: doesn't exist </li>
                         <li class="you">You: :( :( :( IT EXISTS THOUGH </li>
@@ -236,7 +236,7 @@
                         <ul class="record-expl">
                             <li><strong>Name:</strong> short-ttl <br> </li>
                             <li><strong>Type:</strong> CNAME <br> </li>
-                            <li><strong>Target:</strong> <code>orange.messwithdns.net</code> <br> </li>
+                            <li><strong>Target:</strong> <code>orange.messwithdns.com</code> <br> </li>
                             <li><strong>TTL: </strong> 30</li>
                         </ul>
                         <img src="/images/short-ttl.png">
@@ -246,7 +246,7 @@
                         in your browser. You should see an orange website.
                     </li>
                     <li>
-                        Click 'Edit' and change the CNAME record to point at <code>purple.messwithdns.net</code> instead.
+                        Click 'Edit' and change the CNAME record to point at <code>purple.messwithdns.com</code> instead.
                         <img src="/images/short-purple-ttl.png">
                     </li>
                     <li>
@@ -265,7 +265,7 @@
                         <ul class="record-expl">
                             <li><strong>Name:</strong> long-ttl <br> </li>
                             <li><strong>Type:</strong> CNAME <br> </li>
-                            <li><strong>Target:</strong> <code>orange.messwithdns.net</code> <br> </li>
+                            <li><strong>Target:</strong> <code>orange.messwithdns.com</code> <br> </li>
                             <li><strong>TTL: </strong> 3000000 (that's 30 days! Or use any reasonably big number)</li>
                         </ul>
                         <img src="/images/long-ttl.png">
@@ -275,7 +275,7 @@
                         in your browser. You should see an orange website.
                     </li>
                     <li>
-                        Click 'Edit' and change the CNAME record to point at <code>purple.messwithdns.net</code> instead.
+                        Click 'Edit' and change the CNAME record to point at <code>purple.messwithdns.com</code> instead.
                         <img src="/images/long-purple-ttl.png">
                     </li>
                     <li>
@@ -302,14 +302,14 @@
                     </p>
                     <ul class="explanation-list">
                         <li class="you ">You create a record</li>
-                        <li class="browser ">Browser asks: where's short-ttl.{{domain}}.messwithdns.net? </li>
+                        <li class="browser ">Browser asks: where's short-ttl.{{domain}}.messwithdns.com? </li>
                         <li class="resolver action">Resolver doesn't have this in cache, so requests it</li>
                         <li class="server ">DNS server responds: Here's the IP! The TTL is 30 seconds!</li>
                         <li class="resolver action">Resolver caches the IP for 30 seconds</li>
                         <li class="resolver">Resolver responds: Here's the IP!</li>
                         <li class="action"> ... 30 seconds pass </li>
                         <li class="you ">You update the record</li>
-                        <li class="browser ">Browser asks: where's short-ttl.{{domain}}.messwithdns.net? </li>
+                        <li class="browser ">Browser asks: where's short-ttl.{{domain}}.messwithdns.com? </li>
                         <li class="resolver action">Resolver notices that the cache expired, and requests it again</li>
                         <li class="server ">DNS server responds: Here's the IP!</li>
                         <li class="resolver action">Resolver caches the IP for 30 seconds</li>
@@ -322,14 +322,14 @@
 
                     <ul class="explanation-list">
                         <li class="you ">You create a record</li>
-                        <li class="browser ">Browser asks: where's long-ttl.{{domain}}.messwithdns.net? </li>
+                        <li class="browser ">Browser asks: where's long-ttl.{{domain}}.messwithdns.com? </li>
                         <li class="resolver action">Resolver doesn't have this in cache, so requests it</li>
                         <li class="server ">DNS server responds: Here's the IP! The TTL is 10 days!</li>
                         <li class="resolver action">Resolver caches the IP for 10 days</li>
                         <li class="resolver">Resolver responds: Here's the IP!</li>
                         <li class="action"> ... 30 seconds pass </li>
                         <li class="you ">You update the record</li>
-                        <li class="browser ">Browser asks: where's long-ttl.{{domain}}.messwithdns.net? </li>
+                        <li class="browser ">Browser asks: where's long-ttl.{{domain}}.messwithdns.com? </li>
                         <li class="resolver">Resolver responds: I have that cached! Here's the IP!</li>
                     </ul>
                 </details>
@@ -391,14 +391,14 @@
                             <li class="example">Example.com server: I know that site! Here's a response!</li>
                         </ul>
                         <p>
-                            But when you request bad-ip.{{domain}}.messwithdns.net and you get a 404, here's how it goes:
+                            But when you request bad-ip.{{domain}}.messwithdns.com and you get a 404, here's how it goes:
                         </p>
                         <ul class="explanation-list">
                             <li class="you">Type example.com into your browser</li>
-                            <li class="browser">Browser asks: where's bad-ip.{{domain}}.messwithdns.net?</li>
+                            <li class="browser">Browser asks: where's bad-ip.{{domain}}.messwithdns.com?</li>
                             <li class="resolver">Resolver responds: 93.184.216.34</li>
                             <li class="action">(everything is the same so far!)</li>
-                            <li class="browser">Browser (to 93.184.216.34): an HTTP request for <code>Host: bad-ip.{{domain}}.messwithdns.net</code>!</li>
+                            <li class="browser">Browser (to 93.184.216.34): an HTTP request for <code>Host: bad-ip.{{domain}}.messwithdns.com</code>!</li>
                             <li class="example">Example.com server: I've never heard of that site!! 404! </li>
                         </ul>
 
@@ -448,7 +448,7 @@
                     </li>
                     <li>
                         In your terminal, run
-                        <pre>$ dig +noall +answer @8.8.8.8 3-ips.{{domain}}.messwithdns.net</pre>
+                        <pre>$ dig +noall +answer @8.8.8.8 3-ips.{{domain}}.messwithdns.com</pre>
                         Run it 10 times just to be safe. Google has many DNS servers, so we want to hit most of them.
                     </li>
                     <li>
@@ -456,7 +456,7 @@
                     </li>
                     <li>
                         Time to tell Cloudflare about the domain! In your terminal, run
-                        <pre>$ dig +noall +answer @1.1.1.1 3-ips.{{domain}}.messwithdns.net</pre>
+                        <pre>$ dig +noall +answer @1.1.1.1 3-ips.{{domain}}.messwithdns.com</pre>
                         Run it a few times.
                     </li>
                     <li>
@@ -465,18 +465,18 @@
                     </li>
                     <li>
                         Now we'll tell Quad9 about the domain. In your terminal, run
-                        <pre>$ dig +noall +answer @9.9.9.9 3-ips.{{domain}}.messwithdns.net</pre>
+                        <pre>$ dig +noall +answer @9.9.9.9 3-ips.{{domain}}.messwithdns.com</pre>
                     </li>
                     <li>
                         Now, let's ask all 3 providers what they think our IP address is. Here's what I see:
 
                         <pre>
-$ dig +noall +answer @8.8.8.8 3-ips.{{domain}}.messwithdns.net
-bad-ip.ionized-twig.messwithdns.net. 30	IN A	10.11.12.13
-$ dig +noall +answer @1.1.1.1 3-ips.{{domain}}.messwithdns.net
-bad-ip.ionized-twig.messwithdns.net. 30	IN A	20.21.22.23
-$ dig +noall +answer @9.9.9.9 3-ips.{{domain}}.messwithdns.net
-bad-ip.ionized-twig.messwithdns.net. 30	IN A	30.31.32.33
+$ dig +noall +answer @8.8.8.8 3-ips.{{domain}}.messwithdns.com
+bad-ip.ionized-twig.messwithdns.com. 30	IN A	10.11.12.13
+$ dig +noall +answer @1.1.1.1 3-ips.{{domain}}.messwithdns.com
+bad-ip.ionized-twig.messwithdns.com. 30	IN A	20.21.22.23
+$ dig +noall +answer @9.9.9.9 3-ips.{{domain}}.messwithdns.com
+bad-ip.ionized-twig.messwithdns.com. 30	IN A	30.31.32.33
 </pre>
                         All of the 3 DNS servers have different opinion about what our IP address is! Mischief managed.
 
@@ -493,7 +493,7 @@ bad-ip.ionized-twig.messwithdns.net. 30	IN A	30.31.32.33
                         The reason this works is that Google, Cloudflare, and Quad9 will never
                         proactively look up our domain -- they only look up domain when someone
                         makes a request for it. And because you're literally the only person in the
-                        world who's ever made a request for bad-ip.{{domain}}.messwithdns.net,
+                        world who's ever made a request for bad-ip.{{domain}}.messwithdns.com,
                         you have total control over when they learn about the domain for the first
                         time.
                     </p>
@@ -551,25 +551,25 @@ bad-ip.ionized-twig.messwithdns.net. 30	IN A	30.31.32.33
                     </li>
                     <li>
                         In your terminal, run
-                        <pre>curl http://conflict.{{currDomain()}}.messwithdns.net 2&gt;/dev/null | grep title </pre>
+                        <pre>curl http://conflict.{{currDomain()}}.messwithdns.com 2&gt;/dev/null | grep title </pre>
                         10 times.
                         When I run it, the result I get changes back and forth between 'orange' and 'purple', like this. You might see different behaviour though, which we'll talk about in the explanation :)
                         <pre>
-$ curl http://conflict.{{currDomain()}}.messwithdns.net/ 2&gt; /dev/null | grep title
+$ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
 &lt;title&gt;orange&lt;/title&gt;
-$ curl http://conflict.{{currDomain()}}.messwithdns.net/ 2&gt; /dev/null | grep title
+$ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
 &lt;title&gt;purple&lt;/title&gt;
-$ curl http://conflict.{{currDomain()}}.messwithdns.net/ 2&gt; /dev/null | grep title
+$ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
 &lt;title&gt;orange&lt;/title&gt;
-$ curl http://conflict.{{currDomain()}}.messwithdns.net/ 2&gt; /dev/null | grep title
+$ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
 &lt;title&gt;purple&lt;/title&gt;
-$ curl http://conflict.{{currDomain()}}.messwithdns.net/ 2&gt; /dev/null | grep title
+$ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
 &lt;title&gt;orange&lt;/title&gt;
-$ curl http://conflict.{{currDomain()}}.messwithdns.net/ 2&gt; /dev/null | grep title
+$ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
 &lt;title&gt;purple&lt;/title&gt;
-$ curl http://conflict.{{currDomain()}}.messwithdns.net/ 2&gt; /dev/null | grep title
+$ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
 &lt;title&gt;orange&lt;/title&gt;
-$ curl http://conflict.{{currDomain()}}.messwithdns.net/ 2&gt; /dev/null | grep title
+$ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep title
 &lt;title&gt;purple&lt;/title&gt;
 </pre>
                     </li>
@@ -590,8 +590,8 @@ $ curl http://conflict.{{currDomain()}}.messwithdns.net/ 2&gt; /dev/null | grep 
                     </p>
                     <ul class="explanation-list">
                         <li class="you    "> You create 2 records </li>
-                        <li class="you"> You run <code>curl conflict.{{domain}}.messwithdns.net</code></li>
-                        <li class="you"> You run <code>curl conflict.{{domain}}.messwithdns.net</code> again, it gets sent to your resolver</li>
+                        <li class="you"> You run <code>curl conflict.{{domain}}.messwithdns.com</code></li>
+                        <li class="you"> You run <code>curl conflict.{{domain}}.messwithdns.com</code> again, it gets sent to your resolver</li>
                         <li class="resolver">Resolver has the 2 records cached, and returns them</li>
                     </ul>
 
@@ -631,9 +631,9 @@ $ curl http://conflict.{{currDomain()}}.messwithdns.net/ 2&gt; /dev/null | grep 
                 </p>
                 <ol>
                     <li>On Netlify: Create a new website</li>
-                    <li>On Netlify: Add the domain www.{{currDomain()}}.messwithdns.net to your Netlify site</li>
-                    <li>On Mess With DNS: Create a CNAME record pointing www.{{currDomain()}}.messwithdns.net at your new Netlify site</li>
-                    <li>Visit www.{{currDomain()}}.messwithdns.net in your browser and see if it works!</li>
+                    <li>On Netlify: Add the domain www.{{currDomain()}}.messwithdns.com to your Netlify site</li>
+                    <li>On Mess With DNS: Create a CNAME record pointing www.{{currDomain()}}.messwithdns.com at your new Netlify site</li>
+                    <li>Visit www.{{currDomain()}}.messwithdns.com in your browser and see if it works!</li>
                 </ol>
                 <p>DNS records are deleted after a week, so don't use this site for anything real! :) </p>
             </div>
@@ -649,9 +649,9 @@ $ curl http://conflict.{{currDomain()}}.messwithdns.net/ 2&gt; /dev/null | grep 
                     Here's an example of some steps using Fastmail:
                 </p>
                 <ol>
-                    <li>On Fastmail: Sign up for a free trial using the email <code>you@mail.{{currDomain()}}.messwithdns.net</li>
-                    <li>On Mess With DNS: Create 2 MX records pointing mail.{{currDomain()}}.messwithdns.net at Fastmail's mail servers. Fastmail will give you instructions when you sign up.</li>
-                    <li>Send yourself an email at you@mail.{{currDomain()}}.messwithdns.net and see if you get it!</li>
+                    <li>On Fastmail: Sign up for a free trial using the email <code>you@mail.{{currDomain()}}.messwithdns.com</li>
+                    <li>On Mess With DNS: Create 2 MX records pointing mail.{{currDomain()}}.messwithdns.com at Fastmail's mail servers. Fastmail will give you instructions when you sign up.</li>
+                    <li>Send yourself an email at you@mail.{{currDomain()}}.messwithdns.com and see if you get it!</li>
                 </ol>
                 <p>DNS records are deleted after a week, so don't use this email address for anything real! :) </p>
             </div>

@@ -47,52 +47,52 @@ var records = map[string]dns.RR{
 		},
 		A: net.ParseIP("1.2.3.4"),
 	},
-	"orange.messwithdns.net.": &dns.A{
+	"orange.messwithdns.com.": &dns.A{
 		Hdr: dns.RR_Header{
-			Name:   "orange.messwithdns.net.",
+			Name:   "orange.messwithdns.com.",
 			Rrtype: dns.TypeA,
 			Class:  dns.ClassINET,
 			Ttl:    3600,
 		},
 		A: net.ParseIP("213.188.218.160"),
 	},
-	"purple.messwithdns.net.": &dns.A{
+	"purple.messwithdns.com.": &dns.A{
 		Hdr: dns.RR_Header{
-			Name:   "purple.messwithdns.net.",
+			Name:   "purple.messwithdns.com.",
 			Rrtype: dns.TypeA,
 			Class:  dns.ClassINET,
 			Ttl:    3600,
 		},
 		A: net.ParseIP("213.188.209.192"),
 	},
-	"ns1.messwithdns.net.": &dns.A{
+	"ns1.messwithdns.com.": &dns.A{
 		Hdr: dns.RR_Header{
-			Name:   "ns1.messwithdns.net.",
+			Name:   "ns1.messwithdns.com.",
 			Rrtype: dns.TypeA,
 			Class:  dns.ClassINET,
 			Ttl:    3600,
 		},
 		A: net.ParseIP("213.188.214.254"),
 	},
-	"ns2.messwithdns.net.": &dns.A{
+	"ns2.messwithdns.com.": &dns.A{
 		Hdr: dns.RR_Header{
-			Name:   "ns2.messwithdns.net.",
+			Name:   "ns2.messwithdns.com.",
 			Rrtype: dns.TypeA,
 			Class:  dns.ClassINET,
 			Ttl:    3600,
 		},
 		A: net.ParseIP("213.188.214.237"),
 	},
-	"www.messwithdns.net": &dns.CNAME{
+	"www.messwithdns.com": &dns.CNAME{
 		Hdr: dns.RR_Header{
-			Name:   "www.messwithdns.net.",
+			Name:   "www.messwithdns.com.",
 			Rrtype: dns.TypeCNAME,
 			Class:  dns.ClassINET,
 			Ttl:    3600,
 		},
 		Target: "mess-with-dns.fly.dev.",
 	},
-	"messwithdns.net.": getSOA(soaSerial),
+	"messwithdns.com.": getSOA(soaSerial),
 }
 
 func specialRecords(name string, qtype uint16) []dns.RR {
@@ -107,12 +107,12 @@ func specialRecords(name string, qtype uint16) []dns.RR {
 func getSOA(serial uint32) *dns.SOA {
 	var soa = dns.SOA{
 		Hdr: dns.RR_Header{
-			Name:   "messwithdns.net.",
+			Name:   "messwithdns.com.",
 			Rrtype: dns.TypeSOA,
 			Class:  dns.ClassINET,
 			Ttl:    300, /* RFC 1035 says soa records always should have a ttl of 0 but cloudflare doesn't seem to do that*/
 		},
-		Ns:      "ns1.messwithdns.net.",
+		Ns:      "ns1.messwithdns.com.",
 		Mbox:    "julia.wizardzines.com.",
 		Serial:  serial,
 		Refresh: 3600,

@@ -16,10 +16,10 @@ var disallowedDomains = map[string]bool{
 }
 
 func getSubdomain(domain string) string {
-	if !strings.HasSuffix(domain, ".messwithdns.net.") {
+	if !strings.HasSuffix(domain, ".messwithdns.com.") {
 		return ""
 	}
-	name := strings.TrimSuffix(domain, "messwithdns.net.")
+	name := strings.TrimSuffix(domain, "messwithdns.com.")
 	parts := strings.Split(name, ".")
 	if len(parts) == 1 {
 		return ""
@@ -34,11 +34,11 @@ func validateDomainName(domain string, username string) error {
 	if _, ok := dns.IsDomainName(domain); !ok {
 		return fmt.Errorf("Invalid domain name: %s", domain)
 	}
-	if !strings.HasSuffix(domain, ".messwithdns.net.") {
-		return fmt.Errorf("Subdomain must end with .messwithdns.net.")
+	if !strings.HasSuffix(domain, ".messwithdns.com.") {
+		return fmt.Errorf("Subdomain must end with .messwithdns.com.")
 	}
 	// get last component of domain
-	name := strings.TrimSuffix(domain, ".messwithdns.net.")
+	name := strings.TrimSuffix(domain, ".messwithdns.com.")
 	subdomain := getSubdomain(domain)
 	if subdomain != username {
 		return fmt.Errorf("Subdomain must be '%s'", username)

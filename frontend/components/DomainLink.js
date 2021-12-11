@@ -4,11 +4,11 @@ export default {
   <a
     v-if="domain && domain.length > 0"
     target="_blank"
-    :href="'http://' + subdomain + '.' + domain + '.messwithdns.net'"
-    >{{subdomain}}.{{ domain }}.messwithdns.net</a
+    :href="'http://' + subdomain + '.' + domain + '.messwithdns.com'"
+    >{{subdomain}}.{{ domain }}.messwithdns.com</a
   >
   <span v-else>
-    <span class="text-green-700">your-domain</span>.messwithdns.net
+    <span class="text-green-700">your-domain</span>.messwithdns.com
   </span>
 </code>
     `,

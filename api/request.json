@@ -1,6 +1,6 @@
 {
     "Hdr": {
-        "Name": "example.messwithdns.net.",
+        "Name": "example.messwithdns.com.",
         "Rrtype": 1,
         "Class": 1,
         "Ttl": 5,

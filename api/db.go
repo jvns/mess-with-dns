@@ -291,7 +291,7 @@ func GetRecords(db *sql.DB, name string, rrtype uint16) ([]dns.RR, int, error) {
 		return nil, 0, err
 	}
 	// first get all the records
-	rows, err := tx.Query("SELECT content FROM dns_records WHERE name = $1", name)
+	rows, err := tx.Query("SELECT content FROM dns_records WHERE name = $1 ORDER BY created_at DESC", name)
 	if err != nil {
 		return nil, 0, err
 	}

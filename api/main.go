@@ -220,6 +220,10 @@ func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	p := strings.Split(r.URL.Path, "/")[1:]
 	n := len(p)
 	switch {
+	// check host header for messwithdns.com
+	case r.Host == "messwithdns.com" || r.Host == "www.messwithdns.com":
+		// redirect to .net
+		http.Redirect(w, r, "https://messwithdns.net"+r.URL.Path, http.StatusFound)
 	// GET /domain: get everything from USERNAME.messwithdns.com.
 	case r.Method == "GET" && p[0] == "domains":
 		if !requireLogin(username, w) {

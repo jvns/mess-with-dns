@@ -65,34 +65,24 @@ var records = map[string]dns.RR{
 		},
 		A: net.ParseIP("213.188.209.192"),
 	},
-	"ns1.messwithdns.com.": &dns.A{
+	"www.messwithdns.com": &dns.A{
 		Hdr: dns.RR_Header{
-			Name:   "ns1.messwithdns.com.",
+			Name:   "messwithdns.com.",
 			Rrtype: dns.TypeA,
 			Class:  dns.ClassINET,
-			Ttl:    3600,
+			Ttl:    60,
 		},
 		A: net.ParseIP("213.188.214.254"),
 	},
-	"ns2.messwithdns.com.": &dns.A{
+	"messwithdns.com.": &dns.A{
 		Hdr: dns.RR_Header{
-			Name:   "ns2.messwithdns.com.",
+			Name:   "messwithdns.com.",
 			Rrtype: dns.TypeA,
 			Class:  dns.ClassINET,
-			Ttl:    3600,
+			Ttl:    60,
 		},
-		A: net.ParseIP("213.188.214.237"),
+		A: net.ParseIP("213.188.214.254"),
 	},
-	"www.messwithdns.com": &dns.CNAME{
-		Hdr: dns.RR_Header{
-			Name:   "www.messwithdns.com.",
-			Rrtype: dns.TypeCNAME,
-			Class:  dns.ClassINET,
-			Ttl:    3600,
-		},
-		Target: "mess-with-dns.fly.dev.",
-	},
-	"messwithdns.com.": getSOA(soaSerial),
 }
 
 func specialRecords(name string, qtype uint16) []dns.RR {
@@ -100,6 +90,10 @@ func specialRecords(name string, qtype uint16) []dns.RR {
 		if record.Header().Rrtype == qtype {
 			return []dns.RR{record}
 		}
+	}
+	// special case for SOA
+	if qtype == dns.TypeSOA && name == "messwithdns.com." {
+		return []dns.RR{getSOA(soaSerial)}
 	}
 	return nil
 }

@@ -2,6 +2,8 @@ import {
     rrTypesReverse
 } from "../common.js";
 import template from "./ViewRequest.html";
+import * as rcodes from '../rcodes.json';
+
 export default {
     template: template,
     props: ["request"],
@@ -9,6 +11,7 @@ export default {
         return {
             clicked: false,
             rrTypesReverse: rrTypesReverse,
+            rcodes: rcodes,
         };
     },
     methods: {

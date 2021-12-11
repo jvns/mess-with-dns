@@ -1,0 +1,21 @@
+{
+  "0": "NOERROR",
+  "1": "FORMERR",
+  "10": "NOTZONE",
+  "16": "BADSIG",
+  "17": "BADKEY",
+  "18": "BADTIME",
+  "19": "BADMODE",
+  "2": "SERVFAIL",
+  "20": "BADNAME",
+  "21": "BADALG",
+  "22": "BADTRUNC",
+  "23": "BADCOOKIE",
+  "3": "NXDOMAIN",
+  "4": "NOTIMP",
+  "5": "REFUSED",
+  "6": "YXDOMAIN",
+  "7": "YXRRSET",
+  "8": "NXRRSET",
+  "9": "NOTAUTH"
+}

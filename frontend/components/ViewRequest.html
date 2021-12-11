@@ -12,8 +12,10 @@
                 From: <span class="request-host">{{request.src_host}}</span>
             </div>
         </td>
-        <td class="lg:px-2 lg:py-4 request-response">
-            <strong class="inline lg:hidden">Response:</strong> <span v-if="!request.response.Answer">no records</span>
+        <td class="lg:px-2 lg:py-4 request-response align-top">
+            <strong class="inline lg:hidden">Response:<br></strong>  
+            Code: {{rcodes[request.response.Rcode.toString()]}} <br>
+            Records: <span v-if="!request.response.Answer || request.response.Answer.length == 0">none</span> <br>
             <div class="border-l-4 pl-4 mb-4 border-pink-200" v-for="answer in request.response.Answer">
                 Type: {{rrTypesReverse[answer.Hdr.Rrtype]}} <br>
                 TTL: {{answer.Hdr.Ttl}} <br>

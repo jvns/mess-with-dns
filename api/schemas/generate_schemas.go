@@ -15,7 +15,7 @@ var examples = map[string]string{
 	"AAAA":        "2001:db8::1",
 	"Algorithm":   "1",
 	"Certificate": "MIIGDjCCA/agAwIBAgIJAJz/8nh5oYsMA0GCSqGSIb3DQEBBQUAMIGuMQswCQYDVQQGEwJKUDEOMAwGA1UECBMF",
-	"Digest":      "32996839A6D808AFE3EB4A795A0E6A7A39A76FC52FF228B22B76F6D6",
+	"Digest":      "QmFzZTY0IGVuY29kZWQgZm9ybWF0",
 	"DigestType":  "1",
 	"Expire":      "1",
 	"Flag":        "1",
@@ -105,6 +105,16 @@ func main() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
+	file.Write(x)
+
+	// rcodes.json
+	file, err = os.Create("../frontend/rcodes.json")
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	x, _ = json.MarshalIndent(dns.RcodeToString, "", "  ")
 	file.Write(x)
 }
 

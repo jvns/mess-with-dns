@@ -1,0 +1,169 @@
+<details class="experiment">
+    <summary>
+        <h3>
+            1. Query the source of truth
+            <span class="category">
+                authoritative nameserver
+            </span>
+        </h3>
+    </summary>
+    <div class="details-modal">
+
+        <p>
+            In the previous experiments, we were looking at how
+            DNS names are cached.
+
+            But you can always query the source of truth for a domain: the
+            <strong> authoritative nameserver </strong> and get an uncached
+            result. Let's:
+        </p>
+        <ul class="pl-2 md:pl-8 steps">
+            <li>Create a DNS record with a really long TTL (like 5 hours)</li>
+            <li>See that it gets cached by your usual DNS server, but that when we query the authoritative server we get the up-to-date result</li>
+        </ul>
+
+
+        <ol>
+            <li>
+
+                Create an A record with:
+                <ul class="record-expl">
+                    <li><strong>Name:</strong> truth <br> </li>
+                    <li><strong>IPv4 Address:</strong> <code>1.2.3.4</code> <br> </li>
+                    <li><strong>TTL:</strong> 3600</li>
+                </ul>
+                <img src="/images/truth.png" class="block border  border-dashed border-green-700 mb-4 mt-2">
+            </li>
+            <li>
+                In your terminal, run
+                <pre>dig +noall +answer {{currDomain()}}.messwithdns.net</pre>
+                to get the A record for your domain. Run it 5 times just to
+                make sure all of your resolver's servers cache it.
+            </li>
+            <li>
+                Edit the <code>truth</code> record to have the IP <code>5.6.7.8</code> instead.
+            </li>
+            <li>
+                Now, run this command again:.
+                <pre>dig +noall +answer {{currDomain()}}.messwithdns.net</pre>
+                You should see the old IP address: <code>1.2.3.4</code>
+            </li>
+            <li>
+                Now, let's query the authoritative nameserver directly! Run this command:
+                <pre> dig +noall +answer @ns1.messwithdns.net {{currDomain()}}.messwithdns.net </pre>
+                Notice the changes are always immediately reflected even if there's a very big TTL!
+            </li>
+        </ol>
+    </div>
+</details>
+<!--
+        <details class="experiment">
+            <summary>
+                <h3>
+                    2. Get a Let's Encrypt certificate
+                    <span class="category">
+                        TXT records
+                    </span>
+                </h3>
+            </summary>
+            <div class="details-modal">
+                TODO
+            </div>
+        </details>
+        -->
+
+<details class="experiment">
+    <summary>
+        <h3>
+            2. Set up Netlify or GitHub Pages
+            <span class="category">
+                CNAME records
+            </span>
+        </h3>
+    </summary>
+    <div class="details-modal">
+        <p>
+            If you control the DNS for a server, you can put a website
+            there! So let's set up a website. You can use any service you
+            want for this experiment, I'm just using Netlify as an example
+            because it's free to use and I'm familiar with it. We're going to:
+        </p>
+        <ul class="steps">
+            <li>Create a new website on Netlify</li>
+            <li>Point www.{{currDomain()}}.messwithdns.net at the Netlify site</li>
+        </ul>
+        <p>
+            Let's start!
+        </p>
+        <ol>
+            <li>Download an example website from here (or make your own if you want, the example site just contains a single index.html file)</li>
+            <li>Go to https://app.netlify.com/drop and upload thing (TODO)</li>
+            <li>It'll give you a subdomain like tender-pike-eaf8b4.netlify.app </li>
+            <li>
+                Create a record with
+                <ul class="record-expl">
+                    <li><strong>Name:</strong> www </li>
+                    <li><strong>Type:</strong> CNAME </li>
+                    <li><strong>Target:</strong> (the subdomain Netlify gave you in the previous step) </li>
+                    <li><strong>TTL: </strong> 60</li>
+                </ul>
+
+            </li>
+            <li>Click "Domain settings", then "Add custom domain" and type in <code>www.{{currDomain()}}.messwithdns.net </code>. Then click "Verify" and "Add Domain" </li>
+            <li> Go to <domain-link :domain='domain' subdomain='www'> </domain-link> in your browser! You should see the netlify site! </li>
+        </ol>
+    </div>
+</details>
+<details class="experiment">
+    <summary>
+        <h3>
+            3. Receive an email
+            <span class="category">
+                MX records
+            </span>
+        </h3>
+    </summary>
+    <div class="details-modal">
+        <ol>
+            <li>
+                Go to Fastmail and sign up for an email account using the address yourname@{{currDomain()}}.messwithdns.net
+                (they have a 30-day free trial). The setup options you use don't matter too much.
+            </li>
+            <li>
+                Create an MX record with:
+                <ul class="record-expl">
+                    <li><strong>Name:</strong> @ <br> </li>
+                    <li><strong>Preference:</strong> <code>10</code> <br> </li>
+                    <li><strong>Target:</strong> <code>ns1.messagingengine.com</code> <br> </li>
+                </ul>
+            </li>
+            <li>
+                Add another MX record with
+                <ul class="record-expl">
+                    <li><strong>Name:</strong> @ <br> </li>
+                    <li><strong>Preference:</strong> <code>20</code> <br> </li>
+                    <li><strong>Target:</strong> <code>ns2.messagingengine.com</code> <br> </li>
+                </ul>
+            </li>
+            <li>
+                Check with Fastmail that your MX records are working. There's a button in the settings
+            </li>
+        </ol>
+    </div>
+</details>
+<details class="experiment">
+    <summary>
+        <h3>
+            4. Send an email (and pass the SPF check)
+            <span class="category">
+                TXT records (SPF)
+            </span>
+        </h3>
+    </summary>
+    <div class="details-modal">
+        go to blah https://www.appmaildev.com/en/spf
+        send email
+        see spf: none
+
+    </div>
+</details>

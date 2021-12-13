@@ -15,18 +15,6 @@ var disallowedDomains = map[string]bool{
 	"www":    true,
 }
 
-func getSubdomain(domain string) string {
-	if !strings.HasSuffix(domain, ".messwithdns.com.") {
-		return ""
-	}
-	name := strings.TrimSuffix(domain, "messwithdns.com.")
-	parts := strings.Split(name, ".")
-	if len(parts) == 1 {
-		return ""
-	}
-	return strings.ToLower(parts[len(parts)-2])
-}
-
 func validateDomainName(domain string, username string) error {
 	if !strings.HasSuffix(domain, ".") {
 		return fmt.Errorf("Domain must end with a period")
@@ -39,7 +27,7 @@ func validateDomainName(domain string, username string) error {
 	}
 	// get last component of domain
 	name := strings.TrimSuffix(domain, ".messwithdns.com.")
-	subdomain := getSubdomain(domain)
+	subdomain := ExtractSubdomain(domain)
 	if subdomain != username {
 		return fmt.Errorf("Subdomain must be '%s'", username)
 	}

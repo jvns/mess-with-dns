@@ -108,7 +108,7 @@ func getRequests(db *sql.DB, username string, w http.ResponseWriter, r *http.Req
 	w.Write(jsonOutput)
 }
 
-func streamRequests(db *sql.DB, name string, w http.ResponseWriter, r *http.Request) {
+func streamRequests(db *sql.DB, subdomain string, w http.ResponseWriter, r *http.Request) {
 	// create websocket connection
 	conn, err := websocket.Upgrade(w, r, nil, 1024, 1024)
 	if err != nil {
@@ -116,8 +116,8 @@ func streamRequests(db *sql.DB, name string, w http.ResponseWriter, r *http.Requ
 		returnError(w, err, http.StatusInternalServerError)
 		return
 	}
-	domain := makeDomain(name)
-	stream := CreateStream(domain)
+	fmt.Println("creating stream", subdomain)
+	stream := CreateStream(subdomain)
 	defer stream.Delete()
 	c := stream.Get()
 	for {
@@ -186,8 +186,7 @@ func updateRecord(db *sql.DB, username string, id string, w http.ResponseWriter,
 }
 
 func getDomains(db *sql.DB, username string, w http.ResponseWriter, r *http.Request) {
-	domain := makeDomain(username)
-	records, err := GetRecordsForName(db, domain)
+	records, err := GetRecordsForName(db, username)
 	if err != nil {
 		returnError(w, fmt.Errorf("Error getting records: %s", err.Error()), http.StatusInternalServerError)
 		return

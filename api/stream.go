@@ -10,17 +10,17 @@ import (
 var streams = map[string]map[string]chan []byte{}
 
 type Stream struct {
-	id     string
-	domain string
+	id        string
+	subdomain string
 }
 
-func CreateStream(domain string) Stream {
-	if _, ok := streams[domain]; !ok {
-		streams[domain] = make(map[string]chan []byte)
+func CreateStream(subdomain string) Stream {
+	if _, ok := streams[subdomain]; !ok {
+		streams[subdomain] = make(map[string]chan []byte)
 	}
 	id := randString(10)
-	streams[domain][id] = make(chan []byte)
-	return Stream{id: id, domain: domain}
+	streams[subdomain][id] = make(chan []byte)
+	return Stream{id: id, subdomain: subdomain}
 }
 
 func randString(n int) string {
@@ -33,15 +33,15 @@ func randString(n int) string {
 }
 
 func (s *Stream) Delete() {
-	if _, ok := streams[s.domain]; ok {
-		close(streams[s.domain][s.id])
-		delete(streams[s.domain], s.id)
+	if _, ok := streams[s.subdomain]; ok {
+		close(streams[s.subdomain][s.id])
+		delete(streams[s.subdomain], s.id)
 	}
 }
 
 func (s *Stream) Get() chan []byte {
-	if _, ok := streams[s.domain]; ok {
-		return streams[s.domain][s.id]
+	if _, ok := streams[s.subdomain]; ok {
+		return streams[s.subdomain][s.id]
 	}
 	return nil
 }

@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/getsentry/sentry-go"
 	_ "github.com/lib/pq"
 	"github.com/miekg/dns"
 )
@@ -136,7 +137,8 @@ func UpdateRecord(db *sql.DB, id int, record dns.RR) error {
 	if err != nil {
 		return err
 	}
-	_, err = tx.Exec("UPDATE dns_records SET name = $1, rrtype = $2, content = $3 WHERE id = $4", record.Header().Name, record.Header().Rrtype, jsonString, id)
+	name := record.Header().Name
+	_, err = tx.Exec("UPDATE dns_records SET name = $1, subdomain = $2, rrtype = $3, content = $4 WHERE id = $5", name, ExtractSubdomain(name), record.Header().Rrtype, jsonString, id)
 	if err != nil {
 		return err
 	}
@@ -149,7 +151,8 @@ func InsertRecord(db *sql.DB, record dns.RR) error {
 	if err != nil {
 		return err
 	}
-	_, err = tx.Exec("INSERT INTO dns_records (name, rrtype, content) VALUES ($1, $2, $3)", record.Header().Name, record.Header().Rrtype, jsonString)
+	name := record.Header().Name
+	_, err = tx.Exec("INSERT INTO dns_records (name, subdomain, rrtype, content) VALUES ($1, $2, $3, $4)", name, ExtractSubdomain(name), record.Header().Rrtype, jsonString)
 	if err != nil {
 		return err
 	}
@@ -168,10 +171,10 @@ func uncommittedTransation(db *sql.DB) (*sql.Tx, error) {
 	return tx, nil
 }
 
-func GetRecordsForName(db *sql.DB, name string) (map[int]dns.RR, error) {
+func GetRecordsForName(db *sql.DB, subdomain string) (map[int]dns.RR, error) {
 	// we're stricter about the isolation level here because it's weird if you delete a record
 	// but it still exists after
-	rows, err := db.Query("SELECT id, content FROM dns_records WHERE name LIKE $1", "%"+name)
+	rows, err := db.Query("SELECT id, content FROM dns_records WHERE subdomain = $1", subdomain)
 	if err != nil {
 		return nil, err
 	}
@@ -202,12 +205,14 @@ func LogRequest(db *sql.DB, request *dns.Msg, response *dns.Msg, src_ip net.IP, 
 		return err
 	}
 	name := request.Question[0].Name
-	subdomain := getSubdomain(name)
-	_, err = db.Exec("INSERT INTO dns_requests (name, request, response, src_ip, src_host) VALUES ($1, $2, $3, $4, $5)", subdomain, jsonRequest, jsonResponse, src_ip.String(), src_host)
+	subdomain := ExtractSubdomain(name)
+	StreamRequest(subdomain, jsonRequest, jsonResponse, src_ip.String(), src_host)
+	_, err = db.Exec("INSERT INTO dns_requests (name, subdomain, request, response, src_ip, src_host) VALUES ($1, $2, $3, $4, $5, $6)", name, subdomain, jsonRequest, jsonResponse, src_ip.String(), src_host)
 	if err != nil {
+		fmt.Println("Error inserting requests", err)
+		sentry.CaptureException(err)
 		return err
 	}
-	StreamRequest(name, jsonRequest, jsonResponse, src_ip.String(), src_host)
 	return nil
 }
 
@@ -218,11 +223,9 @@ func max(a, b int) int {
 	return b
 }
 
-func StreamRequest(name string, request []byte, response []byte, src_ip string, src_host string) error {
+func StreamRequest(subdomain string, request []byte, response []byte, src_ip string, src_host string) error {
+	fmt.Println("writing", subdomain)
 	// get base domain
-	parts := strings.Split(name, ".")
-	start := max(0, len(parts)-4)
-	base := strings.Join(parts[start:], ".")
 	x := map[string]interface{}{
 		"created_at": time.Now().Unix(),
 		"request":    string(request),
@@ -234,12 +237,12 @@ func StreamRequest(name string, request []byte, response []byte, src_ip string, 
 	if err != nil {
 		return err
 	}
-	WriteToStreams(base, jsonString)
+	WriteToStreams(subdomain, jsonString)
 	return nil
 }
 
 func DeleteRequestsForDomain(db *sql.DB, subdomain string) error {
-	_, err := db.Exec("DELETE FROM dns_requests WHERE name = $1", subdomain)
+	_, err := db.Exec("DELETE FROM dns_requests WHERE subdomain = $1", subdomain)
 	if err != nil {
 		return err
 	}
@@ -251,7 +254,7 @@ func GetRequests(db *sql.DB, subdomain string) ([]map[string]interface{}, error)
 	if err != nil {
 		return nil, err
 	}
-	rows, err := tx.Query("SELECT id, extract(epoch from created_at), request, response, src_ip, src_host FROM dns_requests WHERE name = $1 ORDER BY created_at DESC LIMIT 30", subdomain)
+	rows, err := tx.Query("SELECT id, extract(epoch from created_at), request, response, src_ip, src_host FROM dns_requests WHERE subdomain = $1 ORDER BY created_at DESC LIMIT 30", subdomain)
 	if err != nil {
 		return make([]map[string]interface{}, 0), err
 	}

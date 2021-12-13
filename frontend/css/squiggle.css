@@ -28,7 +28,7 @@ hr.squiggle {
 }
 
 .squiggle-top::before {
-  bottom: 100%;
+  bottom: calc(100% - 1px);
   background: url("./squiggle-top-invert.svg") repeat top center;
   background-color: inherit;
   -webkit-mask: url("./squiggle-top-mask.svg") repeat top center;
@@ -36,7 +36,7 @@ hr.squiggle {
 }
 
 .squiggle-bottom::after {
-  top: 100%;
+  top: calc(100% - 1px);
   background: url("./squiggle-bottom-invert.svg") repeat bottom center;
   background-color: inherit;
   -webkit-mask: url("./squiggle-bottom-mask.svg") repeat bottom center;

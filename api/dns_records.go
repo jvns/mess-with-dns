@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"net"
+	"strings"
 
 	"github.com/miekg/dns"
 )
@@ -17,6 +18,9 @@ func lookupRecords(db *sql.DB, name string, qtype uint16) ([]dns.RR, int, error)
 }
 
 func dnsResponse(db *sql.DB, request *dns.Msg) *dns.Msg {
+	if !strings.HasSuffix(request.Question[0].Name, "messwithdns.com.") {
+		return refusedResponse(request)
+	}
 	records, totalRecords, err := lookupRecords(db, request.Question[0].Name, request.Question[0].Qtype)
 	if err != nil {
 		msg := errorResponse(request)
@@ -49,6 +53,15 @@ func nxDomainResponse(request *dns.Msg) *dns.Msg {
 	msg := emptyMessage(request)
 	msg.SetRcode(request, dns.RcodeNameError)
 	return msg
+}
+
+func refusedResponse(request *dns.Msg) *dns.Msg {
+	msg := dns.Msg{Compress: true}
+	msg.SetReply(request)
+	msg.Authoritative = true
+
+	msg.SetRcode(request, dns.RcodeRefused)
+	return &msg
 }
 
 func successResponse(request *dns.Msg, records []dns.RR) *dns.Msg {

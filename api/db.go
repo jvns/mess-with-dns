@@ -267,13 +267,9 @@ func GetRequests(db *sql.DB, subdomain string) ([]map[string]interface{}, error)
 		if err != nil {
 			return make([]map[string]interface{}, 0), err
 		}
-		created_time := time.Unix(int64(created_at), 0)
-		if err != nil {
-			return make([]map[string]interface{}, 0), err
-		}
 		x := map[string]interface{}{
 			"id":         id,
-			"created_at": created_time,
+			"created_at": int64(created_at),
 			"request":    string(request),
 			"response":   string(response),
 			"src_ip":     src_ip,

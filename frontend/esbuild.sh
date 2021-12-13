@@ -1,1 +1,1 @@
-esbuild script.js  --sourcemap --bundle --minify --outfile=bundle.js --loader:.html=text
+esbuild script.js  --sourcemap --bundle --outfile=bundle.js --loader:.html=text

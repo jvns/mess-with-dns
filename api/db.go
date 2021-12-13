@@ -10,7 +10,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/getsentry/sentry-go"
 	_ "github.com/lib/pq"
 	"github.com/miekg/dns"
 )
@@ -209,8 +208,6 @@ func LogRequest(db *sql.DB, request *dns.Msg, response *dns.Msg, src_ip net.IP, 
 	StreamRequest(subdomain, jsonRequest, jsonResponse, src_ip.String(), src_host)
 	_, err = db.Exec("INSERT INTO dns_requests (name, subdomain, request, response, src_ip, src_host) VALUES ($1, $2, $3, $4, $5, $6)", name, subdomain, jsonRequest, jsonResponse, src_ip.String(), src_host)
 	if err != nil {
-		fmt.Println("Error inserting requests", err)
-		sentry.CaptureException(err)
 		return err
 	}
 	return nil

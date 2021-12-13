@@ -296,7 +296,11 @@ func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 
 	}
 	remote_addr := w.RemoteAddr().(*net.UDPAddr).IP
-	LogRequest(handle.db, r, msg, remote_addr, lookupHost(handle.ipRanges, remote_addr))
+	err := LogRequest(handle.db, r, msg, remote_addr, lookupHost(handle.ipRanges, remote_addr))
+	if err != nil {
+		fmt.Println("Error logging request:", err)
+		sentry.CaptureException(err)
+	}
 }
 
 func cleanup(db *sql.DB) {

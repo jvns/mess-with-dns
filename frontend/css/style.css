@@ -198,10 +198,6 @@ details.experiment {
     border-top-color: rgba(191, 219, 254);
 }
 
-details.experiment summary {
-    position: relative;
-}
-
 #experiments details.experiment[open] .category {
     display: none;
 }
@@ -213,22 +209,6 @@ details.experiment summary {
 #experiments p {
     margin: 1em 0;
 }
-
-#experiments .category {
-    top: -1.8em;
-    right: -.25em;
-    display: block; 
-    display: none; /* todo: maybe put back */
-    position: absolute; 
-    padding-left: 0.25rem;
-    padding-right: 0.25rem; 
-    background-color: #ffffff; 
-    color: #047857; 
-    font-size: 0.875rem;
-    line-height: 1.25rem; 
-    text-align: right; 
-}
-
 
 .record-expl li {
     list-style-type: none;
@@ -328,12 +308,18 @@ html {
     transition: opacity 0.2s ease-out;
     pointer-events: none;
     background: white;
-    position: fixed;
+    position: absolute;
     opacity: 0;
     bottom: 0;
     right: 0;
-    left: 66%;
+    left: 0;
     top: 0;
+}
+
+@media screen and (max-width: 768px) {
+    .details-modal-overlay {
+        left: 50%;
+    }
 }
 
 nav {

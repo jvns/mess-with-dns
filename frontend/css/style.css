@@ -248,6 +248,11 @@ html {
     box-sizing: border-box;
 }
 
+summary {
+    /* this is needed because otherwise on ipad we get a big ugly outline */
+    outline:none;
+}
+
 .details-modal {
     background: #ffffff;
     border-radius: 0.5em;

@@ -2,7 +2,6 @@
     <!-- beaker svg -->
     <h1 class="font-bold  text-xl text-left mb-8">
         <svg class="inline" width="50px" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
-            <g>
                 <path fill="none" fill-rule="nonzero" stroke="#000000" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" marker-start="none" marker-mid="none" marker-end="none" stroke-miterlimit="4" stroke-dashoffset="0" id="rect3162" d="m43.035622,6.4153c6.53336,6.41494 5.54726,11.26442 5.618279,19.0292l0.224281,24.521339l-31.822762,47.669956c-7.70109,12.839386 -2.49131,25.401253 10.13991,24.659454l73.043257,0.073807c13.653183,-0.057426 18.638214,-12.708916 8.057533,-26.039894l-30.186295,-46.244804l-0.56813,-24.560598c-0.071014,-7.76478 -1.14566,-12.595409 5.269279,-19.12877l-39.775352,0.02031z" />
                 <path fill="none" fill-rule="evenodd" stroke="#000000" stroke-width="6" stroke-linecap="round" stroke-miterlimit="4" id="path3180" d="m77.493759,25.174719l-10.905273,0" />
                 <path fill="none" fill-rule="evenodd" stroke="#000000" stroke-width="6" stroke-linecap="round" stroke-miterlimit="4" d="m77.493759,44.409069l-10.905273,0" id="path3182" />
@@ -400,7 +399,7 @@
                             <li class="browser">Browser (to 93.184.216.34): an HTTP request for <code>Host: bad-ip.{{domain}}.messwithdns.com</code>!</li>
                             <li class="example">Example.com server: I've never heard of that site!! 404! </li>
                         </ul>
-
+                    </div>
                 </details>
             </div>
         </details>
@@ -648,7 +647,7 @@ $ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep 
                     Here's an example of some steps using Fastmail:
                 </p>
                 <ol>
-                    <li>On Fastmail: Sign up for a free trial using the email <code>you@mail.{{currDomain()}}.messwithdns.com</li>
+                    <li>On Fastmail: Sign up for a free trial using the email <code>you@mail.{{currDomain()}}.messwithdns.com</code></li>
                     <li>On Mess With DNS: Create 2 MX records pointing mail.{{currDomain()}}.messwithdns.com at Fastmail's mail servers. Fastmail will give you instructions when you sign up.</li>
                     <li>Send yourself an email at you@mail.{{currDomain()}}.messwithdns.com and see if you get it!</li>
                 </ol>

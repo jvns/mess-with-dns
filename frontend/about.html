@@ -43,46 +43,29 @@ p {
 
     <div style="max-width: 600px" class="m-auto p-4 main">
         <h1 class="text-3xl mt-8 mb-8 text-center">About</h1>
-        <h2 class="text-2xl mt-8 mb-8">Why did you build this?</h1>
+        <h2 class="text-2xl mt-8 mb-8">Why did you build this?</h2>
 
         <p>
-        This site exists because I (Julia) was writing a zine about DNS. At the
-        end of many of my zines, I say "the best way to learn is to experiment!
-        Do weird DNS experiments and see how it works". But I realized that
-        most people, even if they have a domain, probably aren't comfortalbe
-        doing weird DNS experiments on a domain that's important to
+        Well, I was writing a <a href="https://wizardzines.com">zine</a> about DNS. And at the end of
+        many of my zines, I say "the best way to learn is to experiment!  Do
+        weird DNS experiments and see how it works". But I realized that most
+        people, even if they have a domain, probably aren't comfortable doing
+        weird DNS experiments on a domain that's important to
         them.
         </p>
         <p>
         So I figured I'd create a domain that's just for playing around
         (<code>messwithdns.com</code>) and let anyone set DNS records on it.
+        You're very encouraged to play around and break things.
         </p>
 
-        <p>
-        This project was built by <a href="https://jvns.ca">Julia Evans</a> and 
-        <a href="https://marieflanagan.com/">Marie Claire LeBlanc Flanagan</a>.
-        </p>
-
-        <h1 class="text-2xl mt-8 mb-8">How does it work?</h1>
-
-        Here are a few notes on how Mess With DNS is implemented, in question/answer form.
-
-        <h3>How do you parse DNS queries?</h3>
-        <p>
-        It's written in Go and it uses the <a href="https://pkg.go.dev/github.com/miekg/dns">github.com/miekg/dns</a>
-        library for all if its DNS query parsing and for formatting the replies.
-        </p>
+        <h2 class="text-2xl mt-8 mb-8">How does it work?</h2>
 
         <h3>Will my records get deleted?</h3>
         <p>
-        Yes, records get deleted after a week. This is to heavily discourage
-        anyone from relying on this for anything real. It's just for learning.
-        </p>
-
-        <h3>Where are the records stored?</h3>
-        <p>
-        They're in a small PostgreSQL database. It contains the records and
-        every DNS response that's it's served in the last 24 hours.
+        Yes, records get deleted after a week. This is to save disk space and
+        to discourage anyone from relying on this for anything real. It's just
+        for learning.
         </p>
 
         <h3>What's the difference between messwithdns.com and messwithdns.com?</h3>
@@ -93,7 +76,7 @@ p {
         more reliable (I can use a "real" DNS server for messwithdns.com).
         </p>
 
-        <h3>Does it really support setting all DNS record types</h3>
+        <h3>Does it support setting all DNS record types</h3>
 
         <p>
         Technically the API does allow setting any DNS record type you want,
@@ -103,7 +86,13 @@ p {
 
         <h3>Can I get any subdomain I want?</h3>
         <p>
-        No, I got worried about phishing so you can only get a randomly generated subdomain, like <code>banana17</code>
+        No, you can only get a randomly generated subdomain, like <code>banana17.messwithdns.com</code>
+        </p>
+
+        <h2 class="text-2xl mt-8 mb-8">Credits</h2>
+        <p>
+        This project was built by <a href="https://jvns.ca">Julia Evans</a> and 
+        <a href="https://marieflanagan.com/">Marie Claire LeBlanc Flanagan</a>.
         </p>
     </div>
 </body>

@@ -1,10 +1,10 @@
-<formulate-form name="new-record" @submit="createRecord" v-model="data">
+<formulate-form name="new-record" @submit="createRecord" v-model="data" class="border border-gray-200 p-4">
   <fieldset class="flex">
       <div class="flex flex-wrap mr-auto"> <!-- this mr-auto is literally just for screenshots, not layout -->
       <formulate-input
         class="mr-4"
         outer-class="mt-4 w-40 formulate-input"
-        element-class="border border-black rounded-lg mt-2 p-1"
+        element-class="input-border"
         name="subdomain"
         label="Name"
         validation="required"
@@ -15,7 +15,7 @@
       <formulate-input
         class="mr-4"
         outer-class="mt-4"
-        element-class="border border-black rounded-lg mt-2 p-1"
+        element-class="input-border"
         name="type"
         label="Type"
         error-behavior="submit"
@@ -25,7 +25,7 @@
       ></formulate-input>
 
       <formulate-input
-        element-class="border border-black rounded-lg mt-2 p-1"
+        element-class="input-border"
         class="mr-4"
         v-for="item in schemas[type]"
         v-bind:outer-class="((item.name == 'ttl' && 'w-28') || 'w-36') + ' formulate-input mt-4'"

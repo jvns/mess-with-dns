@@ -43,14 +43,14 @@
       <formulate-form v-model="updated_record" class="mt-2" @submit="updateRecord">
         <div class="flex">
         <formulate-input
-            element-class="border border-black rounded-lg mt-2 p-1 flex-grow"
+            element-class="input-border flex-grow"
             wrapper-class="block"
           label="Name"
           name="subdomain"
           type="text"
           ></formulate-input>
         <formulate-input
-                element-class="border border-black rounded-lg mt-2 p-1"
+                element-class="input-border"
                 class="ml-4"
                 name="type"
                 label="Type"
@@ -62,7 +62,7 @@
 
           <formulate-input
             class="ml-4"
-            element-class="border border-black rounded-lg mt-2 p-1"
+            element-class="input-border"
             v-for="item in schemas[record.type]"
             :key="item.name"
             v-bind="item"
@@ -126,9 +126,9 @@
           <div class="p-2">
               <formulate-form v-model="updated_record" class="mt-2" @submit="updateRecord">
                   <!-- basis is because of https://stackoverflow.com/questions/43123117/select-element-grows-differently-than-input-in-display-flex/43123479 -->
-                  <formulate-input element-class="border border-black rounded-lg ml-2 p-1 flex-grow shrink basis-0" label-class="w-24 text-right font-bold" wrapper-class="flex flex-row justify-end items-center" label="Name " name="subdomain" type="text"></formulate-input>
-                  <formulate-input element-class="border border-black rounded-lg ml-2 p-1 flex-grow shrink basis-0" label-class="w-24 text-right font-bold" wrapper-class="mt-2 flex flex-row justify-end items-center" name="type" label="Type" type="select" :disabled="true" :options="[record.type]"></formulate-input>
-                  <formulate-input element-class="border border-black rounded-lg ml-2 p-1 flex-grow shrink basis-0" label-class="w-24 text-right font-bold" wrapper-class="mt-2 flex flex-row justify-end items-center" v-for="item in schemas[record.type]" :key="item.name" v-bind="item"></formulate-input>
+                  <formulate-input element-class="input-border flex-grow shrink basis-0" label-class="w-24 text-right font-bold" wrapper-class="flex flex-row justify-end items-center" label="Name " name="subdomain" type="text"></formulate-input>
+                  <formulate-input element-class="input-border flex-grow shrink basis-0" label-class="w-24 text-right font-bold" wrapper-class="mt-2 flex flex-row justify-end items-center" name="type" label="Type" type="select" :disabled="true" :options="[record.type]"></formulate-input>
+                  <formulate-input element-class="input-border flex-grow shrink basis-0" label-class="w-24 text-right font-bold" wrapper-class="mt-2 flex flex-row justify-end items-center" v-for="item in schemas[record.type]" :key="item.name" v-bind="item"></formulate-input>
                   <div class="flex justify-end mt-4">
                       <button type="button" class="cancel mr-4 text-center block my-2 hover:bg-gray-400 bg-gray-200 py-2 px-4 rounded" @click="clicked = false">
                           Cancel

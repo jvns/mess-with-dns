@@ -50,72 +50,94 @@
                     </div>
                 </div>
 
-                <h2 class="font-bold text-base mt-4 add-record"> Add a record </h2>
+                <div class="section">
+                    <h2 class="font-bold text-base my-4 add-record">
 
-                <new-record :domain='domain' :schemas='schemas'> </new-record>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6 13h-5v5h-2v-5h-5v-2h5v-5h2v5h5v2z" />
+                        </svg>
+                        <span> Add a record </span>
+                    </h2>
 
-                <h2 class="font-bold text-base mb-4 mt-12"> All DNS records 
+                    <new-record :domain='domain' :schemas='schemas'> </new-record>
+                </div>
+
+                <div class="section">
+                    <h2 class="font-bold text-base mb-4 mt-12">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path d="M4 22h-4v-4h4v4zm0-12h-4v4h4v-4zm0-8h-4v4h4v-4zm3 0v4h17v-4h-17zm0 12h17v-4h-17v4zm0 8h17v-4h-17v4z" />
+                        </svg>
+                        <span class="mr-1"> All DNS records </span>
 
                         <a id="clear-records" v-if="records && records.length > 0" class="pr-4 cursor-pointer" @click="clearRecords()">
                             (clear)
                         </a>
-                </h2>
-                <div v-if="records && records.length > 0">
-                    <table class="w-full" id="records">
-                        <tr class="hidden lg:table-row bg-gray-100 border border-gray-300">
-                            <th class="text-left px-4 py-2">
-                                Name
-                            </th>
-                            <th class="text-left">
-                                Type
-                            </th>
-                            <th class="text-left">
-                                Content
-                            </th>
-                            <th class="text-left">
-                                TTL
-                            </th>
-                            <th class="text-left">
-                                &nbsp;
-                            </th>
-                        </tr>
-                        <tbody is="record" v-for="record in records" :key="record.id" :record="record" :domain="domain" />
-                    </table>
-                </div>
-                <div v-else-if="records">
-                    <p id="no-records-yet">
-                        No records yet! You can add one!
-                    </p>
-                </div>
-                <div v-else>
-                    <p>
-                        Loading...
-                    </p>
+                    </h2>
+                    <div v-if="records && records.length > 0">
+                        <table class="w-full" id="records">
+                            <tr class="hidden lg:table-row bg-gray-100 border border-gray-300">
+                                <th class="text-left px-4 py-2">
+                                    Name
+                                </th>
+                                <th class="text-left">
+                                    Type
+                                </th>
+                                <th class="text-left">
+                                    Content
+                                </th>
+                                <th class="text-left">
+                                    TTL
+                                </th>
+                                <th class="text-left">
+                                    &nbsp;
+                                </th>
+                            </tr>
+                            <tbody is="record" v-for="record in records" :key="record.id" :record="record" :domain="domain" />
+                        </table>
+                    </div>
+                    <div v-else-if="records">
+                        <p id="no-records-yet">
+                            No records yet! You can add one!
+                        </p>
+                    </div>
+                    <div v-else>
+                        <p>
+                            Loading...
+                        </p>
+                    </div>
                 </div>
 
-                <h2 class="font-bold text-base mt-12 mb-4 relative"> Requests
-                        <a id="clear-requests" v-if="requests && requests.length > 0" class="pr-4 cursor-pointer" 
-                            @click="clearRequests()">
+                <div class="section">
+                    <h2 class="font-bold text-base mt-12 mb-4 relative">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path d="M10 3.002c4.411 0 8 2.849 8 6.35 0 3.035-3.029 6.311-7.925 6.311-1.58 0-2.718-.317-3.718-.561-.966.593-1.256.813-3.006 1.373.415-1.518.362-2.182.331-3.184-.837-1.001-1.682-2.069-1.682-3.939 0-3.501 3.589-6.35 8-6.35zm0-2.002c-5.281 0-10 3.526-10 8.352 0 1.711.615 3.391 1.705 4.695.047 1.527-.851 3.718-1.661 5.312 2.168-.391 5.252-1.258 6.649-2.115 1.181.289 2.312.421 3.382.421 5.903 0 9.925-4.038 9.925-8.313 0-4.852-4.751-8.352-10-8.352zm11.535 11.174c-.161.488-.361.961-.601 1.416 1.677 1.262 2.257 3.226.464 5.365-.021.745-.049 1.049.138 1.865-.892-.307-.979-.392-1.665-.813-2.127.519-4.265.696-6.089-.855-.562.159-1.145.278-1.74.364 1.513 1.877 4.298 2.897 7.577 2.1.914.561 2.933 1.127 4.352 1.385-.53-1.045-1.117-2.479-1.088-3.479 1.755-2.098 1.543-5.436-1.348-7.348zm-15.035-3.763c-.591 0-1.071.479-1.071 1.071s.48 1.071 1.071 1.071 1.071-.479 1.071-1.071-.48-1.071-1.071-1.071zm3.5 0c-.591 0-1.071.479-1.071 1.071s.48 1.071 1.071 1.071 1.071-.479 1.071-1.071-.48-1.071-1.071-1.071zm3.5 0c-.591 0-1.071.479-1.071 1.071s.48 1.071 1.071 1.071 1.071-.479 1.071-1.071-.48-1.071-1.071-1.071z" />
+                        </svg>
+                        <span class="mr-1">
+                            Requests
+                        </span>
+                        <a id="clear-requests" v-if="requests && requests.length > 0" class="pr-4 cursor-pointer" @click="clearRequests()">
                             (clear)
                         </a>
-                </h2>
-                <p class="my-4">
-                    This is a list of all requests made to our authoritative DNS server for your domain.
+                    </h2>
+                    <p class="my-4">
+                        This is a 
+                        <span v-if="websocketOpen"> live updating </span>
+                        list of all requests for your subdomain's records.
 
-                        <span v-if="websocketOpen"> Updating live! </span>
-                </p>
+                    </p>
 
-                <table class="w-full request-table">
-                    <thead>
-                        <tr class="hidden lg:table-row bg-gray-100 border border-gray-300">
-                            <th class="text-left px-4 py-2"> Time </th>
-                            <th class="text-left"> Request </th>
-                            <th class="text-left"> Response </th>
-                        </tr>
-                    </thead>
+                    <table class="w-full request-table">
+                        <thead>
+                            <tr class="hidden lg:table-row bg-gray-100 border border-gray-300">
+                                <th class="text-left px-4 py-2"> Time </th>
+                                <th class="text-left"> Request </th>
+                                <th class="text-left"> Response </th>
+                            </tr>
+                        </thead>
 
-                    <tbody is="view-request" v-for="request in requests" :request="request" />
-                </table>
+                        <tbody is="view-request" v-for="request in requests" :request="request" />
+                    </table>
+                </div>
             </div>
             <experiments :domain="domain"> </experiments>
         </div>

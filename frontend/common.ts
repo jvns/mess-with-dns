@@ -162,13 +162,14 @@ export async function createRecord(record: Record) {
     return response;
 }
 
-export async function getRecords() {
-    const response = await fetch('/domains');
+export async function getRecords(domain) {
+    const response = await fetch('/domains/' + domain);
     const json = await response.json();
     // id is key, value is record
     const records = [];
-    for (const id in json) {
-        const record = transformRecord(id, json[id]);
+    for (const r of json) {
+        console.log(r);
+        const record = transformRecord(r.id, r.record); 
         // parse key as int
         records.push(record);
     }

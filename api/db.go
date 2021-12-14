@@ -170,14 +170,19 @@ func uncommittedTransation(db *sql.DB) (*sql.Tx, error) {
 	return tx, nil
 }
 
-func GetRecordsForName(db *sql.DB, subdomain string) (map[int]dns.RR, error) {
+type Record struct {
+	ID     int    `json:"id"`
+	Record dns.RR `json:"record"`
+}
+
+func GetRecordsForName(db *sql.DB, subdomain string) ([]Record, error) {
 	// we're stricter about the isolation level here because it's weird if you delete a record
 	// but it still exists after
-	rows, err := db.Query("SELECT id, content FROM dns_records WHERE subdomain = $1", subdomain)
+	rows, err := db.Query("SELECT id, content FROM dns_records WHERE subdomain = $1 ORDER BY created_at DESC", subdomain)
 	if err != nil {
 		return nil, err
 	}
-	records := make(map[int]dns.RR)
+	records := make([]Record, 0)
 	for rows.Next() {
 		var content []byte
 		var id int
@@ -189,7 +194,7 @@ func GetRecordsForName(db *sql.DB, subdomain string) (map[int]dns.RR, error) {
 		if err != nil {
 			return nil, err
 		}
-		records[id] = record
+		records = append(records, Record{ID: id, Record: record})
 	}
 	return records, nil
 }

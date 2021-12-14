@@ -125,32 +125,35 @@ ul.explanation-list {
     list-style-type: disc;
 }
 
+.explanation-list li:before {
+    font-family: 'icomoon' !important;
+}
 .explanation-list li.you:before {
-    content: "🧕";
+    content: "👤";
 }
 
 .explanation-list li.browser:before {
-    content: "🌐➞";
+    content: "🌐➡";
+    color: rebeccapurple;
 }
 
 .explanation-list li.server:before {
-    content: "🖳🠔";
+    content: "💻⬅";
     color: blue;
 }
 
 .explanation-list li.resolver:before {
-    content: "🖳🠔";
-    color: red;
-}
-
-.explanation-list li.example.action:before {
-    content: "🖳➞";
+    content: "💻⬅";
     color: green;
 }
 
-.explanation-list li.resolver.action:before {
-    content: "🖳";
+.explanation-list li.example.action:before {
+    content: "💻";
     color: red;
+}
+
+.explanation-list li.resolver.action:before {
+    content: "💻";
 }
 
 .action {

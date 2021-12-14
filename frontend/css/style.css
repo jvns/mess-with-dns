@@ -385,4 +385,5 @@ input, select {
     border: 1px solid #888;
     padding: .25em;
     margin-top: .5em;
+    border-radius: 5px;
 }

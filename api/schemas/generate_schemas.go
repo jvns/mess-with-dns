@@ -59,17 +59,16 @@ func main() {
 	schemas["A"] = genSchema(dns.A{}, map[string]string{"A": "IPv4 Address"})
 	schemas["AAAA"] = genSchema(dns.AAAA{}, map[string]string{"AAAA": "IPv6 Address"})
 	schemas["CAA"] = genSchema(dns.CAA{}, map[string]string{"Value": "CA domain name"})
-	schemas["CERT"] = genSchema(dns.CERT{}, map[string]string{"Type": "Cert type", "KeyTag": "Key tag"})
 	schemas["CNAME"] = genSchema(dns.CNAME{}, map[string]string{"Cname": "Canonical Name"})
-	schemas["DS"] = genSchema(dns.DS{}, map[string]string{"KeyTag": "Key tag", "Algorithm": "Algorithm", "DigestType": "Digest type"})
 	schemas["MX"] = genSchema(dns.MX{}, map[string]string{"Mx": "Mail Server"})
 	schemas["NS"] = genSchema(dns.NS{}, map[string]string{"Ns": "Nameserver "})
 	schemas["PTR"] = genSchema(dns.PTR{}, map[string]string{"Ptr": "Pointer"})
-	schemas["SOA"] = genSchema(dns.SOA{}, map[string]string{"Minttl": "Minimum TTL", "Ns": "Name Server", "Mbox": "Email address"})
 	schemas["SRV"] = genSchema(dns.SRV{}, map[string]string{"Srv": "Service"})
-	schemas["SRV"] = genSchema(dns.SRV{}, map[string]string{})
 	schemas["TXT"] = genSchema(dns.TXT{}, map[string]string{"Txt": "Content"})
-	schemas["URI"] = genSchema(dns.URI{}, map[string]string{})
+	//schemas["CERT"] = genSchema(dns.CERT{}, map[string]string{"Type": "Cert type", "KeyTag": "Key tag"})
+	//schemas["URI"] = genSchema(dns.URI{}, map[string]string{})
+	//schemas["DS"] = genSchema(dns.DS{}, map[string]string{"KeyTag": "Key tag", "Algorithm": "Algorithm", "DigestType": "Digest type"})
+	//schemas["SOA"] = genSchema(dns.SOA{}, map[string]string{"Minttl": "Minimum TTL", "Ns": "Name Server", "Mbox": "Email address"})
 
 	// add ttl field to each schema
 	for k, schema := range schemas {

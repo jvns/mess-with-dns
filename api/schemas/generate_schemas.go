@@ -59,7 +59,7 @@ func main() {
 	schemas["A"] = genSchema(dns.A{}, map[string]string{"A": "IPv4 Address"})
 	schemas["AAAA"] = genSchema(dns.AAAA{}, map[string]string{"AAAA": "IPv6 Address"})
 	schemas["CAA"] = genSchema(dns.CAA{}, map[string]string{"Value": "CA domain name"})
-	schemas["CNAME"] = genSchema(dns.CNAME{}, map[string]string{"Cname": "Canonical Name"})
+	schemas["CNAME"] = genSchema(dns.CNAME{}, map[string]string{})
 	schemas["MX"] = genSchema(dns.MX{}, map[string]string{"Mx": "Mail Server"})
 	schemas["NS"] = genSchema(dns.NS{}, map[string]string{"Ns": "Nameserver "})
 	schemas["PTR"] = genSchema(dns.PTR{}, map[string]string{"Ptr": "Pointer"})

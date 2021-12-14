@@ -183,11 +183,11 @@
                     <ul class="explanation-list">
                         <li class="browser ">Browser: where's visit-before.{{domain}}.messwithdns.com? </li>
                         <li class="server  ">DNS server: doesn't exist! </li>
-                        <li class="resolver no-arrow">DNS resolver: "oops it doesn't exist! Better cache that!" </li>
+                        <li class="resolver action">DNS resolver: "oops it doesn't exist! Better cache that!" </li>
                         <li class="resolver">DNS resolver: Doesn't exist</li>
                         <li class="you">You create record </li>
                         <li class="browser">Request: where's visit-before.{{domain}}.messwithdns.com? </li>
-                        <li class="resolver no-arrow">DNS resolver: "I saw this before!! It doesn't exist!" </li>
+                        <li class="resolver action">DNS resolver: "I saw this before!! It doesn't exist!" </li>
                         <li class="resolver">DNS resolver: doesn't exist </li>
                         <li class="you">You: :( :( :( IT EXISTS THOUGH </li>
                         <li class="you">You wait 1 hour and try again, everything works because the cache expired </li>
@@ -579,20 +579,17 @@ $ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep 
                 <details>
                     <summary>
                         <span class="text-green-700">
-                            (click here to see the explanation)
+                            Why do different people get different results for this experiment?
                         </span>
                     </summary>
                     <p>
-                        The weird thing about this experiment is actually that I've seen 3
-                        different results from different people I've tested it with, even though
-                        everyone was using the same version of curl. So, why do different people see
-                        different behaviour? Let's start by thinking about what happens when you run <code>curl</code>.
+                        I've seen 3 different results for this experiment. Why is that? Well, let's start by thinking about what happens when you run <code>curl</code>.
                     </p>
                     <ul class="explanation-list">
                         <li class="you    "> You create 2 records </li>
                         <li class="you"> You run <code>curl conflict.{{domain}}.messwithdns.com</code></li>
-                        <li class="you"> You run <code>curl conflict.{{domain}}.messwithdns.com</code> again, it gets sent to your resolver</li>
-                        <li class="resolver">Resolver has the 2 records cached, and returns them</li>
+                        <li class=""> curl makes a DNS request </li>
+                        <li class="resolver">Resolver finds 2 matching records</li>
                     </ul>
 
                     Your resolver now has 2 records, and it needs to decide what order to return them in. It might do any of:
@@ -622,15 +619,15 @@ $ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep 
         <details class="experiment">
             <summary>
                 <h3>
-                    1. Set up a Netlify or GitHub pages website
+                    1. Set up a website
                 </h3>
             </summary>
             <div class="details-modal">
                 <p>
-                    You can use any service you want for this experiment. Here's an example of some steps using Netlify:
+                    You can use any service you want for this experiment, for example Netlify, GitHub Pages, GitLab Pages, etc. Here's an example of some steps using Netlify:
                 </p>
                 <ol>
-                    <li>On Netlify: Create a new website</li>
+                    <li>On Netlify: Create a new site</li>
                     <li>On Netlify: Add the domain www.{{currDomain()}}.messwithdns.com to your Netlify site</li>
                     <li>On Mess With DNS: Create a CNAME record pointing www.{{currDomain()}}.messwithdns.com at your new Netlify site</li>
                     <li>Visit www.{{currDomain()}}.messwithdns.com in your browser and see if it works!</li>
@@ -646,7 +643,7 @@ $ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep 
             </summary>
             <div class="details-modal">
                 <p>
-                    Here's an example of some steps using Fastmail:
+                    You can use any email service that lets you use your own domain for this experiment. Here's an example of some steps using Fastmail:
                 </p>
                 <ol>
                     <li>On Fastmail: Sign up for a free trial using the email <code>you@mail.{{currDomain()}}.messwithdns.com</code></li>
@@ -664,7 +661,7 @@ $ curl http://conflict.{{currDomain()}}.messwithdns.com/ 2&gt; /dev/null | grep 
             </summary>
             <div class="details-modal">
                 <p>
-                    The goal is to create SPF and DKIM records so that receivers recognize your mail as legitimately coming from your domain.
+                    The goal is to create SPF and DKIM records so that receivers recognize your mail as coming from your domain.
                 </p>
                 <ol>
                     <li>First you need to set up an email account, as described in experiment 2. </a>

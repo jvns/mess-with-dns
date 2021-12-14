@@ -147,9 +147,9 @@ ul.explanation-list {
     color: green;
 }
 
-.explanation-list li.example.action:before {
+.explanation-list li.example:before {
     content: "💻";
-    color: red;
+    color: #333;
 }
 
 .explanation-list li.resolver.action:before {

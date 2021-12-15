@@ -144,24 +144,29 @@
             <experiments :domain="domain"> </experiments>
         </div>
 
-        <div id="main" v-else class="bg-white p-8 w-full m-auto" style="max-width: 40em">
-            <h1 class="font-bold text-3xl text-left mb-8">
-                Welcome to mess with dns!
-            </h1>
-            <p class="mt-8 mb-4 text-xl">
-                I think the most fun way to learn is by experimenting and
-                breaking things.
-            </p>
-            <p class="mb-8 text-xl">
-                This is a playground where you can do weird DNS experiments
-                with no consequences if you mess something up. Click the button
-                below to get started.
-            </p>
-            <div class="text-center">
-                <!-- login with github -->
-                <a id="start-experimenting" class="no-underline bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-xl" href="/login">
-                    Start experimenting
-                </a>
+        <div id="main" v-else class="bg-white p-8 w-full m-auto flex mt-32" style="max-width: 40em;">
+            <div class="m-auto">
+                <h1 class="font-bold text-3xl text-left text-center">
+                    Welcome to mess with dns!
+                </h1>
+                <p class="mt-8 mb-4 text-xl">
+                    It's fun to learn by experimenting and
+                    breaking things!
+                    Here you can do weird DNS experiments
+                    with no consequences if you mess something up.
+                </p>
+                <p class="mb-4 text-xl">
+                </p>
+
+                <p class="mb-8 text-xl">
+                    Click the button below to get started.
+                </p>
+                <div class="text-center mt-16">
+                    <!-- login with github -->
+                    <a id="start-experimenting" class="no-underline bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-xl" href="/login">
+                        Start experimenting
+                    </a>
+                </div>
             </div>
         </div>
     </div>

@@ -18,7 +18,7 @@ func lookupRecords(db *sql.DB, name string, qtype uint16) ([]dns.RR, int, error)
 }
 
 func dnsResponse(db *sql.DB, request *dns.Msg) *dns.Msg {
-	if !strings.HasSuffix(request.Question[0].Name, "messwithdns.com.") {
+	if !strings.HasSuffix(strings.ToLower(request.Question[0].Name), "messwithdns.com.") {
 		return refusedResponse(request)
 	}
 	records, totalRecords, err := lookupRecords(db, request.Question[0].Name, request.Question[0].Qtype)

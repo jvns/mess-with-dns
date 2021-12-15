@@ -137,7 +137,7 @@ func UpdateRecord(db *sql.DB, id int, record dns.RR) error {
 		return err
 	}
 	name := record.Header().Name
-	_, err = tx.Exec("UPDATE dns_records SET name = $1, subdomain = $2, rrtype = $3, content = $4 WHERE id = $5", name, ExtractSubdomain(name), record.Header().Rrtype, jsonString, id)
+	_, err = tx.Exec("UPDATE dns_records SET name = $1, subdomain = $2, rrtype = $3, content = $4 WHERE id = $5", strings.ToLower(name), ExtractSubdomain(name), record.Header().Rrtype, jsonString, id)
 	if err != nil {
 		return err
 	}
@@ -151,7 +151,7 @@ func InsertRecord(db *sql.DB, record dns.RR) error {
 		return err
 	}
 	name := record.Header().Name
-	_, err = tx.Exec("INSERT INTO dns_records (name, subdomain, rrtype, content) VALUES ($1, $2, $3, $4)", name, ExtractSubdomain(name), record.Header().Rrtype, jsonString)
+	_, err = tx.Exec("INSERT INTO dns_records (name, subdomain, rrtype, content) VALUES ($1, $2, $3, $4)", strings.ToLower(name), ExtractSubdomain(name), record.Header().Rrtype, jsonString)
 	if err != nil {
 		return err
 	}
@@ -292,7 +292,7 @@ func GetRecords(db *sql.DB, name string, rrtype uint16) ([]dns.RR, int, error) {
 		return nil, 0, err
 	}
 	// first get all the records
-	rows, err := tx.Query("SELECT content FROM dns_records WHERE name = $1 ORDER BY created_at DESC", name)
+	rows, err := tx.Query("SELECT content FROM dns_records WHERE name = $1 ORDER BY created_at DESC", strings.ToLower(name))
 	if err != nil {
 		return nil, 0, err
 	}

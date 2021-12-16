@@ -94,11 +94,14 @@ function convertRecord(record: Record): GoRecord {
 }
 
 function parseName(name: string): [string, string] {
+    // split on '.' and trim last 3 segments
     const parts = name.split('.');
-    if (parts.length == 5) {
-        return [parts[0], parts[1]]
-    } else {
+    if (parts.length == 4) {
         return ['@', parts[0]]
+    } else {
+        const subdomain = parts.slice(0, parts.length - 4).join('.');
+        const domain = parts[parts.length-4];
+        return [subdomain, domain];
     }
 }
 

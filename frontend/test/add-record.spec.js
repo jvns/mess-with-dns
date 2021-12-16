@@ -135,6 +135,14 @@ test('@ record works', async ({ page }) => {
     await page.locator('#records').waitFor({state: 'detached'})
 })
 
+test('subdomain with multiple layers works', async ({ page }) => {
+    await setName(page, 'a.b.c.d.e.f');
+    await page.type("[name='A']", '1.2.3.4');
+    await page.click('#create')
+    const subdomain = await getSubdomain(page);
+    await expect(page.locator('.desktop .view-name')).toHaveText('a.b.c.d.e.f.' + subdomain + ".messwithdns.com");
+})
+
 
 
 /********************

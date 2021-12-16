@@ -15,6 +15,14 @@ export default {
         };
     },
     methods: {
+        typeName: function(type) {
+            const name = this.rrTypesReverse[type];
+            if (name !== undefined) {
+                return name;
+            } else {
+                return 'TYPE' + type;
+            }
+        },
         localTime: function(timestamp) {
             // convert to local time
             var date = new Date(timestamp * 1000);

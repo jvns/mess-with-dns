@@ -1,5 +1,6 @@
 import rrTypes from './rrTypes.json';
 import schemas from './schemas.json';
+const punycode = require('punycode');
 
 export interface Record {
     id: string
@@ -53,9 +54,11 @@ function convertRecord(record: Record): GoRecord {
     // =>
     // { "Hdr": { "Name": "example.messwithdns.com.", "Rrtype": 1, "Class": 1, "Ttl": 5, "Rdlength": 0 }, "A": "93.184.216.34" }
     const domainName = fullName(record);
+    const punycoded = punycode.toASCII(domainName);
+    console.log(punycoded);
     const newRecord: GoRecord = {
         Hdr: {
-            Name: domainName,
+            Name: punycoded,
             Rrtype: rrTypes[record.type],
             Class: 1,
             Ttl: parseInt(record.ttl),
@@ -109,7 +112,8 @@ function transformRecord(id: string, record: GoRecord): Record {
     // { "Hdr": { "Name": "example.messwithdns.com.", "Rrtype": 1, "Class": 1, "Ttl": 5, "Rdlength": 0 }, "A": "
     // =>
     // { ttl: 5, name: "example", type: 'A' }
-    const [subdomain, domain] = parseName(record.Hdr.Name)
+    const decoded = punycode.toUnicode(record.Hdr.Name);
+    const [subdomain, domain] = parseName(decoded)
     const basic = {
         id: id,
         ttl: record.Hdr.Ttl + '',

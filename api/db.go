@@ -226,7 +226,6 @@ func max(a, b int) int {
 }
 
 func StreamRequest(subdomain string, request []byte, response []byte, src_ip string, src_host string) error {
-	fmt.Println("writing", subdomain)
 	// get base domain
 	x := map[string]interface{}{
 		"created_at": time.Now().Unix(),

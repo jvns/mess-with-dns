@@ -128,6 +128,28 @@ func specialRecords(name string, qtype uint16) []dns.RR {
 	if qtype == dns.TypeSOA && name == "messwithdns.com." {
 		return []dns.RR{getSOA(soaSerial)}
 	}
+	if qtype == dns.TypeNS && name == "messwithdns.com." {
+		return []dns.RR{
+			&dns.NS{
+				Hdr: dns.RR_Header{
+					Name:   "messwithdns.com.",
+					Rrtype: dns.TypeNS,
+					Class:  dns.ClassINET,
+					Ttl:    60,
+				},
+				Ns: "mess-with-dns1.wizardzines.com.",
+			},
+			&dns.NS{
+				Hdr: dns.RR_Header{
+					Name:   "messwithdns.com.",
+					Rrtype: dns.TypeNS,
+					Class:  dns.ClassINET,
+					Ttl:    60,
+				},
+				Ns: "mess-with-dns2.wizardzines.com.",
+			},
+		}
+	}
 	return nil
 }
 
@@ -139,7 +161,7 @@ func getSOA(serial uint32) *dns.SOA {
 			Class:  dns.ClassINET,
 			Ttl:    300, /* RFC 1035 says soa records always should have a ttl of 0 but cloudflare doesn't seem to do that*/
 		},
-		Ns:      "ns1.messwithdns.com.",
+		Ns:      "mess-with-dns1.wizardzines.com.",
 		Mbox:    "julia.wizardzines.com.",
 		Serial:  serial,
 		Refresh: 3600,

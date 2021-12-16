@@ -285,7 +285,11 @@ func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	start := time.Now()
 	fmt.Println("Received request: ", r.Question[0].String())
 	msg := dnsResponse(handle.db, r)
-	w.WriteMsg(msg)
+	err := w.WriteMsg(msg)
+	if err != nil {
+		fmt.Println("Error writing response: ", err.Error())
+		sentry.CaptureException(err)
+	}
 	// everything after this is just logging
 	elapsed := time.Since(start)
 	if len(msg.Answer) > 0 {
@@ -295,12 +299,14 @@ func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 		fmt.Println("Response: (no records found)", elapsed)
 
 	}
+
 	remote_addr := w.RemoteAddr().(*net.UDPAddr).IP
-	err := LogRequest(handle.db, r, msg, remote_addr, lookupHost(handle.ipRanges, remote_addr))
+	err = LogRequest(handle.db, r, msg, remote_addr, lookupHost(handle.ipRanges, remote_addr))
 	if err != nil {
 		fmt.Println("Error logging request:", err)
 		sentry.CaptureException(err)
 	}
+	fmt.Println("Logged request")
 }
 
 func cleanup(db *sql.DB) {

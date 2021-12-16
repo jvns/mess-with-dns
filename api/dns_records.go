@@ -116,6 +116,15 @@ var records = map[string]dns.RR{
 		},
 		A: net.ParseIP("213.188.214.254"),
 	},
+	"_psl.messwithdns.com.": &dns.TXT{
+		Hdr: dns.RR_Header{
+			Name:   "_psl.messwithdns.com.",
+			Rrtype: dns.TypeTXT,
+			Class:  dns.ClassINET,
+			Ttl:    60,
+		},
+		Txt: []string{"https://github.com/publicsuffix/list/pull/1490"},
+	},
 }
 
 func specialRecords(name string, qtype uint16) []dns.RR {

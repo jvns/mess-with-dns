@@ -9,28 +9,41 @@ import (
 	"github.com/miekg/dns"
 )
 
-func lookupRecords(db *sql.DB, name string, qtype uint16) ([]dns.RR, int, error) {
+func lookupRecords(db *sql.DB, name string, qtype uint16) ([]dns.RR, error) {
 	records := specialRecords(name, qtype)
 	if len(records) > 0 {
-		return records, len(records), nil
+		return records, nil
 	}
 	return GetRecords(db, name, qtype)
 }
 
 func dnsResponse(db *sql.DB, request *dns.Msg) *dns.Msg {
-	if !strings.HasSuffix(strings.ToLower(request.Question[0].Name), "messwithdns.com.") {
+	name := strings.ToLower(request.Question[0].Name)
+	if !strings.HasSuffix(name, "messwithdns.com.") {
 		return refusedResponse(request)
 	}
-	records, totalRecords, err := lookupRecords(db, request.Question[0].Name, request.Question[0].Qtype)
+	records, err := lookupRecords(db, name, request.Question[0].Qtype)
 	if err != nil {
-		msg := errorResponse(request)
 		fmt.Println("Error getting records:", err)
-		return msg
+		return errorResponse(request)
 	}
-	if totalRecords == 0 {
+	if len(records) > 0 {
+		return successResponse(request, records)
+	}
+	// TODO: this does a full table scan on dns_records, it's not ideal, but
+	// this is what the RFC says to do so we're doing it
+	// let's just plan for the database to be small I guess!
+	// maybe we can optimize this later
+	totalRecords, err := GetTotalRecords(db, name)
+	if err != nil {
+		fmt.Println("Error getting total records:", err)
+		return errorResponse(request)
+	}
+	if totalRecords > 0 {
+		return successResponse(request, records)
+	} else {
 		return nxDomainResponse(request)
 	}
-	return successResponse(request, records)
 }
 
 func emptyMessage(request *dns.Msg) *dns.Msg {

@@ -120,6 +120,15 @@ func DeleteOldRecords(db *sql.DB) {
 	}
 }
 
+func GetTotalRecords(db *sql.DB, parent string) (int, error) {
+	var count int
+	err := db.QueryRow("SELECT COUNT(*) FROM dns_records WHERE name LIKE $1", "%"+parent).Scan(&count)
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
 func DeleteOldRequests(db *sql.DB) {
 	// delete requests where created_at timestamp is more than a day
 	// if we don't put the limit I get a "resources exhausted" error
@@ -285,15 +294,15 @@ func GetRequests(db *sql.DB, subdomain string) ([]map[string]interface{}, error)
 	return requests, nil
 }
 
-func GetRecords(db *sql.DB, name string, rrtype uint16) ([]dns.RR, int, error) {
+func GetRecords(db *sql.DB, name string, rrtype uint16) ([]dns.RR, error) {
 	tx, err := uncommittedTransation(db)
 	if err != nil {
-		return nil, 0, err
+		return nil, err
 	}
 	// first get all the records
 	rows, err := tx.Query("SELECT content FROM dns_records WHERE name = $1 ORDER BY created_at DESC", strings.ToLower(name))
 	if err != nil {
-		return nil, 0, err
+		return nil, err
 	}
 	// next parse them
 	var records []dns.RR
@@ -301,11 +310,11 @@ func GetRecords(db *sql.DB, name string, rrtype uint16) ([]dns.RR, int, error) {
 		var content []byte
 		err = rows.Scan(&content)
 		if err != nil {
-			return nil, 0, err
+			return nil, err
 		}
 		record, err := ParseRecord(content)
 		if err != nil {
-			return nil, 0, err
+			return nil, err
 		}
 		records = append(records, record)
 	}
@@ -317,7 +326,7 @@ func GetRecords(db *sql.DB, name string, rrtype uint16) ([]dns.RR, int, error) {
 		}
 	}
 	tx.Commit()
-	return filtered, len(records), nil
+	return filtered, nil
 }
 
 func shouldReturn(queryType uint16, recordType uint16) bool {

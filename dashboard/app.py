@@ -23,6 +23,13 @@ def popular_records_graph():
     df['subdomain'] = df['subdomain'].apply(lambda x: html.A(x, href=f'/{x}'))
     return dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True)
 
+def newest_records_graph():
+    df = pd.read_sql_query('SELECT subdomain, created_at FROM dns_records order by 2 desc limit 30', pg_connection_string)
+    # make name column a link
+    df['subdomain'] = df['subdomain'].apply(lambda x: html.A(x, href=f'/{x}'))
+    return dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True)
+
+
 def popular_requests_graph():
     df = pd.read_sql_query('SELECT subdomain, count(*) AS count FROM dns_requests group by 1 order by 2 desc limit 30', pg_connection_string)
     df['subdomain'] = df['subdomain'].apply(lambda x: html.A(x, href=f'/{x}'))
@@ -73,6 +80,8 @@ homepage_layout = html.Div(children=[
    popular_records_graph(),
    html.H2('popular requests'),
    popular_requests_graph(),
+   html.H2('newest records'),
+   newest_records_graph(),
 ])
 
 app.layout = html.Div([

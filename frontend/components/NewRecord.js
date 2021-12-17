@@ -26,6 +26,8 @@ export default {
 
     methods: {
         createRecord: async function(data) {
+            // trim spaces
+            data.subdomain = data.subdomain.trim();
             data.domain = this.domain;
             const response = await createRecord(data);
             window.response = response;

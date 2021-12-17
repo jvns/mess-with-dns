@@ -63,27 +63,6 @@ def get_dns_records_table(subdomain):
         data=df.to_dict('records'),
     )
 
-
-homepage_layout = html.Div(children=[
-    html.H1(children='mess with dns'),
-    dcc.Location(id='url', refresh=False),
-    html.Div(children='''
-    some metrics lol
-    '''),
-
-    dcc.Graph(
-        id='subdomains',
-        figure=subdomains_graph()
-    ),
-
-   html.H2('popular records'),
-   popular_records_graph(),
-   html.H2('popular requests'),
-   popular_requests_graph(),
-   html.H2('newest records'),
-   newest_records_graph(),
-])
-
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
     html.Div(id='page-content')
@@ -93,7 +72,22 @@ app.layout = html.Div([
               [dash.dependencies.Input('url', 'pathname')])
 def display_page(pathname):
     if pathname == '/':
-        return homepage_layout
+        return html.Div(children=[
+            html.H1(children='mess with dns'),
+            dcc.Location(id='url', refresh=False),
+            html.Div(children='''some metrics lol'''),
+            dcc.Graph(
+                id='subdomains',
+                figure=subdomains_graph()
+                ),
+
+            html.H2('popular records'),
+            popular_records_graph(),
+            html.H2('popular requests'),
+            popular_requests_graph(),
+            html.H2('newest records'),
+            newest_records_graph(),
+            ])
     return html.Div([
         html.H1('{}'.format(pathname)),
         html.H2('dns records'),

@@ -1,4 +1,6 @@
 import dash
+import timeago
+import datetime
 from dash import dcc, html, dash_table
 import dash_bootstrap_components as dbc
 import plotly.express as px
@@ -22,20 +24,27 @@ def subdomains_graph():
     return px.line(df_by_month.reset_index(), x='created_at', y='name')
 
 def popular_records_graph():
-    df = sql_query('SELECT subdomain, count(*) AS count FROM dns_records group by 1 order by 2 desc limit 30')
-    # make name column a link
+    df = sql_query('SELECT subdomain, count(*) AS count, max(created_at) as most_recent FROM dns_records group by 1 order by 2 desc limit 30')
+    df['most_recent'] = format_time_ago(df['most_recent'])
     df['subdomain'] = df['subdomain'].apply(lambda x: html.A(x, href=f'/{x}'))
     return dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True)
 
 def newest_records_graph():
     df = sql_query(f"SELECT subdomain, created_at FROM dns_records order by 2 desc limit 30")
     # make name column a link
+
+    df['created_at'] = format_time_ago(df['created_at'])
     df['subdomain'] = df['subdomain'].apply(lambda x: html.A(x, href=f'/{x}'))
     return dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True)
 
+def format_time_ago(series):
+    series = series.apply(pd.to_datetime)
+    now = datetime.datetime.utcnow()
+    return series.apply(lambda x: timeago.format(x, now))
 
 def popular_requests_graph():
-    df = sql_query('SELECT subdomain, count(*) AS count FROM dns_requests group by 1 order by 2 desc limit 30')
+    df = sql_query('SELECT subdomain, count(*) AS count, max(created_at) as most_recent FROM dns_requests group by 1 order by 2 desc limit 30')
+    df['most_recent'] = format_time_ago(df['most_recent'])
     df['subdomain'] = df['subdomain'].apply(lambda x: html.A(x, href=f'/{x}'))
     return dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True)
 

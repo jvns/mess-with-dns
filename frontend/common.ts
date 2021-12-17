@@ -74,10 +74,13 @@ function convertRecord(record: Record): GoRecord {
             }
         }
         if (key == 'Txt') {
-            // make sure it's a list of strings
-            if (!Array.isArray(record[key])) {
-                record[key] = [record[key]];
+            // split into array of 255 char strings
+            const txt = record[key];
+            const txtArray = [];
+            for (let i = 0; i < txt.length; i += 255) {
+                txtArray.push(txt.substring(i, i + 255));
             }
+            record[key] = txtArray;
         }
         // trim if it's a string
         if (typeof record[key] == 'string') {
@@ -123,7 +126,12 @@ function transformRecord(id: string, record: GoRecord): Record {
     };
     // copy rest of fields from record directly
     for (const key in record) {
-        if (key != 'Hdr') {
+        if (key == 'Hdr') {
+            continue;
+        } else if (key == 'Txt') {
+            // join array of 255 char strings
+            basic[key] = record[key].join('');
+        } else {
             basic[key] = record[key];
         }
     }

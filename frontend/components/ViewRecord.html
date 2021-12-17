@@ -5,7 +5,7 @@
       <a :href="'http://' + displayName()" target="_blank" @click="$event.stopPropagation()">{{ displayName() }}</a>
     </td>
     <td class="px-4 py-2 view-type">{{ record.type }}</td>
-    <td class="view-content">{{ content() }}</td>
+    <td class="view-content overflow-hidden" style="text-overflow: ellipsis; max-width: 16em;">{{ content() }}</td>
     <td class="view-ttl">{{ record.ttl }}</td>
     <td class="view-edit text-right cursor-pointer" @click="toggle()">
 
@@ -99,9 +99,9 @@
                   <strong>Type:</strong>
                   <span class="view-type">{{ record.type }}</span>
               </div>
-              <div>
+              <div style="text-overflow: ellipsis; max-width: 20em; overflow: hidden;">
                   <strong>Content:</strong>
-                  <span class="view-content">{{ content() }}</span>
+                  <span class="view-content" >{{ content() }}</span>
               </div>
               <div>
                   <strong>TTL:</strong>

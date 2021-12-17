@@ -133,7 +133,7 @@ func DeleteOldRequests(db *sql.DB) {
 	// delete requests where created_at timestamp is more than a day
 	// if we don't put the limit I get a "resources exhausted" error
 	// 1 day ago, postgres
-	_, err := db.Exec("DELETE FROM dns_requests WHERE created_at < NOW() - '1 day'::interval")
+	_, err := db.Exec("DELETE FROM dns_requests WHERE created_at < NOW() - '1 week'::interval")
 	if err != nil {
 		panic(err)
 	}

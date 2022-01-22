@@ -111,6 +111,7 @@ func getRequests(db *sql.DB, username string, w http.ResponseWriter, r *http.Req
 func streamRequests(db *sql.DB, subdomain string, w http.ResponseWriter, r *http.Request) {
 	// create websocket connection
 	conn, err := websocket.Upgrade(w, r, nil, 1024, 1024)
+	defer conn.Close()
 	if err != nil {
 		err := fmt.Errorf("Error creating websocket connection: %s", err.Error())
 		returnError(w, err, http.StatusInternalServerError)

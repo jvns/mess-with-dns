@@ -203,6 +203,7 @@ func getDomains(db *sql.DB, username string, w http.ResponseWriter, r *http.Requ
 
 func requireLogin(username string, page string, r *http.Request, w http.ResponseWriter) bool {
 	ip := r.Header.Get("X-Forwarded-For")
+	ip = strings.Split(ip, ",")[0]
 	w.Header().Set("Cache-Control", "no-store")
 	if username == "" {
 		returnError(w, fmt.Errorf("[%s] You must be logged in to access this page: %s", ip, page), http.StatusUnauthorized)

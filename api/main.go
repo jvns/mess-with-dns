@@ -201,10 +201,11 @@ func getDomains(db *sql.DB, username string, w http.ResponseWriter, r *http.Requ
 	w.Write(jsonOutput)
 }
 
-func requireLogin(username string, page string, w http.ResponseWriter) bool {
+func requireLogin(username string, page string, r *http.Request, w http.ResponseWriter) bool {
+	ip := r.Header.Get("X-Forwarded-For")
 	w.Header().Set("Cache-Control", "no-store")
 	if username == "" {
-		returnError(w, fmt.Errorf("You must be logged in to access this page: %s", page), http.StatusUnauthorized)
+		returnError(w, fmt.Errorf("[%s] You must be logged in to access this page: %s", ip, page), http.StatusUnauthorized)
 		return false
 	}
 	return true
@@ -226,44 +227,44 @@ func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "https://messwithdns.net"+r.URL.Path, http.StatusFound)
 	// GET /domain: get everything from USERNAME.messwithdns.com.
 	case r.Method == "GET" && p[0] == "domains":
-		if !requireLogin(username, r.URL.Path, w) {
+		if !requireLogin(username, r.URL.Path, r, w) {
 			return
 		}
 		getDomains(handle.db, username, w, r)
 	// GET /requests
 	case r.Method == "GET" && p[0] == "requests":
-		if !requireLogin(username, r.URL.Path, w) {
+		if !requireLogin(username, r.URL.Path, r, w) {
 			return
 		}
 		getRequests(handle.db, username, w, r)
 	// DELETE /requests
 	case r.Method == "DELETE" && p[0] == "requests":
-		if !requireLogin(username, r.URL.Path, w) {
+		if !requireLogin(username, r.URL.Path, r, w) {
 			return
 		}
 		deleteRequests(handle.db, username, w, r)
 	// GET /requeststream
 	case r.Method == "GET" && p[0] == "requeststream":
-		if !requireLogin(username, r.URL.Path, w) {
+		if !requireLogin(username, r.URL.Path, r, w) {
 			return
 		}
 		streamRequests(handle.db, username, w, r)
 	// POST /record/new: add a new record
 	case r.Method == "POST" && n == 2 && p[0] == "record" && p[1] == "new":
-		if !requireLogin(username, r.URL.Path, w) {
+		if !requireLogin(username, r.URL.Path, r, w) {
 			return
 		}
 		createRecord(handle.db, username, w, r)
 	// DELETE /record/<ID>:
 	case r.Method == "DELETE" && n == 2 && p[0] == "record":
-		if !requireLogin(username, r.URL.Path, w) {
+		if !requireLogin(username, r.URL.Path, r, w) {
 			return
 		}
 		// TODO: don't let people delete other people's records
 		deleteRecord(handle.db, p[1], w, r)
 	// POST /record/<ID>: updates a record
 	case r.Method == "POST" && n == 2 && p[0] == "record":
-		if !requireLogin(username, r.URL.Path, w) {
+		if !requireLogin(username, r.URL.Path, r, w) {
 			return
 		}
 		updateRecord(handle.db, username, p[1], w, r)

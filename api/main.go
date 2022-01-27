@@ -76,8 +76,9 @@ func makeDomain(name string) string {
 	return name + ".messwithdns.com."
 }
 
-func returnError(w http.ResponseWriter, err error, status int) {
-	fmt.Printf("Error [%d]: %s\n", status, err.Error())
+func returnError(w http.ResponseWriter, r *http.Request, err error, status int) {
+	msg := fmt.Sprintf("Error [%d]: %s\n", status, err.Error())
+	logMsg(r, msg)
 	sentry.CaptureException(err)
 	http.Error(w, err.Error(), status)
 }
@@ -86,7 +87,7 @@ func deleteRequests(db *sql.DB, name string, w http.ResponseWriter, r *http.Requ
 	err := DeleteRequestsForDomain(db, name)
 	if err != nil {
 		err := fmt.Errorf("Error deleting requests: %s", err.Error())
-		returnError(w, err, http.StatusInternalServerError)
+		returnError(w, r, err, http.StatusInternalServerError)
 		return
 	}
 }
@@ -95,13 +96,13 @@ func getRequests(db *sql.DB, username string, w http.ResponseWriter, r *http.Req
 	requests, err := GetRequests(db, username)
 	if err != nil {
 		err := fmt.Errorf("Error getting requests: %s", err.Error())
-		returnError(w, err, http.StatusInternalServerError)
+		returnError(w, r, err, http.StatusInternalServerError)
 		return
 	}
 	jsonOutput, err := json.Marshal(requests)
 	if err != nil {
 		err := fmt.Errorf("Error marshalling json: %s", err.Error())
-		returnError(w, err, http.StatusInternalServerError)
+		returnError(w, r, err, http.StatusInternalServerError)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
@@ -114,10 +115,10 @@ func streamRequests(db *sql.DB, subdomain string, w http.ResponseWriter, r *http
 	defer conn.Close()
 	if err != nil {
 		err := fmt.Errorf("Error creating websocket connection: %s", err.Error())
-		returnError(w, err, http.StatusInternalServerError)
+		returnError(w, r, err, http.StatusInternalServerError)
 		return
 	}
-	fmt.Println("creating stream", subdomain)
+	logMsg(r, fmt.Sprintf("creating stream for %s", subdomain))
 	stream := CreateStream(subdomain)
 	defer stream.Delete()
 	c := stream.Get()
@@ -133,20 +134,20 @@ func createRecord(db *sql.DB, username string, w http.ResponseWriter, r *http.Re
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		err := fmt.Errorf("Error reading body: %s", err.Error())
-		returnError(w, err, http.StatusInternalServerError)
+		returnError(w, r, err, http.StatusInternalServerError)
 		return
 	}
 	rr, err := ParseRecord(body)
 	if err != nil {
 		if strings.Contains(err.Error(), "Invalid RR") {
-			returnError(w, fmt.Errorf("Oops, invalid domain name"), http.StatusBadRequest)
+			returnError(w, r, fmt.Errorf("Oops, invalid domain name"), http.StatusBadRequest)
 		} else {
-			returnError(w, fmt.Errorf("Error parsing record: %s", err.Error()), http.StatusInternalServerError)
+			returnError(w, r, fmt.Errorf("Error parsing record: %s", err.Error()), http.StatusInternalServerError)
 		}
 		return
 	}
 	if err = validateDomainName(rr.Header().Name, username); err != nil {
-		returnError(w, err, http.StatusBadRequest)
+		returnError(w, r, err, http.StatusBadRequest)
 		return
 	}
 	InsertRecord(db, rr)
@@ -157,7 +158,7 @@ func deleteRecord(db *sql.DB, id string, w http.ResponseWriter, r *http.Request)
 	idInt, err := strconv.Atoi(id)
 	if err != nil {
 		err := fmt.Errorf("Error parsing id: %s", err.Error())
-		returnError(w, err, http.StatusBadRequest)
+		returnError(w, r, err, http.StatusBadRequest)
 		return
 	}
 	DeleteRecord(db, idInt)
@@ -166,21 +167,21 @@ func deleteRecord(db *sql.DB, id string, w http.ResponseWriter, r *http.Request)
 func updateRecord(db *sql.DB, username string, id string, w http.ResponseWriter, r *http.Request) {
 	idInt, err := strconv.Atoi(id)
 	if err != nil {
-		returnError(w, fmt.Errorf("Error parsing id: %s", err.Error()), http.StatusBadRequest)
+		returnError(w, r, fmt.Errorf("Error parsing id: %s", err.Error()), http.StatusBadRequest)
 		return
 	}
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		returnError(w, fmt.Errorf("Error reading body: %s", err.Error()), http.StatusInternalServerError)
+		returnError(w, r, fmt.Errorf("Error reading body: %s", err.Error()), http.StatusInternalServerError)
 		return
 	}
 	rr, err := ParseRecord(body)
 	if err != nil {
-		returnError(w, fmt.Errorf("Error parsing record: %s", err.Error()), http.StatusBadRequest)
+		returnError(w, r, fmt.Errorf("Error parsing record: %s", err.Error()), http.StatusBadRequest)
 		return
 	}
 	if err = validateDomainName(rr.Header().Name, username); err != nil {
-		returnError(w, err, http.StatusBadRequest)
+		returnError(w, r, err, http.StatusBadRequest)
 		return
 	}
 	UpdateRecord(db, idInt, rr)
@@ -189,31 +190,35 @@ func updateRecord(db *sql.DB, username string, id string, w http.ResponseWriter,
 func getDomains(db *sql.DB, username string, w http.ResponseWriter, r *http.Request) {
 	records, err := GetRecordsForName(db, username)
 	if err != nil {
-		returnError(w, fmt.Errorf("Error getting records: %s", err.Error()), http.StatusInternalServerError)
+		returnError(w, r, fmt.Errorf("Error getting records: %s", err.Error()), http.StatusInternalServerError)
 		return
 	}
 	jsonOutput, err := json.Marshal(records)
 	if err != nil {
-		returnError(w, fmt.Errorf("Error marshalling json: %s", err.Error()), http.StatusInternalServerError)
+		returnError(w, r, fmt.Errorf("Error marshalling json: %s", err.Error()), http.StatusInternalServerError)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(jsonOutput)
 }
 
-func requireLogin(username string, page string, r *http.Request, w http.ResponseWriter) bool {
+func logMsg(r *http.Request, msg string) {
 	ip := r.Header.Get("X-Forwarded-For")
 	ip = strings.Split(ip, ",")[0]
+	fmt.Printf("[%s] %s\n", ip, msg)
+}
+
+func requireLogin(username string, page string, r *http.Request, w http.ResponseWriter) bool {
 	w.Header().Set("Cache-Control", "no-store")
 	if username == "" {
-		returnError(w, fmt.Errorf("[%s] You must be logged in to access this page: %s", ip, page), http.StatusUnauthorized)
+		returnError(w, r, fmt.Errorf("You must be logged in to access this page: %s", page), http.StatusUnauthorized)
 		return false
 	}
 	return true
 }
 
 func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Request:", r.URL.Path)
+	logMsg(r, fmt.Sprintf("Request: %s", r.URL.Path))
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
 	w.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type")

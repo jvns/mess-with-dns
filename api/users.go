@@ -109,7 +109,7 @@ func loginRandom(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	subdomain, err := createAvailableSubdomain(db)
 
 	if err != nil {
-		returnError(w, err, http.StatusInternalServerError)
+		returnError(w, r, err, http.StatusInternalServerError)
 		return
 	}
 	setCookie(w, r, subdomain)

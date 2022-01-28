@@ -122,10 +122,28 @@ func streamRequests(db *sql.DB, subdomain string, w http.ResponseWriter, r *http
 	stream := CreateStream(subdomain)
 	defer stream.Delete()
 	c := stream.Get()
+	// I don't really understand this ping/pong stuff but it's what the gorilla docs say to do
+	ticker := time.NewTicker(15 * time.Second)
+	pongWait := time.Second * 60
+	conn.SetReadDeadline(time.Now().Add(pongWait))
+	conn.SetPongHandler(func(string) error {
+		conn.SetReadDeadline(time.Now().Add(pongWait))
+		return nil
+	})
 	for {
 		select {
+		case <-ticker.C:
+			err := conn.WriteMessage(websocket.PingMessage, []byte{})
+			if err != nil {
+				fmt.Println("Error writing ping:", err)
+				return
+			}
 		case msg := <-c:
-			conn.WriteMessage(websocket.TextMessage, msg)
+			err := conn.WriteMessage(websocket.TextMessage, msg)
+			if err != nil {
+				fmt.Println("Error writing message:", err)
+				return
+			}
 		}
 	}
 }

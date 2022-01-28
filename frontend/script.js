@@ -115,6 +115,11 @@ const vm = new Vue({
                     this.websocketOpen = true;
             });
             ws.onmessage = (event) => {
+                // ignore ping message
+                if (event.data === 'ping') {
+                    console.log("ping, ignoring");
+                    return;
+                }
                 const data = JSON.parse(event.data);
                 fixRequest(data);
                 this.requests.unshift(data);

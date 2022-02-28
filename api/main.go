@@ -58,6 +58,13 @@ func main() {
 			panic(fmt.Sprintf("Failed to set udp listener %s\n", err.Error()))
 		}
 	}()
+	go func() {
+		srv := &dns.Server{Handler: handler, Addr: port, Net: "tcp"}
+		if err := srv.ListenAndServe(); err != nil {
+			panic(fmt.Sprintf("Failed to set tcp listener %s\n", err.Error()))
+		}
+	}()
+
 	fmt.Println("Listening on :8080")
 	err = (&http.Server{Addr: ":8080", Handler: handler}).ListenAndServe()
 	if err != nil {
@@ -310,7 +317,7 @@ func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	start := time.Now()
 	fmt.Println("Received request: ", r.Question[0].String())
-	msg := dnsResponse(handle.db, r)
+	msg := dnsResponse(handle.db, r, w)
 	err := w.WriteMsg(msg)
 	if err != nil {
 		fmt.Println("Error writing response: ", err.Error())
@@ -326,13 +333,23 @@ func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 
 	}
 
-	remote_addr := w.RemoteAddr().(*net.UDPAddr).IP
+	// check if it's a TCP address
+	remote_addr := getIP(w)
 	err = LogRequest(handle.db, r, msg, remote_addr, lookupHost(handle.ipRanges, remote_addr))
 	if err != nil {
 		fmt.Println("Error logging request:", err)
 		sentry.CaptureException(err)
 	}
 	fmt.Println("Logged request")
+}
+
+func getIP(w dns.ResponseWriter) net.IP {
+	if addr, ok := w.RemoteAddr().(*net.TCPAddr); ok {
+		return addr.IP
+	} else if addr, ok := w.RemoteAddr().(*net.UDPAddr); ok {
+		return addr.IP
+	}
+	panic("Needs to be either a TCP or UDP address")
 }
 
 func cleanup(db *sql.DB) {

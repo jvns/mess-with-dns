@@ -3,7 +3,6 @@ package main
 // domain -> stream id -> channel
 
 import (
-	"fmt"
 	"math/rand"
 )
 
@@ -49,7 +48,6 @@ func (s *Stream) Get() chan []byte {
 func WriteToStreams(domain string, msg []byte) {
 	if _, ok := streams[domain]; ok {
 		for _, stream := range streams[domain] {
-			fmt.Println("writing to stream")
 			stream <- msg
 		}
 	}

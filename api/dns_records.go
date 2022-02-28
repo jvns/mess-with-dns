@@ -17,7 +17,7 @@ func lookupRecords(db *sql.DB, name string, qtype uint16) ([]dns.RR, error) {
 	return GetRecords(db, name, qtype)
 }
 
-func dnsResponse(db *sql.DB, request *dns.Msg) *dns.Msg {
+func dnsResponse(db *sql.DB, request *dns.Msg, w dns.ResponseWriter) *dns.Msg {
 	name := strings.ToLower(request.Question[0].Name)
 	if !strings.HasSuffix(name, "messwithdns.com.") {
 		return refusedResponse(request)
@@ -28,7 +28,7 @@ func dnsResponse(db *sql.DB, request *dns.Msg) *dns.Msg {
 		return errorResponse(request)
 	}
 	if len(records) > 0 {
-		return successResponse(request, records)
+		return successResponse(request, w, records)
 	}
 	// TODO: this does a full table scan on dns_records, it's not ideal, but
 	// this is what the RFC says to do so we're doing it
@@ -40,10 +40,17 @@ func dnsResponse(db *sql.DB, request *dns.Msg) *dns.Msg {
 		return errorResponse(request)
 	}
 	if totalRecords > 0 {
-		return successResponse(request, records)
+		return successResponse(request, w, records)
 	} else {
 		return nxDomainResponse(request)
 	}
+}
+
+func truncatedReply(request *dns.Msg) *dns.Msg {
+	msg := emptyMessage(request)
+	msg.SetRcode(request, dns.RcodeSuccess)
+	msg.Truncated = true
+	return msg
 }
 
 func emptyMessage(request *dns.Msg) *dns.Msg {
@@ -77,9 +84,16 @@ func refusedResponse(request *dns.Msg) *dns.Msg {
 	return &msg
 }
 
-func successResponse(request *dns.Msg, records []dns.RR) *dns.Msg {
+func successResponse(request *dns.Msg, w dns.ResponseWriter, records []dns.RR) *dns.Msg {
 	msg := emptyMessage(request)
 	msg.Answer = records
+
+	// don't allow giant replies for UDP
+	if _, ok := w.RemoteAddr().(*net.UDPAddr); ok {
+		if msg.Len() > 512 {
+			return truncatedReply(request)
+		}
+	}
 	return msg
 }
 

@@ -20,6 +20,14 @@ processes = []
     port = "53"
 
 [[services]]
+  internal_port = 53
+  protocol = "tcp"
+
+  [[services.ports]]
+    port = "53"
+
+
+[[services]]
   internal_port = 8080
   protocol = "tcp"
 

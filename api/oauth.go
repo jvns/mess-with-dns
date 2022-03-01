@@ -87,10 +87,9 @@ func setCookie(w http.ResponseWriter, r *http.Request, subdomain string) {
 	}
 	// write secure cookie
 	http.SetCookie(w, &http.Cookie{
-		Name:     "session",
-		Value:    encoded,
-		Path:     "/",
-		HttpOnly: true,
+		Name:  "session",
+		Value: encoded,
+		Path:  "/",
 		// 2 weeks
 		MaxAge:   24 * 60 * 60 * 14,
 		SameSite: http.SameSiteStrictMode,

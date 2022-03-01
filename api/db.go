@@ -35,6 +35,7 @@ func createTables(db *sql.DB) error {
 		// initialize the serials table
 		// check if serials table has anything in it
 		rows, err := db.Query("SELECT * FROM dns_serials")
+		defer rows.Close()
 		if err != nil {
 			return err
 		}
@@ -188,6 +189,7 @@ func GetRecordsForName(db *sql.DB, subdomain string) ([]Record, error) {
 	// we're stricter about the isolation level here because it's weird if you delete a record
 	// but it still exists after
 	rows, err := db.Query("SELECT id, content FROM dns_records WHERE subdomain = $1 ORDER BY created_at DESC", subdomain)
+	defer rows.Close()
 	if err != nil {
 		return nil, err
 	}

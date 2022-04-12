@@ -1,6 +1,6 @@
 <formulate-form name="new-record" @submit="createRecord" v-model="data" class="border border-gray-200 p-4">
   <fieldset class="flex">
-      <div class="flex flex-wrap mr-auto"> <!-- this mr-auto is literally just for screenshots, not layout -->
+      <div class="flex items-end flex-wrap mr-auto"> <!-- this mr-auto is literally just for screenshots, not layout -->
       <formulate-input
         class="mr-4"
         outer-class="mt-4 w-40 formulate-input"
@@ -10,8 +10,10 @@
         validation="required"
         :validation-messages='{"required": "Example: bananas"}'
         error-behavior="submit"
+        v-model="subdomain"
         type="text"
       ></formulate-input>
+
       <formulate-input
         class="mr-4"
         outer-class="mt-4"
@@ -33,10 +35,21 @@
         :key="item.name"
         v-bind="item"
       ></formulate-input>
+
+
     </div>
   </fieldset>
   <div style="color: red" v-if="error" class="pt-2 server-error">{{error}}</div>
-  <div class="flex w-full">
+  <div class="flex w-full justify-between items-end">
+
+    <div class="pt-4 text-sm text-green-600 py-2" v-if="subdomain"> 
+        <span v-if="subdomain == '@'">
+        {{domain}}.messwithdns.com
+        </span>
+        <span v-else>
+        {{subdomain}}.{{domain}}.messwithdns.com
+        </span>
+    </div>
     <formulate-input
       id="create"
       outer-class="ml-auto mt-4 create"

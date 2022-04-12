@@ -11,6 +11,7 @@ export default {
         return {
             type: 'A',
             data: undefined,
+            subdomain: undefined,
             schemas: schemas,
             // don't include 'default' in keys
             options: Object.keys(schemas).filter(key => key != 'default'),

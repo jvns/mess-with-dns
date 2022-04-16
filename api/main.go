@@ -252,6 +252,8 @@ func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	p := strings.Split(r.URL.Path, "/")[1:]
 	n := len(p)
 	switch {
+	case p[0] == "health":
+		healthCheck(w, r)
 	// check host header for messwithdns.com
 	case r.Host == "messwithdns.com" || r.Host == "www.messwithdns.com":
 		// redirect to .net
@@ -341,6 +343,37 @@ func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 		sentry.CaptureException(err)
 	}
 	fmt.Println("Logged request")
+}
+
+func healthCheck(w http.ResponseWriter, r *http.Request) {
+	// make dns request to check if we're up
+	m := new(dns.Msg)
+	m.SetQuestion("glass99.messwithdns.com.", dns.TypeA)
+	m.RecursionDesired = true
+	c := new(dns.Client)
+	c.DialTimeout = time.Second * 1
+	//c.Net = "tcp"
+	_, _, err := c.Exchange(m, "127.0.0.1:53")
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("Error making DNS request: " + err.Error()))
+		return
+	}
+
+	// get requests for glass99 and make sure it's a 200 ok
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", "http://127.0.0.1:8080/requests", nil)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	req.Header.Set("User-Agent", "healthcheck")
+	req.Header.Set("Cookie", "session=MTY1MDEyMjU3MnxTcnB5M3ZvYmFKRXBhWXV0Y3kwWWNTTk5mU05Nb3hvRG5yajNkM2Fod2dNRVJ3MEJUX0RwTng2anduVGpOYVdTVENTdFY3aXNPWEJxVUNORXJlSGp8vaZ4BQTLfPwl6xy5VIvMQsqB2qiTjgss2RYWJUqCCTM=; username=glass99")
+	resp, err := client.Do(req)
+	if err != nil || resp.StatusCode != 200 {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 }
 
 func getIP(w dns.ResponseWriter) net.IP {

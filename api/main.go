@@ -16,6 +16,7 @@ import (
 	"github.com/getsentry/sentry-go"
 	"github.com/gorilla/websocket"
 	"github.com/miekg/dns"
+	_ "net/http/pprof"
 )
 
 func main() {

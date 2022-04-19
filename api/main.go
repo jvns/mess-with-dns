@@ -20,6 +20,10 @@ import (
 )
 
 func main() {
+	// start pprof
+	go func() {
+		log.Println(http.ListenAndServe("localhost:6060", nil))
+	}()
 	if env := os.Getenv("SENTRY_DSN"); env != "" {
 		err := sentry.Init(sentry.ClientOptions{
 			Dsn: env,

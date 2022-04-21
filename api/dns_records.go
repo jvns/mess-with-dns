@@ -195,7 +195,7 @@ func getSOA(serial uint32) *dns.SOA {
 			Name:   "messwithdns.com.",
 			Rrtype: dns.TypeSOA,
 			Class:  dns.ClassINET,
-			Ttl:    300, /* RFC 1035 says soa records always should have a ttl of 0 but cloudflare doesn't seem to do that*/
+			Ttl:    3600, /* RFC 1035 says soa records always should have a ttl of 0 but cloudflare doesn't seem to do that*/
 		},
 		Ns:      "mess-with-dns1.wizardzines.com.",
 		Mbox:    "julia.wizardzines.com.",

@@ -378,7 +378,7 @@ func healthCheck(w http.ResponseWriter, r *http.Request) {
 	resp, err := client.Do(req)
 	if err != nil || resp.StatusCode != 200 {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("Error requesting /requests" + err.Error()))
+		w.Write([]byte("Error requesting /requests"))
 		return
 	}
 }

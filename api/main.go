@@ -370,6 +370,7 @@ func healthCheck(w http.ResponseWriter, r *http.Request) {
 	req, err := http.NewRequest("GET", "http://127.0.0.1:8080/requests", nil)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("Error creating request" + err.Error()))
 		return
 	}
 	req.Header.Set("User-Agent", "healthcheck")
@@ -377,6 +378,7 @@ func healthCheck(w http.ResponseWriter, r *http.Request) {
 	resp, err := client.Do(req)
 	if err != nil || resp.StatusCode != 200 {
 		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("Error requesting /requests" + err.Error()))
 		return
 	}
 }

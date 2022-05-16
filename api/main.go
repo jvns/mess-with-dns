@@ -370,7 +370,7 @@ func healthCheck(w http.ResponseWriter, r *http.Request) {
 	req, err := http.NewRequest("GET", "http://127.0.0.1:8080/requests", nil)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("Error creating request" + err.Error()))
+		w.Write([]byte("Error creating request"))
 		return
 	}
 	req.Header.Set("User-Agent", "healthcheck")

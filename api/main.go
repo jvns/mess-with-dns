@@ -365,22 +365,24 @@ func healthCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// get requests for glass99 and make sure it's a 200 ok
-	client := &http.Client{}
-	req, err := http.NewRequest("GET", "http://127.0.0.1:8080/requests", nil)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("Error creating request"))
-		return
-	}
-	req.Header.Set("User-Agent", "healthcheck")
-	req.Header.Set("Cookie", "session=MTY1MDEyMjU3MnxTcnB5M3ZvYmFKRXBhWXV0Y3kwWWNTTk5mU05Nb3hvRG5yajNkM2Fod2dNRVJ3MEJUX0RwTng2anduVGpOYVdTVENTdFY3aXNPWEJxVUNORXJlSGp8vaZ4BQTLfPwl6xy5VIvMQsqB2qiTjgss2RYWJUqCCTM=; username=glass99")
-	resp, err := client.Do(req)
-	if err != nil || resp.StatusCode != 200 {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("Error requesting /requests"))
-		return
-	}
+	/*
+		// get requests for glass99 and make sure it's a 200 ok
+		client := &http.Client{}
+		req, err := http.NewRequest("GET", "http://127.0.0.1:8080/requests", nil)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("Error creating request"))
+			return
+		}
+		req.Header.Set("User-Agent", "healthcheck")
+		req.Header.Set("Cookie", "session=MTY1MDEyMjU3MnxTcnB5M3ZvYmFKRXBhWXV0Y3kwWWNTTk5mU05Nb3hvRG5yajNkM2Fod2dNRVJ3MEJUX0RwTng2anduVGpOYVdTVENTdFY3aXNPWEJxVUNORXJlSGp8vaZ4BQTLfPwl6xy5VIvMQsqB2qiTjgss2RYWJUqCCTM=; username=glass99")
+		resp, err := client.Do(req)
+		if err != nil || resp.StatusCode != 200 {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("Error requesting /requests"))
+			return
+		}
+	*/
 }
 
 func getIP(w dns.ResponseWriter) net.IP {

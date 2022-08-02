@@ -2,3 +2,6 @@ frontend/node_modules
 dashboard/vendor
 ip2asn*
 */*/serve
+vendor
+*sqlite*
+api/mess-with-dns

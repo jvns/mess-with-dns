@@ -12,6 +12,10 @@ processes = []
   allowed_public_ports = []
   auto_rollback = true
 
+[mount]
+  source = "mess_with_dns_sqlite"
+  destination = "/data"
+
 [[services]]
   internal_port = 53
   protocol = "udp"
@@ -50,3 +54,4 @@ processes = []
     path = "/health"
     protocol = "http"
     timeout = "2s"
+

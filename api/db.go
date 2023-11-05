@@ -22,6 +22,8 @@ func connect() (*sql.DB, error) {
 	if err != nil {
 		return nil, err
 	}
+	// important to avoid running out of memory
+	db.SetMaxOpenConns(8)
 	return db, nil
 }
 

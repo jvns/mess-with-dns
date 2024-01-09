@@ -13,13 +13,27 @@ import (
 	"strings"
 	"time"
 
+	_ "net/http/pprof"
+
 	"github.com/getsentry/sentry-go"
 	"github.com/gorilla/websocket"
+	"github.com/honeycombio/honeycomb-opentelemetry-go"
+	"github.com/honeycombio/otel-config-go/otelconfig"
 	"github.com/miekg/dns"
-	_ "net/http/pprof"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
 func main() {
+	// setup honeycomb
+	bsp := honeycomb.NewBaggageSpanProcessor()
+
+	otelShutdown, err := otelconfig.ConfigureOpenTelemetry(
+		otelconfig.WithSpanProcessor(bsp),
+	)
+	if err != nil {
+		log.Fatalf("error setting up OTel SDK - %e", err)
+	}
+	defer otelShutdown()
 	// start pprof
 	go func() {
 		log.Println(http.ListenAndServe("localhost:6060", nil))
@@ -71,7 +85,9 @@ func main() {
 	}()
 
 	fmt.Println("Listening on :8080")
-	err = (&http.Server{Addr: ":8080", Handler: handler}).ListenAndServe()
+
+	wrappedHandler := otelhttp.NewHandler(handler, "mess-with-dns-api")
+	err = (&http.Server{Addr: ":8080", Handler: wrappedHandler}).ListenAndServe()
 	if err != nil {
 		panic(fmt.Sprintf("Failed to start http listener %s\n", err.Error()))
 	}

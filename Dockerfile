@@ -1,4 +1,4 @@
-FROM golang:1.17 AS go
+FROM golang:1.20 AS go
 
 ADD ./api/go.mod /app/go.mod
 ADD ./api/go.sum /app/go.sum
@@ -18,7 +18,7 @@ RUN npm install
 ADD ./frontend/ /app/
 RUN bash esbuild.sh
 
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
 RUN apt-get update
 RUN apt-get install -y ca-certificates wget

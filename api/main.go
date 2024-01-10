@@ -272,6 +272,7 @@ func requireLogin(username string, page string, r *http.Request, w http.Response
 func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	ctx, span := tracer.Start(ctx, "http.request")
+	span.SetAttributes(attribute.String("http.path", r.URL.Path))
 	defer span.End()
 	logMsg(r, fmt.Sprintf("Request: %s", r.URL.Path))
 	w.Header().Set("Access-Control-Allow-Origin", "*")

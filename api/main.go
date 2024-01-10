@@ -347,7 +347,6 @@ func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	ctx := context.Background()
 	ctx, span := tracer.Start(ctx, "dns.request")
-	defer span.End()
 	start := time.Now()
 	fmt.Println("Received request: ", r.Question[0].String())
 	msg := dnsResponse(ctx, handle.db, r, w)
@@ -356,6 +355,12 @@ func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 		fmt.Println("Error writing response: ", err.Error())
 		sentry.CaptureException(err)
 	}
+	span.End()
+
+	ctx = context.Background()
+	ctx, span = tracer.Start(ctx, "dns.request.log")
+	defer span.End()
+
 	// everything after this is just logging
 	elapsed := time.Since(start)
 	if len(msg.Answer) > 0 {

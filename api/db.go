@@ -336,7 +336,7 @@ func GetRequests(ctx context.Context, db *sql.DB, subdomain string) ([]map[strin
 
 func GetRecords(ctx context.Context, db *sql.DB, name string, rrtype uint16) ([]dns.RR, error) {
 	_, span := tracer.Start(ctx, "db.GetRecords")
-	span.SetAttributes(attribute.String("name", name))
+	span.SetAttributes(attribute.String("subdomain", name))
 	span.SetAttributes(attribute.Int("rrtype", int(rrtype)))
 	defer span.End()
 	tx, err := uncommittedTransation(db)

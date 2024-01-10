@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"net"
@@ -9,20 +10,20 @@ import (
 	"github.com/miekg/dns"
 )
 
-func lookupRecords(db *sql.DB, name string, qtype uint16) ([]dns.RR, error) {
+func lookupRecords(ctx context.Context, db *sql.DB, name string, qtype uint16) ([]dns.RR, error) {
 	records := specialRecords(name, qtype)
 	if len(records) > 0 {
 		return records, nil
 	}
-	return GetRecords(db, name, qtype)
+	return GetRecords(ctx, db, name, qtype)
 }
 
-func dnsResponse(db *sql.DB, request *dns.Msg, w dns.ResponseWriter) *dns.Msg {
+func dnsResponse(ctx context.Context, db *sql.DB, request *dns.Msg, w dns.ResponseWriter) *dns.Msg {
 	name := strings.ToLower(request.Question[0].Name)
 	if !strings.HasSuffix(name, "messwithdns.com.") {
 		return refusedResponse(request)
 	}
-	records, err := lookupRecords(db, name, request.Question[0].Qtype)
+	records, err := lookupRecords(ctx, db, name, request.Question[0].Qtype)
 	if err != nil {
 		fmt.Println("Error getting records:", err)
 		return errorResponse(request)
@@ -34,7 +35,7 @@ func dnsResponse(db *sql.DB, request *dns.Msg, w dns.ResponseWriter) *dns.Msg {
 	// this is what the RFC says to do so we're doing it
 	// let's just plan for the database to be small I guess!
 	// maybe we can optimize this later
-	totalRecords, err := GetTotalRecords(db, name)
+	totalRecords, err := GetTotalRecords(ctx, db, name)
 	if err != nil {
 		fmt.Println("Error getting total records:", err)
 		return errorResponse(request)

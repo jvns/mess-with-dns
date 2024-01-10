@@ -26,6 +26,8 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 )
 
+var tracer = otel.Tracer("main")
+
 func main() {
 	// setup honeycomb
 	bsp := honeycomb.NewBaggageSpanProcessor()
@@ -58,7 +60,8 @@ func main() {
 		panic(fmt.Sprintf("Error creating tables: %s", err.Error()))
 	}
 	go cleanup(db)
-	soaSerial, err = GetSerial(db)
+	ctx := context.Background()
+	soaSerial, err = GetSerial(ctx, db)
 	if err != nil {
 		panic(fmt.Sprintf("Error getting SOA serial: %s", err.Error()))
 	}
@@ -114,8 +117,8 @@ func returnError(w http.ResponseWriter, r *http.Request, err error, status int) 
 	http.Error(w, err.Error(), status)
 }
 
-func deleteRequests(db *sql.DB, name string, w http.ResponseWriter, r *http.Request) {
-	err := DeleteRequestsForDomain(db, name)
+func deleteRequests(ctx context.Context, db *sql.DB, name string, w http.ResponseWriter, r *http.Request) {
+	err := DeleteRequestsForDomain(ctx, db, name)
 	if err != nil {
 		err := fmt.Errorf("Error deleting requests: %s", err.Error())
 		returnError(w, r, err, http.StatusInternalServerError)
@@ -123,8 +126,8 @@ func deleteRequests(db *sql.DB, name string, w http.ResponseWriter, r *http.Requ
 	}
 }
 
-func getRequests(db *sql.DB, username string, w http.ResponseWriter, r *http.Request) {
-	requests, err := GetRequests(db, username)
+func getRequests(ctx context.Context, db *sql.DB, username string, w http.ResponseWriter, r *http.Request) {
+	requests, err := GetRequests(ctx, db, username)
 	if err != nil {
 		err := fmt.Errorf("Error getting requests: %s", err.Error())
 		returnError(w, r, err, http.StatusInternalServerError)
@@ -140,7 +143,7 @@ func getRequests(db *sql.DB, username string, w http.ResponseWriter, r *http.Req
 	w.Write(jsonOutput)
 }
 
-func streamRequests(db *sql.DB, subdomain string, w http.ResponseWriter, r *http.Request) {
+func streamRequests(ctx context.Context, db *sql.DB, subdomain string, w http.ResponseWriter, r *http.Request) {
 	// create websocket connection
 	conn, err := websocket.Upgrade(w, r, nil, 1024, 1024)
 	defer conn.Close()
@@ -179,7 +182,7 @@ func streamRequests(db *sql.DB, subdomain string, w http.ResponseWriter, r *http
 	}
 }
 
-func createRecord(db *sql.DB, username string, w http.ResponseWriter, r *http.Request) {
+func createRecord(ctx context.Context, db *sql.DB, username string, w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		err := fmt.Errorf("Error reading body: %s", err.Error())
@@ -199,10 +202,10 @@ func createRecord(db *sql.DB, username string, w http.ResponseWriter, r *http.Re
 		returnError(w, r, err, http.StatusBadRequest)
 		return
 	}
-	InsertRecord(db, rr)
+	InsertRecord(ctx, db, rr)
 }
 
-func deleteRecord(db *sql.DB, id string, w http.ResponseWriter, r *http.Request) {
+func deleteRecord(ctx context.Context, db *sql.DB, id string, w http.ResponseWriter, r *http.Request) {
 	// parse int from id
 	idInt, err := strconv.Atoi(id)
 	if err != nil {
@@ -210,10 +213,10 @@ func deleteRecord(db *sql.DB, id string, w http.ResponseWriter, r *http.Request)
 		returnError(w, r, err, http.StatusBadRequest)
 		return
 	}
-	DeleteRecord(db, idInt)
+	DeleteRecord(ctx, db, idInt)
 }
 
-func updateRecord(db *sql.DB, username string, id string, w http.ResponseWriter, r *http.Request) {
+func updateRecord(ctx context.Context, db *sql.DB, username string, id string, w http.ResponseWriter, r *http.Request) {
 	idInt, err := strconv.Atoi(id)
 	if err != nil {
 		returnError(w, r, fmt.Errorf("Error parsing id: %s", err.Error()), http.StatusBadRequest)
@@ -233,11 +236,11 @@ func updateRecord(db *sql.DB, username string, id string, w http.ResponseWriter,
 		returnError(w, r, err, http.StatusBadRequest)
 		return
 	}
-	UpdateRecord(db, idInt, rr)
+	UpdateRecord(ctx, db, idInt, rr)
 }
 
-func getDomains(db *sql.DB, username string, w http.ResponseWriter, r *http.Request) {
-	records, err := GetRecordsForName(db, username)
+func getDomains(ctx context.Context, db *sql.DB, username string, w http.ResponseWriter, r *http.Request) {
+	records, err := GetRecordsForName(ctx, db, username)
 	if err != nil {
 		returnError(w, r, fmt.Errorf("Error getting records: %s", err.Error()), http.StatusInternalServerError)
 		return
@@ -267,6 +270,7 @@ func requireLogin(username string, page string, r *http.Request, w http.Response
 }
 
 func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
 	logMsg(r, fmt.Sprintf("Request: %s", r.URL.Path))
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
@@ -287,44 +291,44 @@ func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if !requireLogin(username, r.URL.Path, r, w) {
 			return
 		}
-		getDomains(handle.db, username, w, r)
+		getDomains(ctx, handle.db, username, w, r)
 	// GET /requests
 	case r.Method == "GET" && p[0] == "requests":
 		if !requireLogin(username, r.URL.Path, r, w) {
 			return
 		}
-		getRequests(handle.db, username, w, r)
+		getRequests(ctx, handle.db, username, w, r)
 	// DELETE /requests
 	case r.Method == "DELETE" && p[0] == "requests":
 		if !requireLogin(username, r.URL.Path, r, w) {
 			return
 		}
-		deleteRequests(handle.db, username, w, r)
+		deleteRequests(ctx, handle.db, username, w, r)
 	// GET /requeststream
 	case r.Method == "GET" && p[0] == "requeststream":
 		if !requireLogin(username, r.URL.Path, r, w) {
 			return
 		}
-		streamRequests(handle.db, username, w, r)
+		streamRequests(ctx, handle.db, username, w, r)
 	// POST /record/new: add a new record
 	case r.Method == "POST" && n == 2 && p[0] == "record" && p[1] == "new":
 		if !requireLogin(username, r.URL.Path, r, w) {
 			return
 		}
-		createRecord(handle.db, username, w, r)
+		createRecord(ctx, handle.db, username, w, r)
 	// DELETE /record/<ID>:
 	case r.Method == "DELETE" && n == 2 && p[0] == "record":
 		if !requireLogin(username, r.URL.Path, r, w) {
 			return
 		}
 		// TODO: don't let people delete other people's records
-		deleteRecord(handle.db, p[1], w, r)
+		deleteRecord(ctx, handle.db, p[1], w, r)
 	// POST /record/<ID>: updates a record
 	case r.Method == "POST" && n == 2 && p[0] == "record":
 		if !requireLogin(username, r.URL.Path, r, w) {
 			return
 		}
-		updateRecord(handle.db, username, p[1], w, r)
+		updateRecord(ctx, handle.db, username, p[1], w, r)
 	// POST /login
 	case r.Method == "GET" && n == 1 && p[0] == "login":
 		w.Header().Set("Cache-Control", "no-store")
@@ -341,12 +345,12 @@ func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
-	tracer := otel.Tracer("dns.request")
-	_, span := tracer.Start(context.Background(), "dns.request")
+	ctx := context.Background()
+	_, span := tracer.Start(ctx, "dns.request")
 	defer span.End()
 	start := time.Now()
 	fmt.Println("Received request: ", r.Question[0].String())
-	msg := dnsResponse(handle.db, r, w)
+	msg := dnsResponse(ctx, handle.db, r, w)
 	err := w.WriteMsg(msg)
 	if err != nil {
 		fmt.Println("Error writing response: ", err.Error())
@@ -369,7 +373,7 @@ func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	span.SetAttributes(attribute.String("dns.remote_host", remote_host))
 	span.SetAttributes(attribute.String("dns.question", r.Question[0].String()))
 	span.SetAttributes(attribute.Int("dns.answer_count", len(msg.Answer)))
-	err = LogRequest(handle.db, r, msg, remote_addr, lookupHost(handle.ipRanges, remote_addr))
+	err = LogRequest(ctx, handle.db, r, msg, remote_addr, lookupHost(handle.ipRanges, remote_addr))
 	if err != nil {
 		fmt.Println("Error logging request:", err)
 		sentry.CaptureException(err)
@@ -422,10 +426,13 @@ func getIP(w dns.ResponseWriter) net.IP {
 }
 
 func cleanup(db *sql.DB) {
+	ctx := context.Background()
+	_, span := tracer.Start(ctx, "cleanup")
+	defer span.End()
 	for {
 		fmt.Println("Deleting old requests...")
-		DeleteOldRequests(db)
-		DeleteOldRecords(db)
+		DeleteOldRequests(ctx, db)
+		DeleteOldRecords(ctx, db)
 		time.Sleep(time.Minute * 15)
 	}
 }

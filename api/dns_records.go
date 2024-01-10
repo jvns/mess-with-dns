@@ -19,6 +19,8 @@ func lookupRecords(ctx context.Context, db *sql.DB, name string, qtype uint16) (
 }
 
 func dnsResponse(ctx context.Context, db *sql.DB, request *dns.Msg, w dns.ResponseWriter) *dns.Msg {
+	ctx, span := tracer.Start(ctx, "dnsResponse")
+	defer span.End()
 	name := strings.ToLower(request.Question[0].Name)
 	if !strings.HasSuffix(name, "messwithdns.com.") {
 		return refusedResponse(request)

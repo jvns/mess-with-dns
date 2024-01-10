@@ -368,12 +368,12 @@ func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 
 	// check if it's a TCP address
 	remote_addr := getIP(w)
-	remote_host := lookupHost(handle.ipRanges, remote_addr)
+	remote_host := lookupHost(ctx, handle.ipRanges, remote_addr)
 	span.SetAttributes(attribute.String("dns.remote_addr", remote_addr.String()))
 	span.SetAttributes(attribute.String("dns.remote_host", remote_host))
 	span.SetAttributes(attribute.String("dns.question", r.Question[0].String()))
 	span.SetAttributes(attribute.Int("dns.answer_count", len(msg.Answer)))
-	err = LogRequest(ctx, handle.db, r, msg, remote_addr, lookupHost(handle.ipRanges, remote_addr))
+	err = LogRequest(ctx, handle.db, r, msg, remote_addr, remote_host)
 	if err != nil {
 		fmt.Println("Error logging request:", err)
 		sentry.CaptureException(err)
@@ -437,7 +437,10 @@ func cleanup(db *sql.DB) {
 	}
 }
 
-func lookupHost(ranges *Ranges, host net.IP) string {
+func lookupHost(ctx context.Context, ranges *Ranges, host net.IP) string {
+	ctx, span := tracer.Start(ctx, "lookupHost")
+	span.SetAttributes(attribute.String("host", host.String()))
+	defer span.End()
 	names, err := net.LookupAddr(host.String())
 	if err == nil && len(names) > 0 {
 		return names[0]

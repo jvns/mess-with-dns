@@ -271,11 +271,14 @@ func requireLogin(username string, page string, r *http.Request, w http.Response
 
 func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+	ctx, span := tracer.Start(ctx, "http.request")
+	defer span.End()
 	logMsg(r, fmt.Sprintf("Request: %s", r.URL.Path))
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
 	w.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type")
 	username, _ := ReadSessionUsername(r)
+	span.SetAttributes(attribute.String("username", username))
 
 	p := strings.Split(r.URL.Path, "/")[1:]
 	n := len(p)
@@ -383,6 +386,7 @@ func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	if err != nil {
 		fmt.Println("Error logging request:", err)
 		sentry.CaptureException(err)
+		span.RecordError(err)
 	}
 	fmt.Println("Logged request")
 }

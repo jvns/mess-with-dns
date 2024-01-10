@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -21,6 +22,8 @@ import (
 	"github.com/honeycombio/otel-config-go/otelconfig"
 	"github.com/miekg/dns"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 )
 
 func main() {
@@ -338,6 +341,9 @@ func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
+	tracer := otel.Tracer("dns.request")
+	_, span := tracer.Start(context.Background(), "dns.request")
+	defer span.End()
 	start := time.Now()
 	fmt.Println("Received request: ", r.Question[0].String())
 	msg := dnsResponse(handle.db, r, w)
@@ -358,6 +364,11 @@ func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 
 	// check if it's a TCP address
 	remote_addr := getIP(w)
+	remote_host := lookupHost(handle.ipRanges, remote_addr)
+	span.SetAttributes(attribute.String("dns.remote_addr", remote_addr.String()))
+	span.SetAttributes(attribute.String("dns.remote_host", remote_host))
+	span.SetAttributes(attribute.String("dns.question", r.Question[0].String()))
+	span.SetAttributes(attribute.Int("dns.answer_count", len(msg.Answer)))
 	err = LogRequest(handle.db, r, msg, remote_addr, lookupHost(handle.ipRanges, remote_addr))
 	if err != nil {
 		fmt.Println("Error logging request:", err)

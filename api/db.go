@@ -80,7 +80,7 @@ func loadSQLFile(db *sql.DB, sqlFile string) error {
 }
 
 func GetSerial(ctx context.Context, db *sql.DB) (uint32, error) {
-	_, span := tracer.Start(ctx, "db.GetSerial")
+	ctx, span := tracer.Start(ctx, "db.GetSerial")
 	defer span.End()
 	var serial uint32
 	err := db.QueryRow("SELECT serial FROM dns_serials").Scan(&serial)
@@ -91,7 +91,7 @@ func GetSerial(ctx context.Context, db *sql.DB) (uint32, error) {
 }
 
 func IncrementSerial(ctx context.Context, tx *sql.Tx) error {
-	_, span := tracer.Start(ctx, "db.IncrementSerial")
+	ctx, span := tracer.Start(ctx, "db.IncrementSerial")
 	defer span.End()
 	_, err := tx.Exec("UPDATE dns_serials SET serial = serial + 1")
 	if err != nil {
@@ -113,7 +113,7 @@ func IncrementSerial(ctx context.Context, tx *sql.Tx) error {
 }
 
 func DeleteRecord(ctx context.Context, db *sql.DB, id int) error {
-	_, span := tracer.Start(ctx, "db.DeleteRecord")
+	ctx, span := tracer.Start(ctx, "db.DeleteRecord")
 	span.SetAttributes(attribute.Int("id", id))
 	defer span.End()
 	tx, err := db.Begin()
@@ -126,7 +126,7 @@ func DeleteRecord(ctx context.Context, db *sql.DB, id int) error {
 
 func DeleteOldRecords(ctx context.Context, db *sql.DB) {
 	// delete records where created_at timestamp is more than a week old
-	_, span := tracer.Start(ctx, "db.DeleteOldRecords")
+	ctx, span := tracer.Start(ctx, "db.DeleteOldRecords")
 	defer span.End()
 	_, err := db.Exec("DELETE FROM dns_records WHERE created_at < NOW() - '1 week'::interval")
 	if err != nil {
@@ -135,7 +135,7 @@ func DeleteOldRecords(ctx context.Context, db *sql.DB) {
 }
 
 func GetTotalRecords(ctx context.Context, db *sql.DB, parent string) (int, error) {
-	_, span := tracer.Start(ctx, "db.GetTotalRecords")
+	ctx, span := tracer.Start(ctx, "db.GetTotalRecords")
 	span.SetAttributes(attribute.String("parent", parent))
 	defer span.End()
 	var count int
@@ -147,7 +147,7 @@ func GetTotalRecords(ctx context.Context, db *sql.DB, parent string) (int, error
 }
 
 func DeleteOldRequests(ctx context.Context, db *sql.DB) {
-	_, span := tracer.Start(ctx, "db.DeleteOldRequests")
+	ctx, span := tracer.Start(ctx, "db.DeleteOldRequests")
 	defer span.End()
 	// delete requests where created_at timestamp is more than a day
 	// if we don't put the limit I get a "resources exhausted" error
@@ -159,7 +159,7 @@ func DeleteOldRequests(ctx context.Context, db *sql.DB) {
 }
 
 func UpdateRecord(ctx context.Context, db *sql.DB, id int, record dns.RR) error {
-	_, span := tracer.Start(ctx, "db.UpdateRecord")
+	ctx, span := tracer.Start(ctx, "db.UpdateRecord")
 	span.SetAttributes(attribute.Int("id", id))
 	span.SetAttributes(attribute.String("record", record.String()))
 	defer span.End()
@@ -177,7 +177,7 @@ func UpdateRecord(ctx context.Context, db *sql.DB, id int, record dns.RR) error 
 }
 
 func InsertRecord(ctx context.Context, db *sql.DB, record dns.RR) error {
-	_, span := tracer.Start(ctx, "db.InsertRecord")
+	ctx, span := tracer.Start(ctx, "db.InsertRecord")
 	span.SetAttributes(attribute.String("record", record.String()))
 	defer span.End()
 	tx, err := db.Begin()
@@ -211,7 +211,7 @@ type Record struct {
 }
 
 func GetRecordsForName(ctx context.Context, db *sql.DB, subdomain string) ([]Record, error) {
-	_, span := tracer.Start(ctx, "db.GetRecordsForName")
+	ctx, span := tracer.Start(ctx, "db.GetRecordsForName")
 	span.SetAttributes(attribute.String("subdomain", subdomain))
 	defer span.End()
 	// we're stricter about the isolation level here because it's weird if you delete a record
@@ -239,7 +239,7 @@ func GetRecordsForName(ctx context.Context, db *sql.DB, subdomain string) ([]Rec
 }
 
 func LogRequest(ctx context.Context, db *sql.DB, request *dns.Msg, response *dns.Msg, src_ip net.IP, src_host string) error {
-	_, span := tracer.Start(ctx, "db.LogRequest")
+	ctx, span := tracer.Start(ctx, "db.LogRequest")
 	defer span.End()
 	jsonRequest, err := json.Marshal(request)
 	if err != nil {
@@ -267,7 +267,7 @@ func max(a, b int) int {
 }
 
 func StreamRequest(ctx context.Context, subdomain string, request []byte, response []byte, src_ip string, src_host string) error {
-	_, span := tracer.Start(ctx, "db.StreamRequest")
+	ctx, span := tracer.Start(ctx, "db.StreamRequest")
 	defer span.End()
 	// get base domain
 	x := map[string]interface{}{
@@ -286,7 +286,7 @@ func StreamRequest(ctx context.Context, subdomain string, request []byte, respon
 }
 
 func DeleteRequestsForDomain(ctx context.Context, db *sql.DB, subdomain string) error {
-	_, span := tracer.Start(ctx, "db.DeleteRequestsForDomain")
+	ctx, span := tracer.Start(ctx, "db.DeleteRequestsForDomain")
 	span.SetAttributes(attribute.String("subdomain", subdomain))
 	defer span.End()
 	_, err := db.Exec("DELETE FROM dns_requests WHERE subdomain = $1", subdomain)
@@ -297,7 +297,7 @@ func DeleteRequestsForDomain(ctx context.Context, db *sql.DB, subdomain string) 
 }
 
 func GetRequests(ctx context.Context, db *sql.DB, subdomain string) ([]map[string]interface{}, error) {
-	_, span := tracer.Start(ctx, "db.GetRequests")
+	ctx, span := tracer.Start(ctx, "db.GetRequests")
 	span.SetAttributes(attribute.String("subdomain", subdomain))
 	defer span.End()
 	tx, err := uncommittedTransation(db)
@@ -335,7 +335,7 @@ func GetRequests(ctx context.Context, db *sql.DB, subdomain string) ([]map[strin
 }
 
 func GetRecords(ctx context.Context, db *sql.DB, name string, rrtype uint16) ([]dns.RR, error) {
-	_, span := tracer.Start(ctx, "db.GetRecords")
+	ctx, span := tracer.Start(ctx, "db.GetRecords")
 	span.SetAttributes(attribute.String("subdomain", name))
 	span.SetAttributes(attribute.Int("rrtype", int(rrtype)))
 	defer span.End()

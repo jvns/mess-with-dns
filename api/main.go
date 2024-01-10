@@ -346,7 +346,7 @@ func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	ctx := context.Background()
-	_, span := tracer.Start(ctx, "dns.request")
+	ctx, span := tracer.Start(ctx, "dns.request")
 	defer span.End()
 	start := time.Now()
 	fmt.Println("Received request: ", r.Question[0].String())

@@ -354,6 +354,7 @@ func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	if err != nil {
 		fmt.Println("Error writing response: ", err.Error())
 		sentry.CaptureException(err)
+		span.RecordError(err)
 	}
 	span.End()
 

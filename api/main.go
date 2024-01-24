@@ -352,7 +352,9 @@ func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	ctx := context.Background()
 	ctx, span := tracer.Start(ctx, "dns.request")
 	start := time.Now()
-	fmt.Println("Received request: ", r.Question[0].String())
+	if len(r.Question) > 0 {
+		span.SetAttributes(attribute.String("dns.question", r.Question[0].String()))
+	}
 	msg := dnsResponse(ctx, handle.db, r, w)
 	err := w.WriteMsg(msg)
 	if err != nil {
@@ -381,7 +383,6 @@ func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	remote_host := lookupHost(ctx, handle.ipRanges, remote_addr)
 	span.SetAttributes(attribute.String("dns.remote_addr", remote_addr.String()))
 	span.SetAttributes(attribute.String("dns.remote_host", remote_host))
-	span.SetAttributes(attribute.String("dns.question", r.Question[0].String()))
 	span.SetAttributes(attribute.Int("dns.answer_count", len(msg.Answer)))
 	err = LogRequest(ctx, handle.db, r, msg, remote_addr, remote_host)
 	if err != nil {

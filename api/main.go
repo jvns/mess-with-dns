@@ -352,6 +352,11 @@ func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	ctx := context.Background()
 	ctx, span := tracer.Start(ctx, "dns.request")
 	start := time.Now()
+	// lowercase all names in questions to normalize them
+	// this is needed because google's dns resolve (and others) send queries like BrOMIne77
+	for i := range r.Question {
+		r.Question[i].Name = strings.ToLower(r.Question[i].Name)
+	}
 	if len(r.Question) > 0 {
 		span.SetAttributes(attribute.String("dns.question", r.Question[0].String()))
 	}

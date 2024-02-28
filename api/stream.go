@@ -4,6 +4,7 @@ package main
 
 import (
 	"math/rand"
+	"strings"
 )
 
 var streams = map[string]map[string]chan []byte{}
@@ -46,6 +47,7 @@ func (s *Stream) Get() chan []byte {
 }
 
 func WriteToStreams(domain string, msg []byte) {
+	domain = strings.ToLower(domain)
 	if _, ok := streams[domain]; ok {
 		for _, stream := range streams[domain] {
 			stream <- msg

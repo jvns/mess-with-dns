@@ -16,7 +16,6 @@ import (
 
 	_ "net/http/pprof"
 
-	"github.com/getsentry/sentry-go"
 	"github.com/gorilla/websocket"
 	"github.com/honeycombio/honeycomb-opentelemetry-go"
 	"github.com/honeycombio/otel-config-go/otelconfig"
@@ -44,14 +43,6 @@ func main() {
 	go func() {
 		log.Println(http.ListenAndServe("localhost:6060", nil))
 	}()
-	if env := os.Getenv("SENTRY_DSN"); env != "" {
-		err := sentry.Init(sentry.ClientOptions{
-			Dsn: env,
-		})
-		if err != nil {
-			log.Fatalf("sentry.Init: %s", err)
-		}
-	}
 	db, err := connect()
 	if err != nil {
 		panic(fmt.Sprintf("Error connecting to database: %s", err.Error()))
@@ -114,7 +105,6 @@ func makeDomain(name string) string {
 func returnError(w http.ResponseWriter, r *http.Request, err error, status int) {
 	msg := fmt.Sprintf("Error [%d]: %s\n", status, err.Error())
 	logMsg(r, msg)
-	sentry.CaptureException(err)
 	http.Error(w, err.Error(), status)
 }
 
@@ -359,7 +349,6 @@ func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	err := w.WriteMsg(msg)
 	if err != nil {
 		fmt.Println("Error writing response: ", err.Error())
-		sentry.CaptureException(err)
 		span.RecordError(err)
 	}
 	span.End()
@@ -387,7 +376,6 @@ func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	err = LogRequest(ctx, handle.db, r, msg, remote_addr, remote_host)
 	if err != nil {
 		fmt.Println("Error logging request:", err)
-		sentry.CaptureException(err)
 		span.RecordError(err)
 	}
 	fmt.Println("Logged request")

@@ -158,7 +158,7 @@ func InsertRecord(db *sql.DB, record dns.RR) error {
 	return IncrementSerial(tx)
 }
 
-func uncommittedTransation(db *sql.DB) (*sql.Tx, error) {
+func uncommittedTransaction(db *sql.DB) (*sql.Tx, error) {
 	tx, err := db.Begin()
 	if err != nil {
 		return nil, err
@@ -247,7 +247,7 @@ func DeleteRequestsForDomain(db *sql.DB, subdomain string) error {
 }
 
 func GetRequests(db *sql.DB, subdomain string) ([]map[string]interface{}, error) {
-	tx, err := uncommittedTransation(db)
+	tx, err := uncommittedTransaction(db)
 	if err != nil {
 		return nil, err
 	}
@@ -282,7 +282,7 @@ func GetRequests(db *sql.DB, subdomain string) ([]map[string]interface{}, error)
 }
 
 func GetRecords(db *sql.DB, name string, rrtype uint16) ([]dns.RR, int, error) {
-	tx, err := uncommittedTransation(db)
+	tx, err := uncommittedTransaction(db)
 	if err != nil {
 		return nil, 0, err
 	}

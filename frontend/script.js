@@ -1,8 +1,4 @@
-import Vue from "vue/dist/vue.esm.js";
-
-import VueFormulate from "@braid/vue-formulate";
-Vue.use(VueFormulate);
-
+import { createApp } from "vue/dist/vue.esm-browser.js";
 import * as words from "./words.json";
 import * as schemas from "./schemas.json";
 import {
@@ -20,22 +16,17 @@ import NewRecord from "./components/NewRecord.js";
 import DomainLink from "./components/DomainLink.js";
 import Experiments from "./components/Experiments.js";
 
-Vue.component("record", ViewRecord);
-Vue.component("view-request", ViewRequest);
-Vue.component("new-record", NewRecord);
-Vue.component("domain-link", DomainLink);
-Vue.component("experiments", Experiments);
-
-const vm = new Vue({
-  el: "#app",
-  data: {
-    schemas: schemas,
-    domain: undefined,
-    requests: [],
-    records: undefined,
-    ws: undefined,
-    sidebar: true,
-    websocketOpen: false,
+const app = createApp({
+  data() {
+    return {
+      schemas: schemas,
+      domain: undefined,
+      requests: [],
+      records: undefined,
+      ws: undefined,
+      sidebar: true,
+      websocketOpen: false,
+    };
   },
 
   async mounted() {
@@ -150,3 +141,11 @@ const vm = new Vue({
     },
   },
 });
+
+app.component("record", ViewRecord);
+app.component("view-request", ViewRequest);
+app.component("new-record", NewRecord);
+app.component("domain-link", DomainLink);
+app.component("experiments", Experiments);
+
+app.mount("#app");

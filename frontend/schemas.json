@@ -4,19 +4,8 @@
       "label": "IPv4 Address",
       "name": "A",
       "type": "text",
-      "validation": "matches:/[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+/",
-      "validation-messages": {
-        "matches": "Example: 1.2.3.4"
-      }
-    },
-    {
-      "label": "TTL",
-      "name": "ttl",
-      "type": "number",
-      "validation": "required",
-      "validation-messages": {
-        "required": "Example: 60"
-      }
+      "width": "10rem",
+      "example": "1.2.3.4"
     }
   ],
   "AAAA": [
@@ -24,19 +13,8 @@
       "label": "IPv6 Address",
       "name": "AAAA",
       "type": "text",
-      "validation": "matches:/[0-9a-fA-F:]+/",
-      "validation-messages": {
-        "matches": "Example: 2001:db8::1"
-      }
-    },
-    {
-      "label": "TTL",
-      "name": "ttl",
-      "type": "number",
-      "validation": "required",
-      "validation-messages": {
-        "required": "Example: 60"
-      }
+      "width": "10rem",
+      "example": "2001:db8::1"
     }
   ],
   "CAA": [
@@ -44,37 +22,22 @@
       "label": "Flag",
       "name": "Flag",
       "type": "number",
-      "validation": "number|between:0,255",
-      "validation-messages": {
-        "number|between": "Example: 1"
-      }
+      "width": "10rem",
+      "example": "1"
     },
     {
       "label": "Tag",
       "name": "Tag",
       "type": "text",
-      "validation": "required",
-      "validation-messages": {
-        "required": "Example: 1"
-      }
+      "width": "10rem",
+      "example": "1"
     },
     {
       "label": "CA domain name",
       "name": "Value",
       "type": "text",
-      "validation": "required",
-      "validation-messages": {
-        "required": "Example: TODO"
-      }
-    },
-    {
-      "label": "TTL",
-      "name": "ttl",
-      "type": "number",
-      "validation": "required",
-      "validation-messages": {
-        "required": "Example: 60"
-      }
+      "width": "10rem",
+      "example": "TODO"
     }
   ],
   "CNAME": [
@@ -82,19 +45,8 @@
       "label": "Target",
       "name": "Target",
       "type": "text",
-      "validation": "matches:/^([a-zA-Z0-9-]+\\.)*[a-zA-Z0-9]+\\.[a-zA-Z]+\\.?$/",
-      "validation-messages": {
-        "matches": "Example: orange-ip.fly.dev"
-      }
-    },
-    {
-      "label": "TTL",
-      "name": "ttl",
-      "type": "number",
-      "validation": "required",
-      "validation-messages": {
-        "required": "Example: 60"
-      }
+      "width": "10rem",
+        "example": "orange-ip.fly.dev"
     }
   ],
   "MX": [
@@ -102,28 +54,15 @@
       "label": "Preference",
       "name": "Preference",
       "type": "number",
-      "validation": "number|between:0,65535",
-      "validation-messages": {
-        "number|between": "Example: 10"
-      }
+      "width": "4rem",
+      "example": "10"
     },
     {
       "label": "Mail Server",
       "name": "Mx",
+      "width": "4rem",
       "type": "text",
-      "validation": "matches:/^([a-zA-Z0-9-]+\\.)*[a-zA-Z0-9]+\\.[a-zA-Z]+\\.?$/",
-      "validation-messages": {
-        "matches": "Example: mail.messagingengine.com"
-      }
-    },
-    {
-      "label": "TTL",
-      "name": "ttl",
-      "type": "number",
-      "validation": "required",
-      "validation-messages": {
-        "required": "Example: 60"
-      }
+      "example": "mail.messagingengine.com"
     }
   ],
   "NS": [
@@ -131,39 +70,18 @@
       "label": "Nameserver ",
       "name": "Ns",
       "type": "text",
-      "validation": "matches:/^([a-zA-Z0-9-]+\\.)*[a-zA-Z0-9]+\\.[a-zA-Z]+\\.?$/",
-      "validation-messages": {
-        "matches": "Example: ns1.example.com"
-      }
-    },
-    {
-      "label": "TTL",
-      "name": "ttl",
-      "type": "number",
-      "validation": "required",
-      "validation-messages": {
-        "required": "Example: 60"
-      }
+      "width": "4rem",
+      "example": "ns1.example.com"
     }
+    
   ],
   "PTR": [
     {
       "label": "Pointer",
       "name": "Ptr",
+      "width": "4rem",
       "type": "text",
-      "validation": "matches:/^([a-zA-Z0-9-]+\\.)*[a-zA-Z0-9]+\\.[a-zA-Z]+\\.?$/",
-      "validation-messages": {
-        "matches": "Example: www.example.com"
-      }
-    },
-    {
-      "label": "TTL",
-      "name": "ttl",
-      "type": "number",
-      "validation": "required",
-      "validation-messages": {
-        "required": "Example: 60"
-      }
+      "example": "www.example.com"
     }
   ],
   "SRV": [
@@ -171,46 +89,29 @@
       "label": "Priority",
       "name": "Priority",
       "type": "number",
-      "validation": "number|between:0,65535",
-      "validation-messages": {
-        "number|between": "Example: 10"
-      }
+      "width": "4rem",
+      "example": "10"
     },
     {
       "label": "Weight",
       "name": "Weight",
       "type": "number",
-      "validation": "number|between:0,65535",
-      "validation-messages": {
-        "number|between": "Example: TODO"
-      }
+      "width": "4rem",
+      "example": "TODO"
     },
     {
       "label": "Port",
       "name": "Port",
       "type": "number",
-      "validation": "number|between:0,65535",
-      "validation-messages": {
-        "number|between": "Example: 8080"
-      }
+      "width": "6rem",
+      "example": "8080"
     },
     {
       "label": "Target",
       "name": "Target",
       "type": "text",
-      "validation": "matches:/^([a-zA-Z0-9-]+\\.)*[a-zA-Z0-9]+\\.[a-zA-Z]+\\.?$/",
-      "validation-messages": {
-        "matches": "Example: orange-ip.fly.dev"
-      }
-    },
-    {
-      "label": "TTL",
-      "name": "ttl",
-      "type": "number",
-      "validation": "required",
-      "validation-messages": {
-        "required": "Example: 60"
-      }
+      "width": "10rem",
+      "example": "orange-ip.fly.dev"
     }
   ],
   "TXT": [
@@ -218,19 +119,9 @@
       "label": "Content",
       "name": "Txt",
       "type": "textarea",
+      "width": "10rem",
       "validation": "required",
-      "validation-messages": {
-        "required": "Example: \"Hello World\""
-      }
-    },
-    {
-      "label": "TTL",
-      "name": "ttl",
-      "type": "number",
-      "validation": "required",
-      "validation-messages": {
-        "required": "Example: 60"
-      }
+      "example": "hello world"
     }
   ]
 }

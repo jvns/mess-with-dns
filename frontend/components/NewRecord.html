@@ -1,60 +1,73 @@
-<formulate-form name="new-record" @submit="createRecord" v-model="data" class="border border-gray-200 p-4">
-  <fieldset class="flex">
-      <div class="flex items-end flex-wrap mr-auto"> <!-- this mr-auto is literally just for screenshots, not layout -->
-      <formulate-input
-        class="mr-4"
-        outer-class="mt-4 w-40 formulate-input"
-        element-class="input-border"
-        name="subdomain"
-        label="Name"
-        validation="required"
-        :validation-messages='{"required": "Example: bananas"}'
-        error-behavior="submit"
-        v-model="subdomain"
-        type="text"
-      ></formulate-input>
+ <form ref="form" @submit.prevent="createOrUpdateRecord($event)">
+   <div class="form-record"> <!-- this mr-auto is literally just for screenshots, not layout -->
+     <!-- hidden elt with id -->
+     <input type="hidden" name="id">
+     <div class="form-field">
+       <label for="subdomain">Name</label>
+       <input id="subdomain" required
+                             oninvalid="this.setCustomValidity('Example: orange');"
+                             onchange="this.setCustomValidity('')"
+                             name="subdomain" type="text">
+     </div>
 
-      <formulate-input
-        class="mr-4"
-        outer-class="mt-4"
-        element-class="input-border"
-        name="type"
-        label="Type"
-        error-behavior="submit"
-        v-model="type"
-        type="select"
-        :options="options"
-      ></formulate-input>
+     <div class="form-field">
+       <label for="type">Type</label>
+       <select id="type" name="type" default="A" type="text"
+               required>
+         <option v-for="option in getOptions()" :value="option">{{option}}</option>
+       </select>
+     </div>
 
-      <formulate-input
-        element-class="input-border"
-        class="mr-4"
-        v-for="item in schemas[type]"
-        v-bind:outer-class="((item.name == 'ttl' && 'w-28') || 'w-36') + ' formulate-input mt-4'"
-        error-behavior="submit"
-        :key="item.name"
-        v-bind="item"
-      ></formulate-input>
+     <div class="form-field" v-for="field, i in schemas[form_data.type]">
+       <label for="content_{{i}}" class="block">{{field.label}}</label>
+       <input id="content_{{i}}" type="text" required
+              @invalid="(e) => e.target.setCustomValidity('Example: ' + field.example)"
+              onchange="this.setCustomValidity('')"
+              :name="field.name"
+              :style='{width: field.width}'
+              >
+     </div>
 
-
-    </div>
-  </fieldset>
-  <div style="color: red" v-if="error" class="pt-2 server-error">{{error}}</div>
-  <div class="flex w-full justify-between items-end">
-
-    <div class="pt-4 text-sm text-green-600 py-2" v-if="subdomain"> 
-        <span v-if="subdomain == '@'">
+     <div class="form-field">
+       <label for="ttl">TTL</label>
+       <input id="ttl"
+              required 
+              oninvalid="this.setCustomValidity('Example: 3600');"
+              onchange="this.setCustomValidity('')"
+              name="ttl" type="text" style="width: 4rem">
+     </div>
+   </div>
+  <div style="color: red" v-if="form_error" class="pt-2 server-error">{{form_error}}</div>
+    <!-- only show preview for new records -->
+    <div class="pt-4 text-sm text-green-600 py-2" v-if="form_data.subdomain && !record"> 
+        <span v-if="form_data.subdomain == '@'">
         {{domain}}.messwithdns.com
         </span>
         <span v-else>
-        {{subdomain}}.{{domain}}.messwithdns.com
+        {{form_data.subdomain}}.{{domain}}.messwithdns.com
         </span>
     </div>
-    <formulate-input
-      id="create"
-      outer-class="ml-auto mt-4 create"
-      type="submit"
-      label="Create"
-    ></formulate-input>
-  </div>
-</formulate-form>
+
+    <!-- show 'cancel' and 'save' buttons for editing records, 'Create' for new records -->
+    <div v-if="record" class="w-full flex justify-end mt-4 mb-2">
+      <button type="button" class="cancel text-center w-auto text-left block my-2 inline hover:bg-gray-40
+                    bg-gray-200 py-2 px-4 rounded" @click="cancel()" >
+        Cancel
+      </button>
+
+      <button type="submit"
+          class="save block my-2 text-center w-auto text-left mr-4
+                 hover:bg-green-700 ml-4 bg-green-500 text-white py-2 px-4
+                 rounded">
+        Save
+      </button>
+    </div>
+
+    <div v-else class="flex w-full justify-between items-end">
+      <button
+          id="create"
+          class="ml-auto mt-4 create"
+          type="submit"
+          > Create </button>
+    </div>
+</form>

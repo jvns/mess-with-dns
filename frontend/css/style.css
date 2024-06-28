@@ -224,7 +224,7 @@ details.experiment {
 }
 
 /* button */
-.create button {
+button#create {
     padding-top: 0.5rem;
     padding-bottom: 0.5rem; 
     padding-left: 1rem;
@@ -234,7 +234,7 @@ details.experiment {
     border-radius: 0.25rem; 
 }
 
-.create button:hover {
+button#create:hover {
     background-color: #047857; 
 }
 
@@ -390,3 +390,29 @@ input, select, textarea {
     margin-top: .5em;
     border-radius: 5px;
 }
+
+.form-record {
+    display: flex;
+    margin-right: auto;
+    flex-wrap: wrap;
+    align-items: flex-end;
+}
+.form-field {
+    margin-top: 1rem;
+    margin-right: 1rem;
+}
+
+.form-field label {
+    display: block;
+}
+
+.form-field input {
+    display: block;
+    width: 10rem;
+}
+
+/* invalid input */
+.form-field input:user-invalid {
+    border-color: red;
+}
+

@@ -4,7 +4,6 @@ import {
     displayName
 } from '../common';
 
-import * as schemas from '../schemas.json';
 import template from './ViewRecord.html';
 
 export default {
@@ -12,16 +11,11 @@ export default {
     props: ['record', 'domain'],
     data: function() {
         return {
-            schemas: schemas,
             clicked: false,
-            updated_record: {},
         };
     },
     methods: {
         toggle: function() {
-            if (!this.clicked) {
-                this.updated_record = JSON.parse(JSON.stringify(this.record));
-            }
             this.clicked = !this.clicked;
         },
         displayName: function() {
@@ -37,20 +31,13 @@ export default {
             }
             return content;
         },
-        confirmDelete: function() {
+        confirmDelete: async function() {
             if (confirm('Are you sure you want to delete this record?')) {
-                deleteRecord(this.record);
+                await deleteRecord(this.record);
             }
             this.$parent.refreshRecords();
         },
-        updateRecord: async function(data) {
-            const response = await updateRecord(this.record, data);
-            if (response.ok) {
-                this.clicked = false;
-                // update record in list
-                this.$parent.refreshRecords();
-            } else {
-                alert('Error updating record');
-            }
+        cancel: function() {
+            this.clicked = false;
         },
     }};

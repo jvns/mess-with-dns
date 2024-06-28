@@ -62,7 +62,9 @@
                         <span> Add a record </span>
                     </h2>
 
-                    <new-record :domain='domain' :schemas='schemas'> </new-record>
+                    <div class="border border-gray-200 p-4">
+                      <new-record :record="undefined" :domain='domain'> </new-record>
+                    </div>
                 </div>
 
                 <div class="section">
@@ -95,7 +97,7 @@
                                     &nbsp;
                                 </th>
                             </tr>
-                            <tbody is="record" v-for="record in records" :key="record.id" :record="record" :domain="domain" />
+                            <tbody is="vue:record" v-for="record in records" :key="record.id" :record="record" :domain="domain" />
                         </table>
                     </div>
                     <div v-else-if="records">

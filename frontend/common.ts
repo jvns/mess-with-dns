@@ -183,7 +183,6 @@ export async function getRecords(domain) {
     // id is key, value is record
     const records = [];
     for (const r of json) {
-        console.log(r);
         const record = transformRecord(r.id, r.record); 
         // parse key as int
         records.push(record);

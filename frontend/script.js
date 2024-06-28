@@ -1,4 +1,4 @@
-import { createApp } from "vue/dist/vue.esm-browser.js";
+import { createApp } from "vue/dist/vue.esm-browser.prod.js";
 import * as words from "./words.json";
 import * as schemas from "./schemas.json";
 import {

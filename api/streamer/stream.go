@@ -1,4 +1,4 @@
-package main
+package streamer
 
 import (
 	"encoding/json"
@@ -16,7 +16,7 @@ type Stream struct {
 	subdomain string
 }
 
-func CreateStream(subdomain string) Stream {
+func (l *Logger) CreateStream(subdomain string) Stream {
 	if _, ok := streams[subdomain]; !ok {
 		streams[subdomain] = make(map[string]chan []byte)
 	}

@@ -1,15 +1,51 @@
-package main
+package users
 
 import (
-	"database/sql"
 	_ "embed"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/jvns/mess-with-dns/db"
 	"math/rand"
-	"net/http"
 )
 
-func getExistingSubdomains(db *sql.DB, word string) ([]string, error) {
+type UserService struct {
+	db       *db.LockedDB
+	hashKey  []byte
+	blockKey []byte
+}
+
+//go:embed create.sql
+var create_sql string
+
+func Init(dbFile string, hashKey string, blockKey string) (*UserService, error) {
+	db, err := db.Connect(dbFile)
+	if err != nil {
+		return nil, err
+	}
+	_, err = db.Exec(create_sql)
+	if err != nil {
+		return nil, err
+	}
+
+	decodedHash, err := base64.StdEncoding.DecodeString(hashKey)
+	if err != nil {
+		return nil, err
+	}
+	if len(decodedHash) != 32 {
+		return nil, fmt.Errorf("HASH_KEY must be 32 bytes")
+	}
+	decodedBlock, err := base64.StdEncoding.DecodeString(blockKey)
+	if err != nil {
+		return nil, err
+	}
+	if len(decodedBlock) != 32 {
+		return nil, fmt.Errorf("BLOCK_KEY must be 32 bytes")
+	}
+	return &UserService{db: db, hashKey: decodedHash, blockKey: decodedBlock}, nil
+}
+
+func getExistingSubdomains(db *db.LockedDB, word string) ([]string, error) {
 	var subdomains []string
 	rows, err := db.Query("SELECT name FROM subdomains WHERE name LIKE $1", word+"%")
 	if err != nil {
@@ -29,16 +65,6 @@ func getExistingSubdomains(db *sql.DB, word string) ([]string, error) {
 //go:embed words.json
 var words_json []byte
 var words_cache []string
-
-func getShortWords(words []string) []string {
-	shortwords := make([]string, 0)
-	for _, word := range words {
-		if len(word) <= 7 {
-			shortwords = append(shortwords, word)
-		}
-	}
-	return shortwords
-}
 
 func getWords() []string {
 	if len(words_cache) == 0 {
@@ -71,7 +97,7 @@ func smallestMissing(prefix string, existing []string) string {
 	}
 }
 
-func insertAvailableSubdomain(db *sql.DB) (string, error) {
+func insertAvailableSubdomain(db *db.LockedDB) (string, error) {
 	prefix := randomWord()
 	existing, err := getExistingSubdomains(db, prefix)
 	if err != nil {
@@ -85,33 +111,22 @@ func insertAvailableSubdomain(db *sql.DB) (string, error) {
 	return subdomain, nil
 }
 
-func createAvailableSubdomain(db *sql.DB) (string, error) {
+func (u UserService) CreateAvailableSubdomain() (string, error) {
 	var err error
 	// try 3 times before giving up
 	// this is a hack to make sure we don't randomly get a subdomain that's
 	// already taken
-	subdomain, err := insertAvailableSubdomain(db)
+	subdomain, err := insertAvailableSubdomain(u.db)
 	if err == nil {
 		return subdomain, nil
 	}
-	subdomain, err = insertAvailableSubdomain(db)
+	subdomain, err = insertAvailableSubdomain(u.db)
 	if err == nil {
 		return subdomain, nil
 	}
-	subdomain, err = insertAvailableSubdomain(db)
+	subdomain, err = insertAvailableSubdomain(u.db)
 	if err == nil {
 		return subdomain, nil
 	}
 	return "", err
-}
-
-func loginRandom(db *sql.DB, w http.ResponseWriter, r *http.Request) {
-	subdomain, err := createAvailableSubdomain(db)
-
-	if err != nil {
-		returnError(w, r, err, http.StatusInternalServerError)
-		return
-	}
-	setCookie(w, r, subdomain)
-	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 }

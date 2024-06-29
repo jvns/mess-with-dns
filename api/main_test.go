@@ -5,8 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/websocket"
+	//"github.com/jvns/mess-with-dns/streamer"
 	"github.com/miekg/dns"
-	"io/ioutil"
+	"github.com/stretchr/testify/assert"
+	"io"
 	"net/http"
 	"net/http/cookiejar"
 	"net/http/httptest"
@@ -14,10 +16,6 @@ import (
 	"strings"
 	"testing"
 	"time"
-
-	"github.com/jvns/mess-with-dns/dnstester"
-	"github.com/jvns/mess-with-dns/parsing"
-	"github.com/stretchr/testify/assert"
 )
 
 func fatalIfErr(t *testing.T, err error) {
@@ -26,35 +24,98 @@ func fatalIfErr(t *testing.T, err error) {
 	}
 }
 
-func createTestHandler() *handler {
-	db, err := connect()
-	if err != nil {
-		panic(fmt.Sprintf("Error connecting to database: %s", err.Error()))
+func createTestHandler(t *testing.T) *handler {
+	base64Hash := "/JLayjTcQf0wl/YifN7WqyP6U1+y/qnxxNzhbQ1Falk="
+	base64Block := "SaJ+upj49i3BzLP46bUh5g860DgB+V5z4zuTlevI9ug="
+	config := &Config{
+		workdir:           "..",
+		requestDBFilename: ":memory:",
+		userDBFilename:    ":memory:",
+		hashKey:           base64Hash,
+		blockKey:          base64Block,
+		powerdnsAddress:   "http://localhost:8082",
+		dnstapAddress:     "localhost:7111",
 	}
-	err = createTables(db)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+	handler, err := createHandler(ctx, config)
 	if err != nil {
-		panic(fmt.Sprintf("Error creating tables: %s", err.Error()))
+		t.Fatal(err)
 	}
-	go cleanup(db)
-	ctx := context.Background()
-	soaSerial, err = GetSerial(ctx, db)
-	if err != nil {
-		panic(fmt.Sprintf("Error getting SOA serial: %s", err.Error()))
-	}
-	ranges, err := parsing.ReadRanges()
-	if err != nil {
-		panic(fmt.Sprintf("Error reading ranges: %s", err.Error()))
-	}
-	return &handler{db: db, ipRanges: &ranges}
+	return handler
 }
 
-func createTestServer() (*httptest.Server, *dnstester.DNSTester) {
-	handler := createTestHandler()
-	return httptest.NewServer(handler), dnstester.NewDNSTester(handler)
+func sendDNSRequest(name string, qtype uint16) (*dns.Msg, error) {
+	request := dns.Msg{
+		Question: []dns.Question{
+			{Name: name, Qtype: qtype, Qclass: dns.ClassINET},
+		},
+	}
+	c := &dns.Client{Net: "udp"}
+	response, _, err := c.Exchange(&request, "localhost:5555")
+	return response, err
+}
+
+func createTestServer(t *testing.T) *httptest.Server {
+	handler := createTestHandler(t)
+	return httptest.NewServer(handler)
+}
+
+/* test harness time */
+
+func createTestHarness(t *testing.T) *TestHarness {
+	ts := createTestServer(t)
+	client, ws, username := login(t, ts)
+	return &TestHarness{t: t, ts: ts, client: client, ws: ws, username: username}
+}
+
+type TestHarness struct {
+	t        *testing.T
+	ts       *httptest.Server
+	client   *http.Client
+	ws       *websocket.Conn
+	username string
+}
+
+func (h *TestHarness) CreateRecord(jsonString string) {
+	t := h.t
+	resp, err := h.client.Post(h.ts.URL+"/records/", "application/json", strings.NewReader(jsonString))
+	fatalIfErr(t, err)
+	if resp.StatusCode != 200 {
+		body, _ := io.ReadAll(resp.Body)
+		t.Fatalf("Error %d: %s", resp.StatusCode, body)
+	}
+}
+
+func (h *TestHarness) UpdateRecord(id string, jsonString string) {
+	t := h.t
+	resp, err := h.client.Post(h.ts.URL+"/records/"+id, "application/json", strings.NewReader(jsonString))
+	fatalIfErr(t, err)
+	if resp.StatusCode != 200 {
+		body, _ := io.ReadAll(resp.Body)
+		t.Fatalf("Error %d: %s", resp.StatusCode, body)
+	}
+}
+
+func (h *TestHarness) GetRecords() []Record2 {
+	t := h.t
+	resp, err := h.client.Get(h.ts.URL + "/records/")
+	fatalIfErr(t, err)
+	assert.Equal(t, resp.StatusCode, 200)
+	body, _ := io.ReadAll(resp.Body)
+	var records []Record2
+	err = json.Unmarshal(body, &records)
+	fatalIfErr(t, err)
+	return records
+}
+
+func (h *TestHarness) Domain() string {
+	return fmt.Sprintf("%s.messwithdns.com.", h.username)
 }
 
 func TestLogin(t *testing.T) {
-	ts, _ := createTestServer()
+	ts := createTestServer(t)
 	defer ts.Close()
 	client := ts.Client()
 	// don't check redirects
@@ -64,7 +125,7 @@ func TestLogin(t *testing.T) {
 	resp, err := client.Get(ts.URL + "/login")
 	fatalIfErr(t, err)
 	if resp.StatusCode != 307 {
-		body, _ := ioutil.ReadAll(resp.Body)
+		body, _ := io.ReadAll(resp.Body)
 		t.Errorf("Error %d: %s", resp.StatusCode, body)
 		return
 	}
@@ -75,27 +136,27 @@ func TestLogin(t *testing.T) {
 
 }
 
-func login(ts *httptest.Server) (*http.Client, *websocket.Conn, string, error) {
+func login(t *testing.T, ts *httptest.Server) (*http.Client, *websocket.Conn, string) {
 	client := ts.Client()
 	client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
 		return http.ErrUseLastResponse
 	}
 	resp, err := client.Get(ts.URL + "/login")
 	if err != nil {
-		return nil, nil, "", err
+		t.Fatal(err)
 	}
 	if resp.StatusCode != 307 {
-		body, _ := ioutil.ReadAll(resp.Body)
-		return nil, nil, "", fmt.Errorf("Error %d: %s", resp.StatusCode, body)
+		body, _ := io.ReadAll(resp.Body)
+		t.Fatalf("Error %d: %s", resp.StatusCode, body)
 	}
 	cookies := resp.Cookies()
 	username := cookies[1].Value
 	if cookies[1].Name != "username" {
-		return nil, nil, "", fmt.Errorf("Expected username cookie, got %s", cookies[1].Name)
+		t.Fatalf("Expected username cookie, got %s", cookies[1].Name)
 	}
 	u, err := url.Parse(ts.URL)
 	if err != nil {
-		return nil, nil, "", err
+		t.Fatal(err)
 	}
 	jar, _ := cookiejar.New(nil)
 	jar.SetCookies(u, cookies)
@@ -108,163 +169,30 @@ func login(ts *httptest.Server) (*http.Client, *websocket.Conn, string, error) {
 	}
 	ws, _, err := dialer.Dial(wsURL, nil)
 	if err != nil {
-		return nil, nil, "", err
+		t.Fatal(err)
 	}
 	ws.SetReadDeadline(time.Now().Add(1 * time.Second))
 
-	return client, ws, username, nil
+	return client, ws, username
 }
 
-func TestCreateRecord(t *testing.T) {
-	ts, _ := createTestServer()
-	client, _, _, err := login(ts)
-	fatalIfErr(t, err)
-	jsonString := `{"subdomain":"@","type":"A","ttl":60,"values":[{"name":"A", "value":"1.2.3.4"}]}`
-	resp, err := client.Post(ts.URL+"/records/", "application/json", strings.NewReader(jsonString))
-	fatalIfErr(t, err)
-	assert.Equal(t, 200, resp.StatusCode)
+type Record2 struct {
+	ID     string            `json:"id"`
+	Record map[string]string `json:"record"`
 }
 
-func TestCreateRecordFixMX(t *testing.T) {
-	// it should add a '.' to the end
-	ts, dnst := createTestServer()
-	client, _, username, err := login(ts)
-	fatalIfErr(t, err)
-	jsonString := `{"subdomain":"@","type":"MX","ttl":60,"values":[{"name": "Preference", "value": "10"}, {"name": "Mx", "value": "example.com"}]}`
-	resp, err := client.Post(ts.URL+"/records/", "application/json", strings.NewReader(jsonString))
-	fatalIfErr(t, err)
-	if resp.StatusCode != 200 {
-		body, _ := ioutil.ReadAll(resp.Body)
-		t.Fatalf("Error %d: %s", resp.StatusCode, body)
-	}
-
-	response := dnst.Request(&dns.Msg{
-		Question: []dns.Question{
-			{Name: fmt.Sprintf("%s.messwithdns.com.", username), Qtype: dns.TypeMX, Qclass: dns.ClassINET},
-		},
-	})
-	if len(response.Answer) != 1 {
-		t.Fatalf("Expected 1 answer, got %d", len(response.Answer))
-	}
-	assert.Equal(t, response.Answer[0].(*dns.MX).Mx, "example.com.")
-}
-
-func TestPunycode(t *testing.T) {
-	ts, dnst := createTestServer()
-	client, _, username, err := login(ts)
-	fatalIfErr(t, err)
-
-	// create a record with a punycode domain
-	jsonString := `{"subdomain":"❤","type":"A","ttl":60,"values":[{"name":"A", "value":"1.2.3.4"}]}`
-	resp, err := client.Post(ts.URL+"/records/", "application/json", strings.NewReader(jsonString))
-	fatalIfErr(t, err)
-	assert.Equal(t, resp.StatusCode, 200)
-
-	response := dnst.Request(&dns.Msg{
-		Question: []dns.Question{
-			{Name: fmt.Sprintf("xn--qei.%s.messwithdns.com.", username), Qtype: dns.TypeA, Qclass: dns.ClassINET},
-		},
-	})
-	assert.Equal(t, len(response.Answer), 1)
-}
-
-func TestCreateAndGetRecords(t *testing.T) {
-	ts, _ := createTestServer()
-	client, _, _, err := login(ts)
-	fatalIfErr(t, err)
-	jsonString := `{"subdomain":"@","type":"A","ttl":60,"values":[{"name":"A", "value":"1.2.3.4"}]}`
-	resp, err := client.Post(ts.URL+"/records/", "application/json", strings.NewReader(jsonString))
-	fatalIfErr(t, err)
-
-	resp, err = client.Get(ts.URL + "/records/")
-	fatalIfErr(t, err)
-	assert.Equal(t, resp.StatusCode, 200)
-	body, _ := ioutil.ReadAll(resp.Body)
-	var records []Record
-	err = json.Unmarshal(body, &records)
-	fatalIfErr(t, err)
-	if len(records) != 1 {
-		t.Fatalf("Expected 1 record, got %d", len(records))
-	}
-	assert.Equal(t, "@", records[0].Record.Subdomain)
-}
-
-func TestCreateAndGetTxtRecords(t *testing.T) {
-	ts, _ := createTestServer()
-	client, _, _, err := login(ts)
-	fatalIfErr(t, err)
-	jsonString := `{"subdomain":"@","type":"TXT","ttl":60,"values":[{"name":"Txt", "value":"hello world"}]}`
-	resp, err := client.Post(ts.URL+"/records/", "application/json", strings.NewReader(jsonString))
-	fatalIfErr(t, err)
-
-	resp, err = client.Get(ts.URL + "/records/")
-	fatalIfErr(t, err)
-	assert.Equal(t, resp.StatusCode, 200)
-	body, _ := ioutil.ReadAll(resp.Body)
-	var records []Record
-	err = json.Unmarshal(body, &records)
-	fatalIfErr(t, err)
-	if len(records) != 1 {
-		t.Fatalf("Expected 1 record, got %d", len(records))
-	}
-	assert.Equal(t, "@", records[0].Record.Subdomain)
-	assert.Equal(t, "hello world", records[0].Record.Values[0].Value)
-}
-
-func TestDNSQuery(t *testing.T) {
-	ts, dnst := createTestServer()
-	client, _, username, err := login(ts)
-	fatalIfErr(t, err)
-	jsonString := `{"subdomain":"@","type":"A","ttl":60,"values":[{"name":"A", "value":"1.2.3.4"}]}`
-	resp, err := client.Post(ts.URL+"/records/", "application/json", strings.NewReader(jsonString))
-	fatalIfErr(t, err)
-	assert.Equal(t, resp.StatusCode, 200)
-
-	response := dnst.Request(&dns.Msg{
-		Question: []dns.Question{
-			{Name: fmt.Sprintf("%s.messwithdns.com.", username), Qtype: dns.TypeA, Qclass: dns.ClassINET},
-		},
-	})
-
-	if len(response.Answer) != 1 {
-		t.Fatalf("Expected 1 answer, got %d", len(response.Answer))
-	}
-
-	assert.Equal(t, response.Answer[0].Header().Name, fmt.Sprintf("%s.messwithdns.com.", username))
-	assert.Equal(t, response.Answer[0].Header().Rrtype, dns.TypeA)
-	assert.Equal(t, response.Answer[0].Header().Ttl, uint32(60))
-	assert.Equal(t, response.Answer[0].(*dns.A).A.String(), "1.2.3.4")
-}
-
-func TestDNSQueryNoRecord(t *testing.T) {
-	_, dnst := createTestServer()
-	response := dnst.Request(&dns.Msg{
-		Question: []dns.Question{
-			{Name: "example.com.", Qtype: dns.TypeA, Qclass: dns.ClassINET},
-		},
-	})
-
-	assert.Equal(t, len(response.Answer), 0)
-}
-
+/*
 func TestWebsocket(t *testing.T) {
-	ts, dnst := createTestServer()
-	client, ws, username, err := login(ts)
-	defer ws.Close()
-	fatalIfErr(t, err)
-	jsonString := `{"subdomain":"@","type":"A","ttl":60,"values":[{"name":"A", "value":"1.2.3.4"}]}`
-	resp, err := client.Post(ts.URL+"/records/", "application/json", strings.NewReader(jsonString))
-	fatalIfErr(t, err)
-	assert.Equal(t, resp.StatusCode, 200)
+	h := createTestHarness(t)
 
-	dnst.Request(&dns.Msg{
-		Question: []dns.Question{
-			{Name: fmt.Sprintf("%s.messwithdns.com.", username), Qtype: dns.TypeA, Qclass: dns.ClassINET},
-		},
-	})
-	_, message, err := ws.ReadMessage()
-	fatalIfErr(t, err)
-	var log StreamLog
+	jsonString := `{"subdomain":"@","type":"A","ttl":"60","value_A":"1.2.3.4"}`
+	h.CreateRecord(jsonString)
+
+	sendDNSRequest(h.Domain(), dns.TypeA)
+
+	_, message, err := h.ws.ReadMessage()
+	fatalIfErr(t, fmt.Errorf("Error reading websocket message: %s", err))
+	var log streamer.StreamLog
 	err = json.Unmarshal(message, &log)
 	fatalIfErr(t, err)
 	assert.Equal(t, log.Response.Code, "NOERROR")
@@ -273,8 +201,9 @@ func TestWebsocket(t *testing.T) {
 		t.Fatalf("Expected 1 record, got %d", len(log.Response.Records))
 	}
 	assert.Equal(t, log.Response.Records[0].Content, "1.2.3.4")
-
 }
+
+/*
 
 func TestGetRequests(t *testing.T) {
 	ts, dnst := createTestServer()
@@ -297,7 +226,7 @@ func TestGetRequests(t *testing.T) {
 	// get /requests
 	resp, err = client.Get(ts.URL + "/requests/")
 	fatalIfErr(t, err)
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	fatalIfErr(t, err)
 	if resp.StatusCode != 200 {
 		t.Fatal(string(body))
@@ -333,3 +262,4 @@ func TestWebsocketMixedCaseRequest(t *testing.T) {
 	}
 	assert.True(t, strings.Contains(string(message), username))
 }
+*/

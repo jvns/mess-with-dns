@@ -61,7 +61,7 @@
       "label": "Mail Server",
       "name": "Mx",
       "type": "text",
-      "width": "4rem",
+      "width": "12rem",
       "example": "mail.messagingengine.com"
     }
   ],
@@ -70,7 +70,7 @@
       "label": "Nameserver",
       "name": "Ns",
       "type": "text",
-      "width": "4rem",
+      "width": "10rem",
       "example": "ns1.example.com"
     }
   ],
@@ -79,7 +79,7 @@
       "label": "Pointer",
       "name": "Ptr",
       "type": "text",
-      "width": "4rem",
+      "width": "10rem",
       "example": "www.example.com"
     }
   ],
@@ -121,5 +121,58 @@
       "width": "10rem",
       "example": "hello world"
     }
+  ],
+  "SOA": [
+    {
+      "label": "Primary NS",
+      "name": "Mname",
+      "type": "text",
+      "width": "16rem",
+      "example": "ns1.example.com"
+    },
+    {
+      "label": "Responsible Email",
+      "name": "Rname",
+      "type": "text",
+      "width": "16rem",
+      "example": "admin@example.com"
+    },
+    {
+      "label": "Serial",
+      "name": "Serial",
+      "type": "number",
+      "width": "6rem",
+      "example": "2024010101"
+    },
+    {
+      "label": "Refresh",
+      "name": "Refresh",
+      "type": "number",
+      "width": "4rem",
+      "example": "3600"
+    },
+    {
+      "label": "Retry",
+      "name": "Retry",
+      "type": "number",
+      "width": "4rem",
+      "example": "600"
+    },
+    {
+      "label": "Expire",
+      "name": "Expire",
+      "type": "number",
+      "width": "4rem",
+      "example": "604800"
+    },
+    {
+      "label": "Minimum TTL",
+      "name": "Minimum",
+      "type": "number",
+      "width": "4rem",
+      "example": "3600"
+    }
   ]
+
+
 }

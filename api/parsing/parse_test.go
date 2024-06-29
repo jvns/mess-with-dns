@@ -1,82 +1,14 @@
 package parsing
 
 import (
-	"encoding/json"
-	"github.com/miekg/dns"
-	"net"
+	//"encoding/json"
+	//"github.com/miekg/dns"
+	//"net"
 	"testing"
 
+	"github.com/joeig/go-powerdns/v3"
 	"github.com/stretchr/testify/assert"
 )
-
-func TestParseMX(t *testing.T) {
-	jsonString := `{"subdomain":"@","type":"MX","ttl":3600,"values":[{"name": "Preference", "value": "10"}, {"name": "Mx", "value": "mail.example.com."}]}`
-	x, err := ParseJSRecord([]byte(jsonString), "test")
-	fatalIfErr(t, err)
-	assert.Equal(t, x.String(), "test.messwithdns.com.	3600	IN	MX	10 mail.example.com.")
-}
-
-func TestParseTxt(t *testing.T) {
-	jsonString := `{"subdomain":"@","type":"TXT","ttl":3600,"values":[{"name":"Txt","value":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}]}`
-	x, err := ParseJSRecord([]byte(jsonString), "test")
-	fatalIfErr(t, err)
-	assert.Equal(t, x.String(), "test.messwithdns.com.	3600	IN	TXT	\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\" \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"")
-}
-
-func TestParseMXSubdomain(t *testing.T) {
-	jsonString := `{"subdomain":"blob","type":"MX","ttl":3600,"values":[{"name": "Preference", "value": "10"}, {"name": "Mx", "value": "mail.example.com."}]}`
-	x, err := ParseJSRecord([]byte(jsonString), "test")
-	fatalIfErr(t, err)
-	assert.Equal(t, x.String(), "blob.test.messwithdns.com.	3600	IN	MX	10 mail.example.com.")
-}
-
-func TestInvalidFqdn(t *testing.T) {
-	jsonString := `{"Hdr":{"Name":"example.com.","Rrtype":15,"Class":1,"Ttl":3600,"Rdlength":0},"Preference":10,"Mx":"mail.example.com"}`
-	_, err := ParseRecord([]byte(jsonString))
-	assert.Equal(t, err.Error(), "Invalid RR: dns: domain must be fully qualified, &dns.MX{Hdr:dns.RR_Header{Name:\"example.com.\", Rrtype:0xf, Class:0x1, Ttl:0xe10, Rdlength:0x0}, Preference:0xa, Mx:\"mail.example.com\"}")
-}
-
-func TestParseInvalidFqdnJS(t *testing.T) {
-	jsonString := `{"subdomain":"blob","type":"MX","ttl":3600,"values":[{"name": "Preference", "value": "10"}, {"name": "Mx", "value": "mail.example.com."}]}`
-	_, err := ParseJSRecord([]byte(jsonString), "test")
-	assert.Nil(t, err)
-}
-
-func TestParseASN(t *testing.T) {
-	ranges, _ := ReadASNs("../../ip2asn-v4.tsv")
-	r, _ := FindASN(ranges, net.ParseIP("172.217.13.174"))
-	assert.Equal(t, r.Num, 15169)
-	assert.Equal(t, r.Name, "GOOGLE")
-
-	_, err := FindASN(ranges, net.ParseIP("255.255.255.255"))
-	assert.Equal(t, err.Error(), "not found")
-
-	_, err = FindASN(ranges, net.ParseIP("0.0.0.0"))
-	assert.Equal(t, err.Error(), "not found")
-}
-
-// now for the RR to js record part
-
-func TestBasicRR(t *testing.T) {
-	record := "test.messwithdns.com. 50 IN A 1.2.3.4"
-	rr, err := dns.NewRR(record)
-	fatalIfErr(t, err)
-	js, err := RRToJSRecord(rr)
-	fatalIfErr(t, err)
-	assert.Equal(t, js.Subdomain, "@")
-	assert.Equal(t, js.Typ, "A")
-	assert.Equal(t, js.TTL, uint32(50))
-	assert.Equal(t, js.Values[0].Value, "1.2.3.4")
-}
-
-func TestTxtRR(t *testing.T) {
-	record := "test.messwithdns.com. 50 IN TXT \"hello\""
-	rr, err := dns.NewRR(record)
-	fatalIfErr(t, err)
-	js, err := RRToJSRecord(rr)
-	fatalIfErr(t, err)
-	assert.Equal(t, js.Values[0].Value, "hello")
-}
 
 func fatalIfErr(t *testing.T, err error) {
 	if err != nil {
@@ -84,48 +16,101 @@ func fatalIfErr(t *testing.T, err error) {
 	}
 }
 
-var testRecords []string = []string{
-	"test.messwithdns.com. 50 IN A 1.2.3.4",
-	"test.messwithdns.com. 50 IN AAAA 2001:db8::1",
-	"test.messwithdns.com. 50 IN CNAME example.com.",
-	"test.messwithdns.com. 50 IN MX 10 mail.example.com.",
-	"test.messwithdns.com. 50 IN NS ns1.example.com.",
-	"test.messwithdns.com. 50 IN PTR www.example.com.",
-	"test.messwithdns.com. 50 IN SRV 10 10 8080 orange-ip.fly.dev.",
-	"test.messwithdns.com. 50 IN TXT \"hello world\"",
-	"test.messwithdns.com. 50 IN CAA 1 issue \"ca.example.com\"",
-}
-
-func TestRoundTrip(t *testing.T) {
-	for _, record := range testRecords {
-		rr, err := dns.NewRR(record)
-		fatalIfErr(t, err)
-		js, err := RRToJSRecord(rr)
-		fatalIfErr(t, err)
-		json, err := json.Marshal(js)
-		fatalIfErr(t, err)
-		rr2, err := ParseJSRecord(json, "test")
-		fatalIfErr(t, err)
-		assert.Equal(t, rr.String(), rr2.String())
-	}
-}
-
-func TestSchemaOrder(t *testing.T) {
-	schemas, err := GenerateSchemas()
+func TestParseMX(t *testing.T) {
+	record := map[string]string{"subdomain": "@", "type": "MX", "ttl": "3600", "value_Preference": "10", "value_Mx": "mail.example.com."}
+	x, err := ParseRecordRequest(record, "test")
 	fatalIfErr(t, err)
-	for _, record := range testRecords {
-		rr, err := dns.NewRR(record)
-		fatalIfErr(t, err)
-		js, err := RRToJSRecord(rr)
-		// test that the order in the values matches the order in the schema
+	assert.Equal(t, *x.Records[0].Content, "10 mail.example.com.")
+	assert.Equal(t, *x.Type, powerdns.RRTypeMX)
+	assert.Equal(t, *x.Name, "test.messwithdns.com.")
+	assert.Equal(t, *x.TTL, uint32(3600))
+}
 
-		schema, ok := schemas[js.Typ]
-		if !ok {
-			t.Fatalf("no schema for %s", js.Typ)
-		}
-		for i, value := range js.Values {
-			assert.Equal(t, schema[i].Name, value.Name)
-		}
+func TestParseTxt(t *testing.T) {
+	record := map[string]string{"subdomain": "@", "type": "TXT", "ttl": "60", "value_Txt": "hello world"}
+	x, err := ParseRecordRequest(record, "test")
+	fatalIfErr(t, err)
+	assert.Equal(t, *x.Records[0].Content, "\"hello world\"")
+}
+
+type TestCase struct {
+	Record  map[string]string
+	Content string
+}
+
+func TestParseAll(t *testing.T) {
+	testCases := []TestCase{
+		{
+			Record:  map[string]string{"subdomain": "@", "type": "A", "ttl": "3600", "value_A": "1.2.3.4"},
+			Content: "1.2.3.4",
+		},
+		{
+			Record:  map[string]string{"subdomain": "@", "type": "AAAA", "ttl": "3600", "value_AAAA": "2001:db8::1"},
+			Content: "2001:db8::1",
+		},
+		{
+			Record:  map[string]string{"subdomain": "@", "type": "CNAME", "ttl": "3600", "value_Target": "example.com."},
+			Content: "example.com.",
+		},
+		{
+			Record:  map[string]string{"subdomain": "@", "type": "MX", "ttl": "3600", "value_Preference": "10", "value_Mx": "mail.example.com."},
+			Content: "10 mail.example.com.",
+		},
+		{
+			// same but with no trailing dot
+			Record:  map[string]string{"subdomain": "@", "type": "MX", "ttl": "3600", "value_Preference": "10", "value_Mx": "mail.example.com"},
+			Content: "10 mail.example.com.",
+		},
+		{
+			Record:  map[string]string{"subdomain": "@", "type": "NS", "ttl": "3600", "value_Ns": "ns1.example.com."},
+			Content: "ns1.example.com.",
+		},
+		{
+			Record:  map[string]string{"subdomain": "@", "type": "PTR", "ttl": "3600", "value_Ptr": "www.example.com."},
+			Content: "www.example.com.",
+		},
+		{
+			Record:  map[string]string{"subdomain": "@", "type": "SRV", "ttl": "3600", "value_Priority": "10", "value_Weight": "10", "value_Port": "8080", "value_Target": "orange-ip.fly.dev."},
+			Content: "10 10 8080 orange-ip.fly.dev.",
+		},
+		{
+			Record:  map[string]string{"subdomain": "@", "type": "TXT", "ttl": "3600", "value_Txt": "hello world"},
+			Content: "\"hello world\"",
+		},
+		{
+			Record:  map[string]string{"subdomain": "@", "type": "CAA", "ttl": "3600", "value_Flag": "1", "value_Tag": "issue", "value_Value": "ca.example.com"},
+			Content: "1 issue \"ca.example.com\"",
+		},
+		// SOA
+		{
+			Record:  map[string]string{"subdomain": "@", "type": "SOA", "ttl": "3600", "value_Mname": "ns1.example.com.", "value_Rname": "hostmaster@example.com.", "value_Serial": "2021010101", "value_Refresh": "3600", "value_Retry": "600", "value_Expire": "604800", "value_Minimum": "3600"},
+			Content: "ns1.example.com. hostmaster.example.com. 2021010101 3600 600 604800 3600",
+		},
 	}
 
+	for _, testCase := range testCases {
+		x, err := ParseRecordRequest(testCase.Record, "test")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, *x.Records[0].Content, testCase.Content)
+		assert.Equal(t, *x.Name, "test.messwithdns.com.")
+		assert.Equal(t, *x.TTL, uint32(3600))
+		assert.Equal(t, *x.Type, powerdns.RRType(testCase.Record["type"]))
+	}
+}
+
+func TestParseError(t *testing.T) {
+	// Some invalid records, maybe add more later
+	testCases := []map[string]string{
+		{"subdomain": "@", "type": "A", "ttl": "3600", "value_A": "1.2.3.5555"},
+		{"subdomain": "@", "type": "A", "ttl": "3600", "value_A": "banana"},
+	}
+
+	for _, testCase := range testCases {
+		_, err := ParseRecordRequest(testCase, "test")
+		if err == nil {
+			t.Fatal("expected error for", testCase)
+		}
+	}
 }

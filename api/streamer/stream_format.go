@@ -1,4 +1,4 @@
-package main
+package streamer
 
 import (
 	"github.com/miekg/dns"

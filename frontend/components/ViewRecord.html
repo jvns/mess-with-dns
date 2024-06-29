@@ -2,12 +2,27 @@
   <!-- desktop version -->
   <tr class="desktop hidden lg:table-row border border-gray-200" >
     <td class="px-4 py-2 view-name">
-      <a :href="'http://' + displayName()" target="_blank" @click="$event.stopPropagation()">{{ displayName() }}</a>
+      <div style="min-width: 7rem">
+        <a :href="'http://' + record.domain_name" target="_blank" @click="$event.stopPropagation()">{{ record.domain_name }}</a>
+      </div>
     </td>
-    <td class="px-4 py-2 view-type">{{ record.type }}</td>
-    <td class="view-content overflow-hidden" style="text-overflow: ellipsis; max-width: 16em;">{{ content() }}</td>
-    <td class="view-ttl">{{ record.ttl }}</td>
+    <td class="px-4 py-2 view-type">
+      <div style="min-width: 3rem">
+        {{ record.type }}
+      </div>
+    </td>
+    <td class="view-content overflow-hidden" style="text-overflow: ellipsis; max-width: 12rem;   word-break: break-all;">
+      <div style="min-width: 5rem">
+        {{ record.content }}
+      </div>
+    </td>
+    <td class="view-ttl">
+      <div style="min-width: 3rem">
+        {{ record.ttl }}
+      </div>
+    </td>
     <td class="view-edit text-right cursor-pointer" @click="toggle()">
+      <div style="min-width: 10rem">
 
               <button class="delete px-4 text-red-700 hover:text-red-500" @click.prevent="confirmDelete()">
                   Delete
@@ -36,6 +51,7 @@
           </svg>
         </span>
       </button>
+      </div>
     </td>
   </tr>
   <tr class="desktop hidden lg:table-row border border-gray-200" v-if="clicked">
@@ -51,8 +67,8 @@
               <div>
                   <strong>Name: </strong>
                   <span class="view-name">
-                      <a :href="'http://' + displayName()" target="_blank"
-                          @click="$event.stopPropagation()">{{ displayName() }}</a>
+                      <a :href="'http://' + record.domain_name" target="_blank"
+                          @click="$event.stopPropagation()">{{ record.domain_name }}</a>
                   </span>
               </div>
               <div>
@@ -61,7 +77,7 @@
               </div>
               <div style="text-overflow: ellipsis; max-width: 20em; overflow: hidden;">
                   <strong>Content: </strong>
-                  <span class="view-content" >{{ content() }}</span>
+                  <span class="view-content" >{{ record.content }}</span>
               </div>
               <div>
                   <strong>TTL: </strong>

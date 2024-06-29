@@ -1,11 +1,3 @@
-export function displayName(domain, record: Record) {
-    if (record.subdomain == '@') {
-        return domain + ".messwithdns.com";
-    } else {
-        return record.subdomain + '.' + domain + ".messwithdns.com";
-    }
-}
-
 export function parseCookies() {
     const cookie = document.cookie;
     const cookies = cookie.split(';');

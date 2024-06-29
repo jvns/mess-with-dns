@@ -22,7 +22,7 @@ export default {
     };
   },
   async mounted() {
-    this.setFormState();
+    this.setFormState(); // TODO: do we need this?
     // iterate over all inputs & selects and call setFormState on change
     const form = this.$refs.form;
     form.querySelectorAll("input, select").forEach((input) => {
@@ -39,15 +39,7 @@ export default {
         const input = form.elements[key];
         if (input) {
           input.value = this.record[key];
-        } else {
-          console.warn(`No input for key ${key}`);
-        }
-      }
-      for (const field of this.record.values) {
-        const input = form.elements['value_' + field.name];
-        if (input) {
-          input.value = field.value;
-        } else {
+        } else if (key != "content" & key != "domain_name") {
           console.warn(`No input for key ${key}`);
         }
       }
@@ -65,23 +57,7 @@ export default {
     setFormState: function () {
       const form = this.$refs.form;
       const formData = new FormData(form);
-      this.form_data = {
-          "values": [],
-      }
-      for (const [key, value] of formData.entries()) {
-          // if it starts with 'value_` it's a value field
-          if (key == 'ttl') {
-              this.form_data[key] = parseInt(value);
-          } else if (key.startsWith("value_")) {
-              const real_key = key.slice(6);
-              this.form_data["values"].push({
-                  'name': real_key,
-                  'value': value,
-              });
-          } else {
-              this.form_data[key] = value
-          }
-      }
+      this.form_data = Object.fromEntries(formData.entries())
     },
 
     cancel() {

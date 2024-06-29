@@ -1,8 +1,5 @@
-import {
-    updateRecord,
-    deleteRecord,
-    displayName
-} from '../common';
+import { displayName } from '../common';
+import { store } from '../store';
 
 import template from './ViewRecord.html';
 
@@ -33,9 +30,8 @@ export default {
         },
         confirmDelete: async function() {
             if (confirm('Are you sure you want to delete this record?')) {
-                await deleteRecord(this.record);
+                await store.deleteRecord(this.record);
             }
-            this.$parent.refreshRecords();
         },
         cancel: function() {
             this.clicked = false;

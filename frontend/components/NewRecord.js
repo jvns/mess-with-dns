@@ -1,6 +1,6 @@
 import * as schemas from "../schemas.json";
 import template from "./NewRecord.html";
-import { createRecord, updateRecord } from "../common.js";
+import { store } from "../store.js";
 
 export default {
   template: template,
@@ -73,9 +73,8 @@ export default {
 
     updateRecord: async function () {
       const data = { ...this.form_data };
-      const response = await updateRecord(this.record, data);
+      const response = await store.updateRecord(this.record, data);
       if (response.ok) {
-        this.$parent.$parent.refreshRecords();
         this.cancel();
       } else {
         this.form_error = await response.text();
@@ -84,18 +83,14 @@ export default {
 
     createRecord: async function (event) {
       const form = event.target;
-      const data = { ...this.form_data };
-      data.subdomain = data.subdomain.trim();
-      data.domain = this.domain;
-      const response = await createRecord(data);
+      const response = await store.createRecord(this.form_data);
       window.response = response;
       // check for errors
       if (response.status != 200) {
         this.form_error = await response.text();
         return;
       }
-      this.$parent.refreshRecords();
-      // clear form but keep type
+      // clear form
       this.form_error = undefined;
       form.reset();
       this.setFormState();

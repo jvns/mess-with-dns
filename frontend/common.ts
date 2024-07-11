@@ -1,17 +1,8 @@
-import rrTypes from './rrTypes.json';
-import schemas from './schemas.json';
-const punycode = require('punycode');
-
-export const rrTypesReverse = {};
-for (const key in rrTypes) {
-    rrTypesReverse[rrTypes[key]] = key;
-}
-
-export function displayName(record: Record) {
+export function displayName(domain, record: Record) {
     if (record.subdomain == '@') {
-        return record.domain + ".messwithdns.com";
+        return domain + ".messwithdns.com";
     } else {
-        return record.subdomain + '.' + record.domain + ".messwithdns.com";
+        return record.subdomain + '.' + domain + ".messwithdns.com";
     }
 }
 

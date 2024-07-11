@@ -1,7 +1,5 @@
  <form ref="form" @submit.prevent="createOrUpdateRecord($event)">
    <div class="form-record"> <!-- this mr-auto is literally just for screenshots, not layout -->
-     <!-- hidden elt with id -->
-     <input type="hidden" name="id">
      <div class="form-field">
        <label for="subdomain">Name</label>
        <input id="subdomain" required
@@ -23,7 +21,7 @@
        <input id="content_{{i}}" type="text" required
               @invalid="(e) => e.target.setCustomValidity('Example: ' + field.example)"
               onchange="this.setCustomValidity('')"
-              :name="field.name"
+              :name="'value_' + field.name"
               :style='{width: field.width}'
               >
      </div>

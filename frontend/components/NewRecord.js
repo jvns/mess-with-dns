@@ -2,9 +2,18 @@ import * as schemas from "../schemas.json";
 import template from "./NewRecord.html";
 import { store } from "../store.js";
 
+function getSchemaField(type, key) {
+    const fields = schemas[type];
+    for (const field of fields) {
+        if (field.name == key) {
+            return field;
+        }
+    }
+}
+
 export default {
   template: template,
-  props: ["domain", "record"],
+  props: ["record", "domain", "id"],
   data: function () {
     return {
       schemas: schemas,
@@ -34,6 +43,14 @@ export default {
           console.warn(`No input for key ${key}`);
         }
       }
+      for (const field of this.record.values) {
+        const input = form.elements['value_' + field.name];
+        if (input) {
+          input.value = field.value;
+        } else {
+          console.warn(`No input for key ${key}`);
+        }
+      }
     }
   },
 
@@ -48,7 +65,23 @@ export default {
     setFormState: function () {
       const form = this.$refs.form;
       const formData = new FormData(form);
-      this.form_data = Object.fromEntries(formData.entries());
+      this.form_data = {
+          "values": [],
+      }
+      for (const [key, value] of formData.entries()) {
+          // if it starts with 'value_` it's a value field
+          if (key == 'ttl') {
+              this.form_data[key] = parseInt(value);
+          } else if (key.startsWith("value_")) {
+              const real_key = key.slice(6);
+              this.form_data["values"].push({
+                  'name': real_key,
+                  'value': value,
+              });
+          } else {
+              this.form_data[key] = value
+          }
+      }
     },
 
     cancel() {
@@ -72,8 +105,7 @@ export default {
     },
 
     updateRecord: async function () {
-      const data = { ...this.form_data };
-      const response = await store.updateRecord(this.record, data);
+      const response = await store.updateRecord(this.id, this.form_data);
       if (response.ok) {
         this.cancel();
       } else {
@@ -84,8 +116,6 @@ export default {
     createRecord: async function (event) {
       const form = event.target;
       const response = await store.createRecord(this.form_data);
-      window.response = response;
-      // check for errors
       if (response.status != 200) {
         this.form_error = await response.text();
         return;

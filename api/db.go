@@ -3,14 +3,15 @@ package main
 import (
 	"context"
 	"database/sql"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net"
 	"os"
 	"strings"
-	"time"
 
+	"github.com/jvns/mess-with-dns/parsing"
 	_ "github.com/lib/pq"
 	"github.com/miekg/dns"
 	"go.opentelemetry.io/otel/attribute"
@@ -22,7 +23,7 @@ func connect() (*sql.DB, error) {
 	connStr := os.Getenv("POSTGRES_CONNECTION_STRING")
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Error connecting to database: %s", err.Error())
 	}
 	// important to avoid running out of memory
 	db.SetMaxOpenConns(8)
@@ -30,9 +31,14 @@ func connect() (*sql.DB, error) {
 }
 
 func createTables(db *sql.DB) error {
+	// get working directory from WORKDIR env var
+	workingDir := os.Getenv("WORKDIR")
+	if workingDir == "" {
+		workingDir = "."
+	}
 	if os.Getenv("DEV") == "true" {
 		fmt.Println("creating tables...")
-		err := loadSQLFile(db, "api/create.sql")
+		err := loadSQLFile(db, workingDir+"/api/create.sql")
 		if err != nil {
 			return err
 		}
@@ -206,8 +212,8 @@ func uncommittedTransation(db *sql.DB) (*sql.Tx, error) {
 }
 
 type Record struct {
-	ID     int    `json:"id"`
-	Record dns.RR `json:"record"`
+	ID     int              `json:"id"`
+	Record parsing.JSRecord `json:"record"`
 }
 
 func GetRecordsForName(ctx context.Context, db *sql.DB, subdomain string) ([]Record, error) {
@@ -229,33 +235,71 @@ func GetRecordsForName(ctx context.Context, db *sql.DB, subdomain string) ([]Rec
 		if err != nil {
 			return nil, err
 		}
-		record, err := ParseRecord(content)
+		rr, err := parsing.ParseRecord(content)
 		if err != nil {
 			return nil, err
 		}
-		records = append(records, Record{ID: id, Record: record})
+		jsRecord, err := parsing.RRToJSRecord(rr)
+		if err != nil {
+			return nil, err
+		}
+		records = append(records, Record{ID: id, Record: *jsRecord})
 	}
 	return records, nil
+}
+
+func serializeMsg(msg *dns.Msg) (string, error) {
+	// Convert to wire format (binary)
+	wire, err := msg.Pack()
+	if err != nil {
+		return "", err
+	}
+
+	// Convert binary to base64
+	encoded := base64.StdEncoding.EncodeToString(wire)
+
+	return encoded, nil
+}
+
+func deserializeMsg(encoded string) (*dns.Msg, error) {
+	// Decode base64 to binary
+	wire, err := base64.StdEncoding.DecodeString(encoded)
+	if err != nil {
+		return nil, err
+	}
+
+	// Unpack binary to dns.Msg
+	msg := new(dns.Msg)
+	err = msg.Unpack(wire)
+	if err != nil {
+		return nil, err
+	}
+
+	return msg, nil
 }
 
 func LogRequest(ctx context.Context, db *sql.DB, request *dns.Msg, response *dns.Msg, src_ip net.IP, src_host string) error {
 	ctx, span := tracer.Start(ctx, "db.LogRequest")
 	defer span.End()
-	jsonRequest, err := json.Marshal(request)
+	serializedReq, err := serializeMsg(request)
 	if err != nil {
 		return err
 	}
-	jsonResponse, err := json.Marshal(response)
+	serializedResp, err := serializeMsg(response)
 	if err != nil {
 		return err
 	}
 	name := request.Question[0].Name
 	subdomain := ExtractSubdomain(name)
-	StreamRequest(ctx, subdomain, jsonRequest, jsonResponse, src_ip.String(), src_host)
-	_, err = db.Exec("INSERT INTO dns_requests (name, subdomain, request, response, src_ip, src_host) VALUES ($1, $2, $3, $4, $5, $6)", name, subdomain, jsonRequest, jsonResponse, src_ip.String(), src_host)
+	err = WriteToStreams(subdomain, response, src_host, src_ip)
 	if err != nil {
 		return err
 	}
+	_, err = db.Exec("INSERT INTO dns_requests (name, subdomain, request, response, src_ip, src_host) VALUES ($1, $2, $3, $4, $5, $6)", name, subdomain, serializedReq, serializedResp, src_ip.String(), src_host)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -264,25 +308,6 @@ func max(a, b int) int {
 		return a
 	}
 	return b
-}
-
-func StreamRequest(ctx context.Context, subdomain string, request []byte, response []byte, src_ip string, src_host string) error {
-	ctx, span := tracer.Start(ctx, "db.StreamRequest")
-	defer span.End()
-	// get base domain
-	x := map[string]interface{}{
-		"created_at": time.Now().Unix(),
-		"request":    string(request),
-		"response":   string(response),
-		"src_ip":     src_ip,
-		"src_host":   src_host,
-	}
-	jsonString, err := json.Marshal(x)
-	if err != nil {
-		return err
-	}
-	WriteToStreams(subdomain, jsonString)
-	return nil
 }
 
 func DeleteRequestsForDomain(ctx context.Context, db *sql.DB, subdomain string) error {
@@ -296,7 +321,7 @@ func DeleteRequestsForDomain(ctx context.Context, db *sql.DB, subdomain string) 
 	return nil
 }
 
-func GetRequests(ctx context.Context, db *sql.DB, subdomain string) ([]map[string]interface{}, error) {
+func GetRequests(ctx context.Context, db *sql.DB, subdomain string) ([]StreamLog, error) {
 	ctx, span := tracer.Start(ctx, "db.GetRequests")
 	span.SetAttributes(attribute.String("subdomain", subdomain))
 	defer span.End()
@@ -306,9 +331,9 @@ func GetRequests(ctx context.Context, db *sql.DB, subdomain string) ([]map[strin
 	}
 	rows, err := tx.Query("SELECT id, extract(epoch from created_at), request, response, src_ip, src_host FROM dns_requests WHERE subdomain = $1 ORDER BY created_at DESC LIMIT 30", subdomain)
 	if err != nil {
-		return make([]map[string]interface{}, 0), err
+		return nil, err
 	}
-	requests := make([]map[string]interface{}, 0)
+	logs := []StreamLog{}
 	for rows.Next() {
 		var id int
 		var created_at float32
@@ -318,20 +343,18 @@ func GetRequests(ctx context.Context, db *sql.DB, subdomain string) ([]map[strin
 		var src_host string
 		err = rows.Scan(&id, &created_at, &request, &response, &src_ip, &src_host)
 		if err != nil {
-			return make([]map[string]interface{}, 0), err
+			return nil, err
 		}
-		x := map[string]interface{}{
-			"id":         id,
-			"created_at": int64(created_at),
-			"request":    string(request),
-			"response":   string(response),
-			"src_ip":     src_ip,
-			"src_host":   src_host,
+		msg, err := deserializeMsg(string(response))
+		if err != nil {
+			// TODO: do we need to worry about this?
+			continue
 		}
-		requests = append(requests, x)
+		log := responseToStreamLog(int64(created_at), msg, src_host, src_ip)
+		logs = append(logs, log)
 	}
 	tx.Commit()
-	return requests, nil
+	return logs, nil
 }
 
 func GetRecords(ctx context.Context, db *sql.DB, name string, rrtype uint16) ([]dns.RR, error) {
@@ -356,7 +379,7 @@ func GetRecords(ctx context.Context, db *sql.DB, name string, rrtype uint16) ([]
 		if err != nil {
 			return nil, err
 		}
-		record, err := ParseRecord(content)
+		record, err := parsing.ParseRecord(content)
 		if err != nil {
 			return nil, err
 		}

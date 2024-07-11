@@ -46,7 +46,7 @@
       "name": "Target",
       "type": "text",
       "width": "10rem",
-        "example": "orange-ip.fly.dev"
+      "example": "orange-ip.fly.dev"
     }
   ],
   "MX": [
@@ -60,27 +60,26 @@
     {
       "label": "Mail Server",
       "name": "Mx",
-      "width": "4rem",
       "type": "text",
+      "width": "4rem",
       "example": "mail.messagingengine.com"
     }
   ],
   "NS": [
     {
-      "label": "Nameserver ",
+      "label": "Nameserver",
       "name": "Ns",
       "type": "text",
       "width": "4rem",
       "example": "ns1.example.com"
     }
-    
   ],
   "PTR": [
     {
       "label": "Pointer",
       "name": "Ptr",
-      "width": "4rem",
       "type": "text",
+      "width": "4rem",
       "example": "www.example.com"
     }
   ],
@@ -118,9 +117,8 @@
     {
       "label": "Content",
       "name": "Txt",
-      "type": "textarea",
+      "type": "text",
       "width": "10rem",
-      "validation": "required",
       "example": "hello world"
     }
   ]

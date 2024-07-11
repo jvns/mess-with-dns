@@ -40,7 +40,7 @@
   </tr>
   <tr class="desktop hidden lg:table-row border border-gray-200" v-if="clicked">
     <td colspan="5" class="pl-4 pl-8">
-      <new-record :record="record" :domain='domain'> </new-record>
+      <new-record :id="id" :record="record" :domain="domain"> </new-record>
     </td>
   </tr>
 
@@ -85,7 +85,7 @@
   <tr class="lg:hidden table-row border border-gray-200" v-if="clicked">
       <td colspan="5">
           <div class="p-2">
-            <new-record :record="record" :domain='domain'> </new-record>
+            <new-record :id="id" :record="record" :domain='domain'> </new-record>
           </div>
       </td>
   </tr>

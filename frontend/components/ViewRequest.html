@@ -2,28 +2,28 @@
     <!-- desktop -->
     <tr class="py-2 lg:py-0 flex flex-col lg:table-row border-t border-b border-gray-200 font-mono text-sm">
         <td class="lg:px-2 lg:py-4">
-            {{ localTime(request.created_at) }}
+            {{ localTime(log.created_at) }}
         </td>
         <td class="lg:px-2 lg:py-4">
             <strong class="inline lg:hidden">Request:</strong>
             <div class="border-l-4 pl-4 mb-4 border-green-200">
-                Name: <span class="request-name">{{request.request.Question[0].Name}}</span> <br>
-                Type: {{typeName(request.request.Question[0].Qtype)}} <br>
-                From: <span class="request-host">{{request.src_host}}</span>
+                Name: <span class="request-name">{{log.request.name}}</span> <br>
+                Type: {{log.request.type}} <br>
+                From: <span class="request-host">{{log.request.src_host}}</span>
             </div>
         </td>
         <td class="lg:px-2 lg:py-4 request-response align-top">
             <strong class="inline lg:hidden">Response:<br></strong>  
             <div class="border-l-4 pl-4 mb-4 border-gray-200">
-            Code: {{rcodes[request.response.Rcode.toString()]}} <br>
+            Code: {{log.response.code}} <br>
             </div>
-            <div class="border-l-4 pl-4 mb-4 border-gray-200" v-if="!request.response.Answer || request.response.Answer.length == 0">
+            <div class="border-l-4 pl-4 mb-4 border-gray-200" v-if="!log.response.records || log.response.records.length == 0">
                 (no records)
             </div>
-            <div class="border-l-4 pl-4 mb-4 border-pink-200" v-for="answer in request.response.Answer">
-                Type: {{typeName(answer.Hdr.Rrtype)}} <br>
-                TTL: {{answer.Hdr.Ttl}} <br>
-                Content: {{formatContent(answer)}}
+            <div class="border-l-4 pl-4 mb-4 border-pink-200" v-for="record in log.response.records">
+                Type: {{record.type}} <br>
+                TTL: {{record.ttl}} <br>
+                Content: {{record.content}}
             </div>
         </td>
     </tr>

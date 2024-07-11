@@ -1,10 +1,12 @@
 package main
 
-// domain -> stream id -> channel
-
 import (
+	"encoding/json"
+	"github.com/miekg/dns"
 	"math/rand"
+	"net"
 	"strings"
+	"time"
 )
 
 var streams = map[string]map[string]chan []byte{}
@@ -46,11 +48,18 @@ func (s *Stream) Get() chan []byte {
 	return nil
 }
 
-func WriteToStreams(domain string, msg []byte) {
+func WriteToStreams(domain string, response *dns.Msg, src_host string, src_ip net.IP) error {
+	streamLog := responseToStreamLog(time.Now().Unix(), response, src_host, src_ip.String())
+	msg, err := json.Marshal(streamLog)
+	if err != nil {
+		return err
+	}
+
 	domain = strings.ToLower(domain)
 	if _, ok := streams[domain]; ok {
 		for _, stream := range streams[domain] {
 			stream <- msg
 		}
 	}
+	return nil
 }

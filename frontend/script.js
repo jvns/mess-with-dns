@@ -46,7 +46,7 @@ const app = createApp({
 
     clearRecords: async function () {
       if (confirm("Are you sure you want to delete all records?")) {
-        await Promise.all(this.records.map(store.deleteRecord));
+        await Promise.all(this.records.map((record) => store.deleteRecord(record.id)));
       }
     },
 
@@ -57,7 +57,7 @@ const app = createApp({
     },
 
     postLogin: async function () {
-      await store.init(this.domain);
+      await store.init();
     },
   },
 });

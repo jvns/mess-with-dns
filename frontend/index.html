@@ -97,7 +97,7 @@
                                     &nbsp;
                                 </th>
                             </tr>
-                            <tbody is="vue:record" v-for="record in records" :key="record.id" :record="record" :domain="domain" />
+                            <tbody is="vue:record" v-for="record in records" :key="record.id" :id="record.id" :record="record.record" :domain="domain" />
                         </table>
                     </div>
                     <div v-else-if="records">
@@ -140,7 +140,7 @@
                             </tr>
                         </thead>
 
-                        <tbody is="vue:view-request" v-for="request in requests" :request="request" />
+                        <tbody is="vue:view-request" v-for="request in requests" :log="request" />
                     </table>
                 </div>
             </div>

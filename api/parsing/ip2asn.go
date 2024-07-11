@@ -1,4 +1,4 @@
-package main
+package parsing
 
 import (
 	"bufio"
@@ -32,11 +32,15 @@ func parseInt(s string) int {
 }
 
 func ReadRanges() (Ranges, error) {
-	ipv4Ranges, err := ReadASNs("ip2asn-v4.tsv")
+	workdir := os.Getenv("WORKDIR")
+	if workdir == "" {
+		workdir = "."
+	}
+	ipv4Ranges, err := ReadASNs(workdir + "/ip2asn-v4.tsv")
 	if err != nil {
 		return Ranges{}, err
 	}
-	ipv6Ranges, err := ReadASNs("ip2asn-v6.tsv")
+	ipv6Ranges, err := ReadASNs(workdir + "/ip2asn-v6.tsv")
 	if err != nil {
 		return Ranges{}, err
 	}

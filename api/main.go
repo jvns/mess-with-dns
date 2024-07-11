@@ -19,6 +19,7 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/honeycombio/honeycomb-opentelemetry-go"
 	"github.com/honeycombio/otel-config-go/otelconfig"
+	"github.com/jvns/mess-with-dns/parsing"
 	"github.com/miekg/dns"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel"
@@ -58,7 +59,7 @@ func main() {
 		panic(fmt.Sprintf("Error getting SOA serial: %s", err.Error()))
 	}
 	defer db.Close()
-	ranges, err := ReadRanges()
+	ranges, err := parsing.ReadRanges()
 	if err != nil {
 		panic(fmt.Sprintf("Error reading ranges: %s", err.Error()))
 	}
@@ -93,7 +94,7 @@ func main() {
 
 type handler struct {
 	db       *sql.DB
-	ipRanges *Ranges
+	ipRanges *parsing.Ranges
 }
 
 var soaSerial uint32
@@ -180,7 +181,7 @@ func createRecord(ctx context.Context, db *sql.DB, username string, w http.Respo
 		returnError(w, r, err, http.StatusInternalServerError)
 		return
 	}
-	rr, err := ParseRecord(body)
+	rr, err := parsing.ParseJSRecord(body, username)
 	if err != nil {
 		if strings.Contains(err.Error(), "Invalid RR") {
 			returnError(w, r, fmt.Errorf("Oops, invalid domain name"), http.StatusBadRequest)
@@ -218,7 +219,7 @@ func updateRecord(ctx context.Context, db *sql.DB, username string, id string, w
 		returnError(w, r, fmt.Errorf("Error reading body: %s", err.Error()), http.StatusInternalServerError)
 		return
 	}
-	rr, err := ParseRecord(body)
+	rr, err := parsing.ParseJSRecord(body, username)
 	if err != nil {
 		returnError(w, r, fmt.Errorf("Error parsing record: %s", err.Error()), http.StatusBadRequest)
 		return
@@ -230,7 +231,7 @@ func updateRecord(ctx context.Context, db *sql.DB, username string, id string, w
 	UpdateRecord(ctx, db, idInt, rr)
 }
 
-func getDomains(ctx context.Context, db *sql.DB, username string, w http.ResponseWriter, r *http.Request) {
+func getRecords(ctx context.Context, db *sql.DB, username string, w http.ResponseWriter, r *http.Request) {
 	records, err := GetRecordsForName(ctx, db, username)
 	if err != nil {
 		returnError(w, r, fmt.Errorf("Error getting records: %s", err.Error()), http.StatusInternalServerError)
@@ -280,12 +281,12 @@ func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case r.Host == "messwithdns.com" || r.Host == "www.messwithdns.com":
 		// redirect to .net
 		http.Redirect(w, r, "https://messwithdns.net"+r.URL.Path, http.StatusFound)
-	// GET /domain: get everything from USERNAME.messwithdns.com.
-	case r.Method == "GET" && p[0] == "domains":
+	// GET /records: get everything from USERNAME.messwithdns.com.
+	case r.Method == "GET" && p[0] == "records":
 		if !requireLogin(username, r.URL.Path, r, w) {
 			return
 		}
-		getDomains(ctx, handle.db, username, w, r)
+		getRecords(ctx, handle.db, username, w, r)
 	// GET /requests
 	case r.Method == "GET" && p[0] == "requests":
 		if !requireLogin(username, r.URL.Path, r, w) {
@@ -304,25 +305,25 @@ func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		streamRequests(ctx, handle.db, username, w, r)
-	// POST /record/new: add a new record
-	case r.Method == "POST" && n == 2 && p[0] == "record" && p[1] == "new":
-		if !requireLogin(username, r.URL.Path, r, w) {
-			return
-		}
-		createRecord(ctx, handle.db, username, w, r)
-	// DELETE /record/<ID>:
-	case r.Method == "DELETE" && n == 2 && p[0] == "record":
+	// DELETE /records/<ID>:
+	case r.Method == "DELETE" && n == 2 && p[0] == "records":
 		if !requireLogin(username, r.URL.Path, r, w) {
 			return
 		}
 		// TODO: don't let people delete other people's records
 		deleteRecord(ctx, handle.db, p[1], w, r)
-	// POST /record/<ID>: updates a record
-	case r.Method == "POST" && n == 2 && p[0] == "record":
+	// POST /records/<ID>: updates a record
+	case r.Method == "POST" && n == 2 && p[0] == "records" && len(p[1]) > 0:
 		if !requireLogin(username, r.URL.Path, r, w) {
 			return
 		}
 		updateRecord(ctx, handle.db, username, p[1], w, r)
+	// POST /records/: add a new record
+	case r.Method == "POST" && p[0] == "records":
+		if !requireLogin(username, r.URL.Path, r, w) {
+			return
+		}
+		createRecord(ctx, handle.db, username, w, r)
 	// POST /login
 	case r.Method == "GET" && n == 1 && p[0] == "login":
 		w.Header().Set("Cache-Control", "no-store")
@@ -334,7 +335,12 @@ func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	default:
 		// serve static files
 		w.Header().Set("Cache-Control", "public, max-age=120")
-		http.ServeFile(w, r, "./frontend/"+r.URL.Path)
+		// get workdir
+		workdir := os.Getenv("WORKDIR")
+		if workdir == "" {
+			workdir = "."
+		}
+		http.ServeFile(w, r, workdir+"/frontend/"+r.URL.Path)
 	}
 }
 
@@ -437,7 +443,7 @@ func cleanup(db *sql.DB) {
 	}
 }
 
-func lookupHost(ctx context.Context, ranges *Ranges, host net.IP) string {
+func lookupHost(ctx context.Context, ranges *parsing.Ranges, host net.IP) string {
 	ctx, span := tracer.Start(ctx, "lookupHost")
 	span.SetAttributes(attribute.String("host", host.String()))
 	defer span.End()

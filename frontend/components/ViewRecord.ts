@@ -5,7 +5,7 @@ import template from './ViewRecord.html';
 
 export default {
     template: template,
-    props: ['record', 'domain'],
+    props: ['record', 'domain', 'id'],
     data: function() {
         return {
             clicked: false,
@@ -16,21 +16,18 @@ export default {
             this.clicked = !this.clicked;
         },
         displayName: function() {
-            return displayName(this.record)
+            return displayName(this.domain, this.record)
         },
         content: function() {
             let content = "";
-            for (const key in this.record) {
-                if (key == 'domain' || key == 'subdomain' || key == 'type' || key == 'ttl' || key == 'id') {
-                    continue;
-                }
-                content += this.record[key] + " ";
+            for (const val of this.record.values) {
+                content += val.value + " ";
             }
             return content;
         },
         confirmDelete: async function() {
             if (confirm('Are you sure you want to delete this record?')) {
-                await store.deleteRecord(this.record);
+                await store.deleteRecord(this.id);
             }
         },
         cancel: function() {

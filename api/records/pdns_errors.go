@@ -15,7 +15,7 @@ func TranslateError(rrset *powerdns.RRset, err error) error {
 
 	// RRset test.pear5.messwithdns.com. IN CNAME: Conflicts with pre-existing RRset
 	if strings.Contains(errorString, "Conflicts with pre-existing RRset") {
-		return fmt.Errorf("Error: can't create record for %s: CNAME record aren't allowed to coexist with other records", name)
+		return fmt.Errorf("Error: can't create record for %s: CNAME records aren't allowed to coexist with other records", name)
 	}
 	// Duplicate record in RRset test.pear5.messwithdns.com. IN A with content "1.2.3.5"
 	if strings.Contains(errorString, "Duplicate record in RRset") {

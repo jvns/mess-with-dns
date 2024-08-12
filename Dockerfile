@@ -21,7 +21,7 @@ RUN bash esbuild.sh
 FROM ubuntu:22.04
 
 RUN apt-get update
-RUN apt-get install -y ca-certificates wget
+RUN apt-get install -y ca-certificates wget pdns-backend-sqlite3 pdns-backend-bind
 RUN wget https://iptoasn.com/data/ip2asn-v4.tsv.gz
 RUN gunzip ip2asn-v4.tsv.gz
 RUN wget https://iptoasn.com/data/ip2asn-v6.tsv.gz
@@ -43,5 +43,9 @@ COPY ./frontend/images /app/frontend/images
 COPY --from=node /app/bundle.js /app/frontend/bundle.js
 COPY --from=node /app/bundle.js.map /app/frontend/bundle.js.map
 
+# powerdns config
+COPY ./pdns/conf_prod /etc/pdns
+COPY ./scripts/entrypoint.sh /usr/bin/entrypoint.sh
+
 USER root
-CMD ["/usr/bin/mess-with-dns"]
+CMD ["/usr/bin/entrypoint.sh"]

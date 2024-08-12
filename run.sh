@@ -10,7 +10,7 @@ export HASH_KEY=CgfCQb/b1yLf251DsG9Zo8CN5h6UKP268QZPxR6ddDw=
 export BLOCK_KEY=psYea0IVC59V3kbfMYgWI7AlUmioiNsv9Em1GqksEEE=
 
 
-cd pdns/conf_prod || exit 1
+cd pdns/conf_dev || exit 1
 rm -f ./pdns.controlsocket
 pdns_server --config-dir=. &
 cd ../.. || exit 1

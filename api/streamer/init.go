@@ -3,16 +3,13 @@ package streamer
 import (
 	"context"
 	"fmt"
-	"log"
 	"net"
 	"time"
 
-	dnstap "github.com/dnstap/golang-dnstap"
 	"github.com/jvns/mess-with-dns/db"
 	"github.com/jvns/mess-with-dns/streamer/ip2asn"
 	"github.com/miekg/dns"
 	"go.opentelemetry.io/otel/attribute"
-	"google.golang.org/protobuf/proto"
 )
 
 // func NewReader(r io.Reader, opt *ReaderOptions) (Reader, error)
@@ -40,7 +37,6 @@ func Init(ctx context.Context, workdir string, dbFilename string, dnstapAddress 
 		db:       ldb,
 	}
 
-	go logger.run(ctx, dnstapAddress)
 	return logger, nil
 }
 
@@ -55,57 +51,32 @@ func cleanup(db *db.LockedDB) {
 	}
 }
 
-func (l *Logger) run(ctx context.Context, host string) {
-	defer l.db.Close()
-	listener, err := net.Listen("tcp", host)
-	if err != nil {
-		panic(fmt.Sprintf("Error opening dnstap listener: %s", err.Error()))
+func getIP(w dns.ResponseWriter) (net.IP, error) {
+	if addr, ok := w.RemoteAddr().(*net.TCPAddr); ok {
+		return addr.IP, nil
+	} else if addr, ok := w.RemoteAddr().(*net.UDPAddr); ok {
+		return addr.IP, nil
 	}
-	defer listener.Close()
-	input := dnstap.NewFrameStreamSockInput(listener)
-	c := make(chan []byte)
-	go input.ReadInto(c)
-
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		case frame := <-c:
-			tap := new(dnstap.Dnstap)
-			err = proto.Unmarshal(frame, tap)
-			if err != nil {
-				log.Printf("could not decode dnstap message: %v\n", err)
-				continue
-			}
-			err = l.logMessage(tap.Message)
-			if err != nil {
-				log.Printf("could not log message: %v\n", err)
-			}
-		}
-	}
+	return nil, fmt.Errorf("Needs to be a TCP or UDP address")
 }
 
-func (l *Logger) logMessage(msg *dnstap.Message) error {
+func (l *Logger) Log(resp *dns.Msg, w dns.ResponseWriter) error {
 	ctx := context.Background()
 	ctx, span := tracer.Start(ctx, "dns.request")
 
-	remote_addr := net.IP(msg.QueryAddress)
+	remote_addr, err := getIP(w)
+	if err != nil {
+		return err
+	}
 	remote_host := lookupHost(ctx, l.ipRanges, remote_addr)
 
-	// TODO: why don't we have a query message here?????
-	// also do we even care?? unclear
-
-	resp := new(dns.Msg)
-	err := resp.Unpack(msg.ResponseMessage)
-	if err != nil {
-		return fmt.Errorf("could not unpack response message: %v", err)
-	}
+	// TODO: should we put the query message back? do we care? idk.
 
 	span.SetAttributes(attribute.String("dns.remote_addr", remote_addr.String()))
 	span.SetAttributes(attribute.String("dns.remote_host", remote_host))
 	span.SetAttributes(attribute.Int("dns.answer_count", len(resp.Answer)))
 
-	err = l.LogRequest(ctx, resp, remote_addr, remote_host)
+	err = l.logRequest(ctx, resp, remote_addr, remote_host)
 	if err != nil {
 		return fmt.Errorf("could not log request: %v", err)
 	}

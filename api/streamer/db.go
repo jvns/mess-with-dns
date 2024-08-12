@@ -70,7 +70,7 @@ func deserializeMsg(encoded string) (*dns.Msg, error) {
 	return msg, nil
 }
 
-func (l *Logger) LogRequest(ctx context.Context, response *dns.Msg, src_ip net.IP, src_host string) error {
+func (l *Logger) logRequest(ctx context.Context, response *dns.Msg, src_ip net.IP, src_host string) error {
 	_, span := tracer.Start(ctx, "db.LogRequest")
 	defer span.End()
 	serializedResp, err := serializeMsg(response)
@@ -79,7 +79,7 @@ func (l *Logger) LogRequest(ctx context.Context, response *dns.Msg, src_ip net.I
 	}
 	name := response.Question[0].Name
 	subdomain := ExtractSubdomain(name)
-	err = WriteToStreams(subdomain, response, src_host, src_ip)
+	err = writeToStreams(subdomain, response, src_host, src_ip)
 	if err != nil {
 		return err
 	}

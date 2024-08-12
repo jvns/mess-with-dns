@@ -48,7 +48,7 @@ func (s *Stream) Get() chan []byte {
 	return nil
 }
 
-func WriteToStreams(domain string, response *dns.Msg, src_host string, src_ip net.IP) error {
+func writeToStreams(domain string, response *dns.Msg, src_host string, src_ip net.IP) error {
 	streamLog := responseToStreamLog(time.Now().Unix(), response, src_host, src_ip.String())
 	msg, err := json.Marshal(streamLog)
 	if err != nil {

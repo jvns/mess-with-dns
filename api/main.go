@@ -15,10 +15,14 @@ import (
 	"github.com/jvns/mess-with-dns/records"
 	"github.com/jvns/mess-with-dns/streamer"
 	"github.com/jvns/mess-with-dns/users"
+	"github.com/miekg/dns"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 )
+
+var tracer = otel.Tracer("main")
 
 type Config struct {
 	workdir           string // where to read ip2asn files and static files from
@@ -90,6 +94,19 @@ func main() {
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
+
+	port := ":53"
+	if len(os.Args) > 1 {
+		port = ":" + os.Args[1]
+	}
+	fmt.Println("Listening for UDP on port", port)
+	go func() {
+		srv := &dns.Server{Handler: handler, Addr: port, Net: "udp"}
+		if err := srv.ListenAndServe(); err != nil {
+			panic(fmt.Sprintf("Failed to set udp listener %s\n", err.Error()))
+		}
+	}()
+
 	wrappedHandler := otelhttp.NewHandler(handler, "mess-with-dns-api")
 	fmt.Println("Listening on :8080")
 	err = (&http.Server{Addr: ":8080", Handler: wrappedHandler}).ListenAndServe()
@@ -220,4 +237,36 @@ func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		// get workdir
 		http.ServeFile(w, r, handle.workdir+"/frontend/"+r.URL.Path)
 	}
+}
+
+func (handle *handler) serveDNS(w dns.ResponseWriter, r *dns.Msg) error {
+	// just proxy it to localhost:5454
+	c := &dns.Client{Net: "udp"}
+	response, _, err := c.Exchange(r, "localhost:5454")
+	if err != nil {
+		return err
+	}
+	err = w.WriteMsg(response)
+	if err != nil {
+		return err
+	}
+	err = handle.logger.Log(response, w)
+
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
+	ctx := context.Background()
+	_, span := tracer.Start(ctx, "dns.request")
+
+	err := handle.serveDNS(w, r)
+
+	if err != nil {
+		fmt.Println("error serving DNS", err)
+		span.RecordError(err)
+	}
+	span.End()
 }

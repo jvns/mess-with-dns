@@ -13,7 +13,6 @@ export BLOCK_KEY=psYea0IVC59V3kbfMYgWI7AlUmioiNsv9Em1GqksEEE=
 cd pdns/conf_prod || exit 1
 rm -f ./pdns.controlsocket
 pdns_server --config-dir=. &
-dnsdist -C dnsdist.conf -l 127.0.0.1:5333 --supervised &
 cd ../.. || exit 1
 
 ls api/*.go api/go* scripts/* run.sh | entr -r bash scripts/run_go.sh &

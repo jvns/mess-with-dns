@@ -261,6 +261,9 @@ func (handle *handler) serveDNS(w dns.ResponseWriter, r *dns.Msg) error {
 func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	ctx := context.Background()
 	_, span := tracer.Start(ctx, "dns.request")
+	if len(r.Question) > 0 {
+		span.SetAttributes(attribute.String("dns.name", r.Question[0].Name))
+	}
 
 	err := handle.serveDNS(w, r)
 

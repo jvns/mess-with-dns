@@ -94,7 +94,7 @@ func (rs RecordService) UpdateRecord(ctx context.Context, username string, id st
 	zoneAdd(zone, newRRset)
 	err = rs.updateZone(ctx, username, zone)
 	if err != nil {
-		return newHTTPError(http.StatusInternalServerError, err)
+		return newHTTPError(http.StatusInternalServerError, TranslateError(newRRset, err))
 	}
 	return nil
 }

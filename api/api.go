@@ -110,7 +110,6 @@ func streamRequests(ctx context.Context, logger *streamer.Logger, subdomain stri
 		returnError(w, r, err, http.StatusInternalServerError)
 		return
 	}
-	logMsg(r, fmt.Sprintf("creating stream for %s", subdomain))
 	stream := logger.CreateStream(subdomain)
 	defer stream.Delete()
 	c := stream.Get()

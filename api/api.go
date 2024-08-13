@@ -126,7 +126,7 @@ func streamRequests(ctx context.Context, logger *streamer.Logger, subdomain stri
 		case <-ticker.C:
 			err := conn.WriteMessage(websocket.PingMessage, []byte{})
 			if err != nil {
-				fmt.Println("Error writing ping:", err)
+				// I think this just means the client disconnected
 				return
 			}
 		case msg := <-c:

@@ -2,7 +2,6 @@ package users
 
 import (
 	"encoding/base64"
-	"fmt"
 	"net/http"
 	"os"
 
@@ -74,6 +73,5 @@ func (u UserService) ReadSessionUsername(r *http.Request) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	fmt.Println("user:", user.User)
 	return user.User, nil
 }

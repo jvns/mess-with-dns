@@ -167,11 +167,11 @@ func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	span := trace.SpanFromContext(ctx)
 	span.SetAttributes(attribute.String("http.path", r.URL.Path))
-	logMsg(r, fmt.Sprintf("%s %s", r.Method, r.URL.Path))
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
 	w.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type")
 	username, _ := handle.userService.ReadSessionUsername(r)
+	logMsg(r, fmt.Sprintf("%s %s (%s)", r.Method, r.URL.Path, username))
 	span.SetAttributes(attribute.String("username", username))
 
 	rs := handle.rs

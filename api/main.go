@@ -146,6 +146,9 @@ func returnError(w http.ResponseWriter, r *http.Request, err error, status int) 
 	msg := fmt.Sprintf("Error [%d]: %s\n", status, err.Error())
 	logMsg(r, msg)
 	http.Error(w, err.Error(), status)
+	ctx := r.Context()
+	span := trace.SpanFromContext(ctx)
+	span.RecordError(err)
 }
 
 func logMsg(r *http.Request, msg string) {

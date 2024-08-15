@@ -11,6 +11,7 @@ import (
 	"github.com/miekg/dns"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
+	"io"
 	"net/http"
 	"time"
 )
@@ -41,13 +42,18 @@ func deleteRecord(ctx context.Context, username string, id string, rs records.Re
 
 func updateRecord(ctx context.Context, username string, id string, rs records.RecordService, w http.ResponseWriter, r *http.Request) {
 	record := map[string]string{}
-	if err := json.NewDecoder(r.Body).Decode(&record); err != nil {
-		returnError(w, r, err, http.StatusBadRequest)
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		returnError(w, r, fmt.Errorf("error reading body: %s", err.Error()), http.StatusBadRequest)
 		return
 	}
-	err := rs.UpdateRecord(ctx, username, id, record)
-	if err != nil {
-		returnError(w, r, err, err.Code)
+	if err := json.Unmarshal(body, &record); err != nil {
+		returnError(w, r, fmt.Errorf("error decoding json: %s, body: %s", err.Error(), string(body)), http.StatusBadRequest)
+		return
+	}
+	err2 := rs.UpdateRecord(ctx, username, id, record)
+	if err2 != nil {
+		returnError(w, r, err2, err2.Code)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
@@ -55,13 +61,18 @@ func updateRecord(ctx context.Context, username string, id string, rs records.Re
 
 func createRecord(ctx context.Context, username string, rs records.RecordService, w http.ResponseWriter, r *http.Request) {
 	record := map[string]string{}
-	if err := json.NewDecoder(r.Body).Decode(&record); err != nil {
-		returnError(w, r, err, http.StatusBadRequest)
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		returnError(w, r, fmt.Errorf("error reading body: %s", err.Error()), http.StatusBadRequest)
 		return
 	}
-	err := rs.CreateRecord(ctx, username, record)
-	if err != nil {
-		returnError(w, r, err, err.Code)
+	if err := json.Unmarshal(body, &record); err != nil {
+		returnError(w, r, fmt.Errorf("error decoding json: %s, body: %s", err.Error(), string(body)), http.StatusBadRequest)
+		return
+	}
+	err2 := rs.CreateRecord(ctx, username, record)
+	if err2 != nil {
+		returnError(w, r, err2, err2.Code)
 		return
 	}
 	w.WriteHeader(http.StatusOK)

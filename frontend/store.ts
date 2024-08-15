@@ -1,4 +1,5 @@
 import { reactive } from "vue/dist/vue.esm-browser.prod.js";
+import { parseCookies } from "./common.js";
 
 interface Store {
     records: Record[]
@@ -88,10 +89,13 @@ async function refreshRequests() {
 function openWebsocket() {
     // use insecure socket on localhost
     var ws;
+    const cookies = parseCookies();
+    const username = cookies["username"];
+    console.log("Opening websocket for", username);
     if (window.location.hostname === "localhost") {
-        ws = new WebSocket("ws://localhost:8080/requeststream");
+        ws = new WebSocket("ws://localhost:8080/requeststream/" + username);
     } else {
-        ws = new WebSocket("wss://" + window.location.host + "/requeststream");
+        ws = new WebSocket("wss://" + window.location.host + "/requeststream/" + username);
     }
     store.ws = ws;
     ws.onmessage = (event) => {

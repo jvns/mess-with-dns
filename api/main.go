@@ -225,8 +225,14 @@ func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		deleteRequests(ctx, handle.logger, username, w, r)
-	// GET /requeststream
+	// GET /requeststream/$USERNAME
 	case r.Method == "GET" && p[0] == "requeststream":
+		// Try setting the username based on the path if the cookie method
+		// didn't work. Trying this because we were getting a lot of requests
+		// for /requeststream with no username for some unknown reason
+		if username == "" && len(p) >= 2 {
+			username = p[1]
+		}
 		if !requireLogin(username, r.URL.Path, r, w) {
 			return
 		}

@@ -91,6 +91,7 @@ func toRecordRequest(jsRecord map[string]string) (*RecordRequest, error) {
 	if !ok {
 		return nil, fmt.Errorf("subdomain is required")
 	}
+	subdomain = strings.TrimSpace(subdomain)
 	typ, ok := jsRecord["type"]
 	if !ok {
 		return nil, fmt.Errorf("type is required")

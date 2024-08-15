@@ -174,11 +174,16 @@ func healthCheck(w http.ResponseWriter, r *http.Request) {
 	c := new(dns.Client)
 	c.DialTimeout = time.Second * 1
 	//c.Net = "tcp"
-	_, _, err := c.Exchange(m, "127.0.0.1:53")
+	response, _, err := c.Exchange(m, "127.0.0.1:53")
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("Error making DNS request: " + err.Error()))
 		return
+	}
+	// Make sure that response code is NXDOMAIN
+	if response.Rcode != dns.RcodeNameError {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("Expected NXDOMAIN, got " + dns.RcodeToString[response.Rcode]))
 	}
 
 	/*

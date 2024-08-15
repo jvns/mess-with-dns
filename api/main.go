@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	_ "net/http/pprof"
 
@@ -245,6 +246,7 @@ func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (handle *handler) serveDNS(w dns.ResponseWriter, r *dns.Msg) error {
 	// just proxy it to localhost:5454
 	c := &dns.Client{Net: "udp"}
+	c.DialTimeout = time.Second * 1
 	response, _, err := c.Exchange(r, "localhost:5454")
 	if err != nil {
 		return err
@@ -271,8 +273,17 @@ func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	err := handle.serveDNS(w, r)
 
 	if err != nil {
+		// return a SERVFAIL
 		fmt.Println("error serving DNS", err)
 		span.RecordError(err)
+		m := new(dns.Msg)
+		m.SetReply(r)
+		m.SetRcode(r, dns.RcodeServerFailure)
+		err = w.WriteMsg(m)
+		if err != nil {
+			fmt.Println("error writing SERVFAIL", err)
+			span.RecordError(err)
+		}
 	}
 	span.End()
 }

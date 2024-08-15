@@ -11,6 +11,7 @@ export BLOCK_KEY=psYea0IVC59V3kbfMYgWI7AlUmioiNsv9Em1GqksEEE=
 
 
 cd pdns/conf_dev || exit 1
+sqlite3 powerdns.sqlite < ../pdns.sql
 rm -f ./pdns.controlsocket
 pdns_server --config-dir=. &
 cd ../.. || exit 1

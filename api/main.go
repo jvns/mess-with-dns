@@ -95,6 +95,7 @@ func main() {
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
+	go handler.cleanup()
 
 	port := ":53"
 	if len(os.Args) > 1 {
@@ -292,4 +293,24 @@ func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 		}
 	}
 	span.End()
+}
+
+func (handle *handler) cleanup() {
+	ctx := context.Background()
+	_, span := tracer.Start(ctx, "cleanup")
+	defer span.End()
+	for {
+		fmt.Println("Deleting old records & requests...")
+		err := handle.rs.DeleteOldRecords(ctx, time.Now())
+		if err != nil {
+			span.RecordError(fmt.Errorf("error deleting old records: %s", err))
+			fmt.Println("error deleting old records:", err)
+		}
+		err = handle.logger.DeleteOldRequests(ctx)
+		if err != nil {
+			span.RecordError(fmt.Errorf("error deleting old requests: %s", err))
+			fmt.Println("error deleting old requests:", err)
+		}
+		time.Sleep(time.Minute * 15)
+	}
 }

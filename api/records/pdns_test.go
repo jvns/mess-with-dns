@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"math/rand"
 	"testing"
+	"time"
 )
 
 func setup() (records.RecordService, context.Context, string) {
@@ -67,7 +68,6 @@ func TestCreateAndDeleteRecords(t *testing.T) {
 	}
 
 	id := records.PdnsID{Name: domain(username), Type: powerdns.RRTypeA, Content: "1.2.3.4"}.String()
-	fmt.Println(id)
 	err = rs.DeleteRecord(ctx, username, id)
 	if err != nil {
 		t.Fatal(err)
@@ -255,4 +255,84 @@ func TestDNSQuery(t *testing.T) {
 	assert.Equal(t, response.Answer[0].Header().Rrtype, dns.TypeA)
 	assert.Equal(t, response.Answer[0].Header().Ttl, uint32(60))
 	assert.Equal(t, response.Answer[0].(*dns.A).A.String(), "1.2.3.4")
+}
+
+func TestParseSerial(t *testing.T) {
+	var serial uint32 = 2021091008
+	serialInt, err := records.ParseSerial(serial)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Equal(t, time.Date(2021, 9, 10, 0, 0, 0, 0, time.UTC), serialInt)
+}
+
+func TestDeleteOldRecordsEmpty(t *testing.T) {
+	rs, ctx, _ := setup()
+	err := rs.DeleteOldRecords(ctx, time.Now())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+}
+
+func TestDeleteOldRecordsCreate(t *testing.T) {
+	rs, ctx, username := setup()
+	// create a record
+	record := map[string]string{"subdomain": "@", "type": "A", "ttl": "60", "value_A": "1.2.3.4"}
+	if err2 := rs.CreateRecord(ctx, username, record); err2 != nil {
+		t.Fatal(err2)
+	}
+
+	// test that deleting old records doesn't do anything
+	if err := rs.DeleteOldRecords(ctx, time.Now()); err != nil {
+		t.Fatal(err)
+	}
+
+	records, err2 := rs.GetRecords(ctx, username)
+	if err2 != nil {
+		t.Fatal(err2)
+	}
+	assert.Equal(t, 4, len(records))
+}
+
+func TestDeleteOldRecords5Days(t *testing.T) {
+	rs, ctx, username := setup()
+	// create a record
+	record := map[string]string{"subdomain": "@", "type": "A", "ttl": "60", "value_A": "1.2.3.4"}
+	if err2 := rs.CreateRecord(ctx, username, record); err2 != nil {
+		t.Fatal(err2)
+	}
+	// set now = now + 8 days & check if record is still there
+	now := time.Now().Add(5 * 24 * time.Hour)
+	err := rs.DeleteOldRecords(ctx, now)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	records, err2 := rs.GetRecords(ctx, username)
+	if err2 != nil {
+		t.Fatal(err2)
+	}
+	assert.Equal(t, 4, len(records))
+}
+
+func TestDeleteOldRecords7Days(t *testing.T) {
+	rs, ctx, username := setup()
+	// create a record
+	record := map[string]string{"subdomain": "@", "type": "A", "ttl": "60", "value_A": "1.2.3.4"}
+	if err2 := rs.CreateRecord(ctx, username, record); err2 != nil {
+		t.Fatal(err2)
+	}
+	// set now = now + 8 days & check if record is still there
+	now := time.Now().Add(8 * 24 * time.Hour)
+	err := rs.DeleteOldRecords(ctx, now)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	records, err2 := rs.GetRecords(ctx, username)
+	if err2 != nil {
+		t.Fatal(err2)
+	}
+	assert.Equal(t, 0, len(records))
 }

@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net"
-	"time"
 
 	"github.com/jvns/mess-with-dns/db"
 	"github.com/jvns/mess-with-dns/streamer/ip2asn"
@@ -30,25 +29,12 @@ func Init(ctx context.Context, workdir string, dbFilename string, dnstapAddress 
 		return nil, fmt.Errorf("could not connect to db: %v", err)
 	}
 
-	go cleanup(ldb)
-
 	logger := &Logger{
 		ipRanges: &ranges,
 		db:       ldb,
 	}
 
 	return logger, nil
-}
-
-func cleanup(db *db.LockedDB) {
-	ctx := context.Background()
-	_, span := tracer.Start(ctx, "cleanup")
-	defer span.End()
-	for {
-		fmt.Println("Deleting old requests...")
-		deleteOldRequests(ctx, db)
-		time.Sleep(time.Minute * 15)
-	}
 }
 
 func getIP(w dns.ResponseWriter) (net.IP, error) {

@@ -28,16 +28,15 @@ func connectDB(dbFile string) (*db.LockedDB, error) {
 
 var tracer = otel.Tracer("main")
 
-func deleteOldRequests(ctx context.Context, db *db.LockedDB) {
+func (logger Logger) DeleteOldRequests(ctx context.Context) error {
 	_, span := tracer.Start(ctx, "db.DeleteOldRequests")
 	defer span.End()
-	// delete requests where created_at timestamp is more than a day
-	// if we don't put the limit I get a "resources exhausted" error
-	// 1 day ago, postgres
-	_, err := db.Exec("DELETE FROM dns_requests WHERE created_at < (strftime('%s', 'now') - (7 * 24 * 60 * 60));")
+	// delete requests where created_at timestamp is more than a day ago
+	_, err := logger.db.Exec("DELETE FROM dns_requests WHERE created_at < (strftime('%s', 'now') - (7 * 24 * 60 * 60));")
 	if err != nil {
-		panic(err)
+		return err
 	}
+	return nil
 }
 
 func serializeMsg(msg *dns.Msg) (string, error) {

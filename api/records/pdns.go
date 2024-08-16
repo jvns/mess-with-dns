@@ -8,6 +8,7 @@ import (
 	"github.com/jvns/mess-with-dns/parsing"
 	"net/http"
 	"strings"
+	"time"
 )
 
 type RecordService struct {
@@ -17,7 +18,6 @@ type RecordService struct {
 func Init(url string, api_key string) RecordService {
 	pdns := powerdns.NewClient(url, "localhost", map[string]string{"X-API-Key": api_key}, nil)
 	return RecordService{pdns: pdns}
-
 }
 
 type HTTPError struct {
@@ -208,6 +208,42 @@ func zoneName(username string) string {
 type Record struct {
 	ID     string                 `json:"id"`
 	Record parsing.RecordResponse `json:"record"`
+}
+
+func (rs RecordService) DeleteOldRecords(ctx context.Context, now time.Time) error {
+	days := 7
+	// Deletes any zones that haven't been updated in the last $DAYS days
+	zones, err := rs.pdns.Zones.List(ctx)
+	if err != nil {
+		return err
+	}
+	for _, zone := range zones {
+		if *zone.Name == "messwithdns.com." {
+			continue
+		}
+		date, err := ParseSerial(*zone.Serial)
+		if err != nil {
+			return err
+		}
+		if now.Sub(date).Hours() < float64(days*24) {
+			continue
+		}
+		err = rs.pdns.Zones.Delete(ctx, *zone.Name)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func ParseSerial(serial uint32) (time.Time, error) {
+	// serial format: YYYYMMDDNN
+	serialStr := fmt.Sprintf("%010d", serial)
+	date, err := time.Parse("20060102", serialStr[:8])
+	if err != nil {
+		return time.Time{}, err
+	}
+	return date, nil
 }
 
 func (rs RecordService) GetRecords(ctx context.Context, username string) ([]Record, *HTTPError) {

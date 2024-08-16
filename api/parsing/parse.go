@@ -87,11 +87,15 @@ func ParseRecordRequest(jsRecord map[string]string, username string) (*powerdns.
 }
 
 func toRecordRequest(jsRecord map[string]string) (*RecordRequest, error) {
+	// Remove leading and trailing spaces because people end up entering
+	// trailing spaces a lot by accident
+	for k, v := range jsRecord {
+		jsRecord[k] = strings.TrimSpace(v)
+	}
 	subdomain, ok := jsRecord["subdomain"]
 	if !ok {
 		return nil, fmt.Errorf("subdomain is required")
 	}
-	subdomain = strings.TrimSpace(subdomain)
 	typ, ok := jsRecord["type"]
 	if !ok {
 		return nil, fmt.Errorf("type is required")

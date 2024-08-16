@@ -7,7 +7,6 @@ import (
 )
 
 func TranslateError(rrset *powerdns.RRset, err error) error {
-
 	errorString := err.Error()
 	name := *rrset.Name
 	typ := *rrset.Type
@@ -24,6 +23,10 @@ func TranslateError(rrset *powerdns.RRset, err error) error {
 	// RRset test2.pear5.messwithdns.com. IN CNAME has more than one record
 	if strings.Contains(errorString, "has more than one record") {
 		return fmt.Errorf("Error: a name is only allowed to have one %s record, and %s already has one", typ, name)
+	}
+	//  Name 'new\032site.island358.messwithdns.com.' contains unsupported characters (only translate if \032 is present)
+	if strings.Contains(errorString, "contains unsupported characters") && strings.Contains(errorString, "\\032") {
+		return fmt.Errorf("Error: name \"%s\" contains a space", name)
 	}
 	return err
 }

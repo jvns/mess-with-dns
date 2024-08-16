@@ -183,6 +183,23 @@ func TestCreateManyRecords(t *testing.T) {
 	}
 }
 
+type ErrorTest struct {
+	Record map[string]string
+	Error  string
+}
+
+func TestTranslateErrors(t *testing.T) {
+	rs, ctx, username := setup()
+	tests := []ErrorTest{
+		{map[string]string{"subdomain": "new site", "type": "A", "ttl": "60", "value_A": "1.2.3.4"}, "Error: name \"new site.%s.messwithdns.com.\" contains a space"},
+	}
+	for _, test := range tests {
+		err := rs.CreateRecord(ctx, username, test.Record)
+		formattedError := fmt.Sprintf(test.Error, username)
+		assert.Equal(t, formattedError, err.Error())
+	}
+}
+
 func TestCreateRecordFixMX(t *testing.T) {
 	rs, ctx, username := setup()
 	record := map[string]string{"subdomain": "@", "type": "MX", "ttl": "60", "value_Preference": "10", "value_Mx": "example.com"}

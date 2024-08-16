@@ -4,7 +4,8 @@ The source for [Mess With DNS](https://messwithdns.net).
 
 ### Developing
 
-Instructions that are probably missing some important steps:
+If you want to run it and poke around, here are some instructions that are
+probably missing some important steps:
 
 1. Install powerdns (`apt install pdns-backend-sqlite3 pdns-backend-bind` in Ubuntu, `brew install pdns` in Homebrew)
 2. Run `bash run.sh`
@@ -15,10 +16,9 @@ Instructions that are probably missing some important steps:
 
 Two main disclaimers:
 
-1. There's no license yet, partly beause I don't think this code is very
+1. There's no license yet, partly because I don't think this code is very
    suitable for anyone other than me to run, there's a bunch of hardcoded stuff
-   ("a wizard zines project") as well as a Honeycomb integration for metrics.
-2. Probably won't be very actively maintained. I'm very open to bugfix pull
-   requests, though I can't guarantee I'll merge them in a timely manner. I
-   have kept the site up for 3 years so far though and I plan to keep it
-   running.
+   like "a wizard zines project" and a metrics integration. Not sure if I'll
+   add a license.
+2. Probably won't be very actively maintained. I have kept the site up for 3
+   years so far though and I plan to keep it running.

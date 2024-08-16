@@ -173,6 +173,8 @@ func TestCreateManyRecords(t *testing.T) {
 		{"subdomain": "@", "type": "NS", "ttl": "60", "value_Ns": "ns1.example.com"},
 		// spaces should get trimmed
 		{"subdomain": "orange ", "type": "A", "ttl": "60", "value_A": "1.2.3.4 "},
+		// underscore is okay
+		{"subdomain": "_test", "type": "A", "ttl": "60", "value_A": "1.2.3.4"},
 	}
 	for _, record := range records {
 		// generate a new username each time so that CNAME doesn't conflict

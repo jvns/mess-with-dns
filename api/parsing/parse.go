@@ -118,7 +118,7 @@ func toRecordRequest(jsRecord map[string]string) (*RecordRequest, error) {
 	// parse the TTL as a uint32
 	ttlInt, err := strconv.ParseUint(ttl, 10, 32)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse TTL: %s", err)
+		return nil, fmt.Errorf("Error: TTL must be a number, got \"%s\"", ttl)
 	}
 
 	return &RecordRequest{

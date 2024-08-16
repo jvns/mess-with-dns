@@ -215,7 +215,7 @@ func (rs RecordService) DeleteOldRecords(ctx context.Context, now time.Time) err
 	// Deletes any zones that haven't been updated in the last $DAYS days
 	zones, err := rs.pdns.Zones.List(ctx)
 	if err != nil {
-		return err
+		return fmt.Errorf("could not list zones: %v", err)
 	}
 	for _, zone := range zones {
 		if *zone.Name == "messwithdns.com." {
@@ -223,14 +223,14 @@ func (rs RecordService) DeleteOldRecords(ctx context.Context, now time.Time) err
 		}
 		date, err := ParseSerial(*zone.Serial)
 		if err != nil {
-			return err
+			return fmt.Errorf("could not parse serial for %s: %v", *zone.Name, err)
 		}
 		if now.Sub(date).Hours() < float64(days*24) {
 			continue
 		}
 		err = rs.pdns.Zones.Delete(ctx, *zone.Name)
 		if err != nil {
-			return err
+			return fmt.Errorf("could not delete zone %s: %v", *zone.Name, err)
 		}
 	}
 	return nil

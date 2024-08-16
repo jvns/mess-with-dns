@@ -31,7 +31,7 @@ type UInt16Error struct {
 }
 
 func (e *UInt16Error) Error() string {
-	return fmt.Sprintf("%s is not between 0-65536: %s", e.Name, e.Value)
+	return fmt.Sprintf("%s is not between 0-65535: %s", e.Name, e.Value)
 }
 
 type UInt8Error struct {

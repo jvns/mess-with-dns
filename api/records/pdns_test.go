@@ -175,6 +175,8 @@ func TestCreateManyRecords(t *testing.T) {
 		{"subdomain": "orange ", "type": "A", "ttl": "60", "value_A": "1.2.3.4 "},
 		// underscore is okay
 		{"subdomain": "_test", "type": "A", "ttl": "60", "value_A": "1.2.3.4"},
+		// SRV record with priority 0 and weight 0 is ok
+		{"subdomain": "@", "type": "SRV", "ttl": "60", "value_Priority": "0", "value_Weight": "0", "value_Port": "8080", "value_Target": "orange-ip.fly.dev"},
 	}
 	for _, record := range records {
 		// generate a new username each time so that CNAME doesn't conflict

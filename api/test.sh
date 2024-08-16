@@ -8,7 +8,6 @@ cd ../pdns/conf_test || exit 1
 rm -f pdns.controlsocket
 sqlite3 powerdns.sqlite < ../pdns.sql
 pdns_server --config-dir=. &
-dnsdist -C dnsdist.conf -l 127.0.0.1:5888 &
 cd ../../api || exit 1
 
 # give the servers some time to start

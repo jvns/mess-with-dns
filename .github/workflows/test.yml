@@ -1,0 +1,35 @@
+name: Tests
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Go 
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.20'
+          cache-dependency-path: api/go.sum
+      # install apt dependencies
+      - name: Install apt dependencies
+        run: sudo apt-get install -y sqlite3 pdns-backend-sqlite3 pdns-backend-bind
+      - name: get TSVs
+        run: |
+          wget https://iptoasn.com/data/ip2asn-v4.tsv.gz
+          gunzip ip2asn-v4.tsv.gz
+          wget https://iptoasn.com/data/ip2asn-v6.tsv.gz
+          gunzip ip2asn-v6.tsv.gz
+      - name: Install dependencies
+        run: |
+          cd api
+          go get .
+      - name: Build
+        run: |
+          cd api
+          go build
+      - name: Test with the Go CLI
+        run: |
+          cd api
+          bash test.sh

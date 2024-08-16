@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "punycode": "^1.4.1",
     "vue": "^3.4.29"
   },
   "devDependencies": {

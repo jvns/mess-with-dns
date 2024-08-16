@@ -15,9 +15,10 @@ Instructions that are probably missing some important steps:
 
 Two main disclaimers:
 
-1. Probably won't be very actively maintained. I'm very open to bugfix pull
-   requests, though I can't guarantee I'll merge them in a timely manner.
-2. This code might not be very suitable for running yourself as is, there's a
-   bunch of hardcoded stuff ("a wizard zines project") as well as a Honeycomb
-   integration for metrics. I'm unlikely to make it easier to run on your own
-   but feel free to fork it.
+1. There's no license yet, partly beause I don't think this code is very
+   suitable for anyone other than me to run, there's a bunch of hardcoded stuff
+   ("a wizard zines project") as well as a Honeycomb integration for metrics.
+2. Probably won't be very actively maintained. I'm very open to bugfix pull
+   requests, though I can't guarantee I'll merge them in a timely manner. I
+   have kept the site up for 3 years so far though and I plan to keep it
+   running.

@@ -177,7 +177,11 @@ func getType(typ string) (RR, error) {
 		return &TXT{}, nil
 	case "SOA":
 		return &SOA{}, nil
-
+	case "SVCB":
+		return &SVCB{}, nil
+	case "HTTPS":
+		// HTTPS and SVCB work the same way
+		return &SVCB{}, nil
 	}
 	return nil, fmt.Errorf("Unsupported record type: %s", typ)
 }

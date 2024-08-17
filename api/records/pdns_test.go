@@ -171,6 +171,12 @@ func TestCreateManyRecords(t *testing.T) {
 		{"subdomain": "@", "type": "TXT", "ttl": "60", "value_Txt": "hello world"},
 		{"subdomain": "@", "type": "SRV", "ttl": "60", "value_Priority": "10", "value_Weight": "10", "value_Port": "8080", "value_Target": "orange-ip.fly.dev"},
 		{"subdomain": "@", "type": "NS", "ttl": "60", "value_Ns": "ns1.example.com"},
+		// SVCB, with/without params
+		{"subdomain": "@", "type": "SVCB", "ttl": "60", "value_Priority": "10", "value_Target": "example.com"},
+		{"subdomain": "@", "type": "SVCB", "ttl": "60", "value_Priority": "10", "value_Target": "example.com", "value_Params": "alpn=h3"},
+		// HTTPS, with/without params
+		{"subdomain": "@", "type": "HTTPS", "ttl": "60", "value_Priority": "10", "value_Target": "example.com"},
+		{"subdomain": "@", "type": "HTTPS", "ttl": "60", "value_Priority": "10", "value_Target": "example.com", "value_Params": "alpn=h3"},
 		// spaces should get trimmed
 		{"subdomain": "orange ", "type": "A", "ttl": "60", "value_A": "1.2.3.4 "},
 		// underscore is okay

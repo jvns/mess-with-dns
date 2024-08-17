@@ -351,3 +351,33 @@ func (r *SOA) FromPDNS(s string) (map[string]string, error) {
 	parts[1] = strings.Replace(parts[1], ".", "@", 1)
 	return map[string]string{"Mname": parts[0], "Rname": parts[1], "Serial": parts[2], "Refresh": parts[3], "Retry": parts[4], "Expire": parts[5], "Minimum": parts[6]}, nil
 }
+
+type SVCB struct{}
+
+func (r *SVCB) ToPDNS(m map[string]string) (string, error) {
+	priority, err := getUint16(m, "Priority")
+	if err != nil {
+		return "", err
+	}
+	target, err := getFqdn(m, "Target")
+	if err != nil {
+		return "", err
+	}
+	// params are optional
+	params, ok := m["Params"]
+	if !ok || params == "" {
+		return fmt.Sprintf("%d %s", priority, target), nil
+	}
+	return fmt.Sprintf("%d %s %s", priority, target, params), nil
+}
+
+func (r *SVCB) FromPDNS(s string) (map[string]string, error) {
+	parts := strings.Split(s, " ")
+	if len(parts) == 2 {
+		return map[string]string{"Priority": parts[0], "Target": parts[1]}, nil
+	}
+	if len(parts) == 3 {
+		return map[string]string{"Priority": parts[0], "Target": parts[1], "Params": parts[2]}, nil
+	}
+	return nil, fmt.Errorf("invalid SVCB record: %s", s)
+}

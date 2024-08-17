@@ -172,6 +172,55 @@
       "width": "4rem",
       "example": "3600"
     }
+  ], 
+
+  "SVCB": [
+    {
+      "label": "Priority",
+      "name": "Priority",
+      "type": "number",
+      "width": "4rem",
+      "example": "10"
+    },
+    {
+      "label": "Target",
+      "name": "Target",
+      "type": "text",
+      "width": "10rem",
+      "example": "orange-ip.fly.dev"
+    },
+    {
+      "label": "Parameters",
+      "name": "Params",
+      "optional": true,
+      "type": "text",
+      "width": "10rem",
+      "example": "alpn=h3"
+    }
+  ],
+  "HTTPS": [
+    {
+      "label": "Priority",
+      "name": "Priority",
+      "type": "number",
+      "width": "4rem",
+      "example": "10"
+    },
+    {
+      "label": "Target",
+      "name": "Target",
+      "type": "text",
+      "width": "10rem",
+      "example": "orange-ip.fly.dev"
+    },
+    {
+      "label": "Parameters",
+      "name": "Params",
+      "optional": true,
+      "type": "text",
+      "width": "10rem",
+      "example": "alpn=h3"
+    }
   ]
 
 

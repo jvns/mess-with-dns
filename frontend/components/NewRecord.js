@@ -68,7 +68,8 @@ export default {
       if (this.record) {
         return [this.record.type];
       }
-      return Object.keys(schemas).filter((key) => key != "default");
+      const types = Object.keys(schemas).sort();
+      return types.filter((key) => key != "default");
     },
 
     createOrUpdateRecord: async function (event) {

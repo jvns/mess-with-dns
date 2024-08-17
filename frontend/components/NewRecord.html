@@ -18,7 +18,7 @@
 
      <div class="form-field" v-for="field, i in schemas[form_data.type]">
        <label for="content_{{i}}" class="block">{{field.label}}</label>
-       <input id="content_{{i}}" type="text" required
+       <input id="content_{{i}}" type="text" :required="!field.optional"
               @invalid="(e) => e.target.setCustomValidity('Example: ' + field.example)"
               onchange="this.setCustomValidity('')"
               :name="'value_' + field.name"

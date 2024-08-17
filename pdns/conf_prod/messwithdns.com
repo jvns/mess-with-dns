@@ -1,6 +1,8 @@
 $ORIGIN messwithdns.com.
 @	       3600	IN SOA	mess-with-dns1.wizardzines.com. julia.wizardzines.com. 119088 3600 3600 7300 3600
 @          3600 IN A    213.188.214.254
+@          3600 IN NS mess-with-dns1.wizardzines.com.
+@          3600 IN NS mess-with-dns2.wizardzines.com.
 orange     3600 IN A    213.188.218.160
 purple     3600 IN A    213.188.209.192
 www        3600 IN A    213.188.214.254

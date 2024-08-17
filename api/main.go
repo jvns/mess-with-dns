@@ -258,8 +258,10 @@ func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (handle *handler) serveDNS(w dns.ResponseWriter, r *dns.Msg) error {
-	// just proxy it to localhost:5454
-	c := &dns.Client{Net: "tcp"}
+	// Proxy it to localhost:5454, using UDP or TCP depending on how the
+	// request came in
+	udp_or_tcp := w.RemoteAddr().Network()
+	c := &dns.Client{Net: udp_or_tcp}
 	c.DialTimeout = time.Second * 1
 	response, _, err := c.Exchange(r, "localhost:5454")
 	if err != nil {

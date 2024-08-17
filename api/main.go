@@ -108,6 +108,13 @@ func main() {
 			panic(fmt.Sprintf("Failed to set udp listener %s\n", err.Error()))
 		}
 	}()
+	fmt.Println("Listening for TCP on port", port)
+	go func() {
+		srv := &dns.Server{Handler: handler, Addr: port, Net: "tcp"}
+		if err := srv.ListenAndServe(); err != nil {
+			panic(fmt.Sprintf("Failed to set tcp listener %s\n", err.Error()))
+		}
+	}()
 
 	wrappedHandler := otelhttp.NewHandler(handler, "mess-with-dns-api")
 	fmt.Println("Listening on :8080")
@@ -252,7 +259,7 @@ func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (handle *handler) serveDNS(w dns.ResponseWriter, r *dns.Msg) error {
 	// just proxy it to localhost:5454
-	c := &dns.Client{Net: "udp"}
+	c := &dns.Client{Net: "tcp"}
 	c.DialTimeout = time.Second * 1
 	response, _, err := c.Exchange(r, "localhost:5454")
 	if err != nil {

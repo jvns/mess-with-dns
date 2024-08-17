@@ -81,9 +81,8 @@ td {
                     A DNS name (like <code>bananas.prince.fruit.oops.pie.com.</code>) has to:
                     <ul>
                         <li> be less than 255 characters</li>
-                        <li> have less than 63 "<code>.</code>"s in it</li>
-                        <li> be composed of only a-z, A-Z, 0-9, and "-" characters</li>
-                        <li> and a couple of other rules </li>
+                        <li> each part like ("bananas") needs to be less than 63 characters </li>
+                        <li> theoretically it should be composed of only a-z, A-Z, 0-9, and "-" characters, but it's common for domain names to have underscores in them too</li>
                     </ul>
                     Other than that, DNS queries can contain any DNS name.
                 </td>

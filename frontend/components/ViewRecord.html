@@ -21,13 +21,12 @@
         {{ record.ttl }}
       </div>
     </td>
-    <td class="view-edit text-right cursor-pointer" @click="toggle()">
+    <td class="view-edit text-right">
       <div style="min-width: 10rem">
-
-              <button class="delete px-4 text-red-700 hover:text-red-500" @click.prevent="confirmDelete()">
-                  Delete
-              </button>
-      <button class="edit hover:text-green-700 text-green-500 font-bold py-2 px-4 rounded">
+        <button class="delete px-4 text-red-700 hover:text-red-500" @click.prevent="confirmDelete()">
+          Delete
+        </button>
+        <button class="edit hover:text-green-700 text-green-500 font-bold py-2 px-4 rounded" @click="toggle()">
         Edit
         <span v-if="clicked">
           <svg

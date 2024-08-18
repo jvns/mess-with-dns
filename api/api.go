@@ -155,7 +155,7 @@ func streamRequests(ctx context.Context, logger *streamer.Logger, subdomain stri
 	}
 }
 
-func loginRandom(u *users.UserService, w http.ResponseWriter, r *http.Request) {
+func loginRandom(u *users.UserService, rs records.RecordService, w http.ResponseWriter, r *http.Request) {
 	subdomain, err := u.CreateAvailableSubdomain()
 
 	if err != nil {
@@ -163,6 +163,7 @@ func loginRandom(u *users.UserService, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	u.SetCookie(w, r, subdomain)
+	rs.CreateZone(context.Background(), subdomain)
 	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 }
 

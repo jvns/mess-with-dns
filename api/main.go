@@ -248,7 +248,7 @@ func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// POST /login
 	case r.Method == "GET" && n == 1 && p[0] == "login":
 		w.Header().Set("Cache-Control", "no-store")
-		loginRandom(handle.userService, w, r)
+		loginRandom(handle.userService, handle.rs, w, r)
 	default:
 		// serve static files
 		w.Header().Set("Cache-Control", "public, max-age=120")

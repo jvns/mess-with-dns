@@ -108,22 +108,27 @@ func (rs RecordService) DeleteAllRecords(ctx context.Context, username string) *
 	return nil
 }
 
+func (rs RecordService) CreateZone(ctx context.Context, username string) (*powerdns.Zone, error) {
+	zoneName := zoneName(username)
+	kind := powerdns.NativeZoneKind
+	zone := powerdns.Zone{
+		Name:        &zoneName,
+		Nameservers: []string{"ns1.messwithdns.com.", "ns2.messwithdns.com."},
+		Kind:        &kind,
+		RRsets:      []powerdns.RRset{},
+	}
+	_, err := rs.pdns.Zones.Add(ctx, &zone)
+	if err != nil {
+		return nil, err
+	}
+	return &zone, nil
+}
+
 func (rs RecordService) getOrCreateZone(ctx context.Context, username string) (*powerdns.Zone, error) {
 	zoneName := zoneName(username)
 	zone, err := rs.pdns.Zones.Get(ctx, zoneName)
 	if err != nil {
-		kind := powerdns.NativeZoneKind
-		zone := powerdns.Zone{
-			Name:        &zoneName,
-			Nameservers: []string{"ns1.messwithdns.com.", "ns2.messwithdns.com."},
-			Kind:        &kind,
-			RRsets:      []powerdns.RRset{},
-		}
-		_, err = rs.pdns.Zones.Add(ctx, &zone)
-		if err != nil {
-			return nil, err
-		}
-		return &zone, nil
+		return rs.CreateZone(ctx, username)
 	}
 	return zone, nil
 }

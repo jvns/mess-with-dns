@@ -40,6 +40,20 @@ func deleteRecord(ctx context.Context, username string, id string, rs records.Re
 	w.WriteHeader(http.StatusOK)
 }
 
+func deleteAllRecords(ctx context.Context, username string, rs records.RecordService, w http.ResponseWriter, r *http.Request) {
+	err := rs.DeleteAllRecords(ctx, username)
+	if err != nil {
+		returnError(w, r, err, err.Code)
+		return
+	}
+	_, err2 := rs.CreateZone(ctx, username)
+	if err2 != nil {
+		returnError(w, r, err2, http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+}
+
 func updateRecord(ctx context.Context, username string, id string, rs records.RecordService, w http.ResponseWriter, r *http.Request) {
 	record := map[string]string{}
 	body, err := io.ReadAll(r.Body)

@@ -207,8 +207,13 @@ func (handle *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if !requireLogin(username, r.URL.Path, r, w) {
 			return
 		}
-		// TODO: don't let people delete other people's records
 		deleteRecord(ctx, username, p[1], rs, w, r)
+	// DELETE /records:
+	case r.Method == "DELETE" && n == 1 && p[0] == "records":
+		if !requireLogin(username, r.URL.Path, r, w) {
+			return
+		}
+		deleteAllRecords(ctx, username, rs, w, r)
 	// POST /records/<ID>: updates a record
 	case r.Method == "POST" && n == 2 && p[0] == "records" && len(p[1]) > 0:
 		if !requireLogin(username, r.URL.Path, r, w) {

@@ -42,6 +42,19 @@ export const store: Store = reactive({
         }
         refreshRecords();
     },
+    async deleteAllRecords() {
+        const url = '/records';
+        const response = await fetch(url, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+        if (!response.ok) {
+            alert('Error deleting all records');
+        }
+        refreshRecords();
+    },
     async createRecord(record) {
         // Make a copy before cleaning it up
         const response = await fetch('/records/', {

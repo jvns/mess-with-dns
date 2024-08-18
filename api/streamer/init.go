@@ -2,10 +2,10 @@ package streamer
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"net"
 
-	"github.com/jvns/mess-with-dns/db"
 	"github.com/jvns/mess-with-dns/streamer/ip2asn"
 	"github.com/miekg/dns"
 	"go.opentelemetry.io/otel/attribute"
@@ -15,7 +15,7 @@ import (
 
 type Logger struct {
 	ipRanges *ip2asn.Ranges
-	db       *db.LockedDB
+	db       *sql.DB
 }
 
 func Init(ctx context.Context, workdir string, dbFilename string, dnstapAddress string) (*Logger, error) {

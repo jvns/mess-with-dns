@@ -1,16 +1,17 @@
 package users
 
 import (
+	"database/sql"
 	_ "embed"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/jvns/mess-with-dns/db"
 	"math/rand"
+	_ "modernc.org/sqlite"
 )
 
 type UserService struct {
-	db       *db.LockedDB
+	db       *sql.DB
 	hashKey  []byte
 	blockKey []byte
 }
@@ -19,10 +20,11 @@ type UserService struct {
 var create_sql string
 
 func Init(dbFile string, hashKey string, blockKey string) (*UserService, error) {
-	db, err := db.Connect(dbFile)
+	db, err := sql.Open("sqlite", dbFile)
 	if err != nil {
 		return nil, err
 	}
+	db.SetMaxOpenConns(1)
 	_, err = db.Exec(create_sql)
 	if err != nil {
 		return nil, err
@@ -45,7 +47,7 @@ func Init(dbFile string, hashKey string, blockKey string) (*UserService, error) 
 	return &UserService{db: db, hashKey: decodedHash, blockKey: decodedBlock}, nil
 }
 
-func getExistingSubdomains(db *db.LockedDB, word string) ([]string, error) {
+func getExistingSubdomains(db *sql.DB, word string) ([]string, error) {
 	var subdomains []string
 	rows, err := db.Query("SELECT name FROM subdomains WHERE name LIKE $1", word+"%")
 	if err != nil {
@@ -97,7 +99,7 @@ func smallestMissing(prefix string, existing []string) string {
 	}
 }
 
-func insertAvailableSubdomain(db *db.LockedDB) (string, error) {
+func insertAvailableSubdomain(db *sql.DB) (string, error) {
 	prefix := randomWord()
 	existing, err := getExistingSubdomains(db, prefix)
 	if err != nil {

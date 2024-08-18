@@ -1,4 +1,5 @@
 PRAGMA foreign_keys = 1;
+PRAGMA journal_mode=WAL;
 
 CREATE TABLE IF NOT EXISTS domains (
   id                    INTEGER PRIMARY KEY,

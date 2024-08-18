@@ -2,23 +2,25 @@ package streamer
 
 import (
 	"context"
+	"database/sql"
 	_ "embed"
 	"encoding/base64"
-	"github.com/jvns/mess-with-dns/db"
 	"github.com/miekg/dns"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
+	_ "modernc.org/sqlite"
 	"net"
 )
 
 //go:embed create.sql
 var create_sql string
 
-func connectDB(dbFile string) (*db.LockedDB, error) {
-	db, err := db.Connect(dbFile)
+func connectDB(dbFile string) (*sql.DB, error) {
+	db, err := sql.Open("sqlite", dbFile)
 	if err != nil {
 		return nil, err
 	}
+	db.SetMaxOpenConns(1)
 	_, err = db.Exec(create_sql)
 	if err != nil {
 		return nil, err

@@ -15,6 +15,7 @@ jobs:
         uses: superfly/flyctl-actions/setup-flyctl@master
       - name: Backup database
         run: |
+          flyctl -t "${{ secrets.FLY_API_TOKEN }}" ssh console -a mess-with-dns -C  "ls /data"
           flyctl -t "${{ secrets.FLY_API_TOKEN }}" ssh console -a mess-with-dns -C  "sqlite3 /data/powerdns.sqlite '.backup /tmp/powerdns.sqlite'"
           flyctl -t "${{ secrets.FLY_API_TOKEN }}" ssh console -a mess-with-dns -C  "cat /tmp/powerdns.sqlite'" > powerdns.sqlite
           gzip powerdns.sqlite

@@ -112,10 +112,9 @@ func (rs RecordService) CreateZone(ctx context.Context, username string) (*power
 	zoneName := zoneName(username)
 	kind := powerdns.NativeZoneKind
 	zone := powerdns.Zone{
-		Name:        &zoneName,
-		Nameservers: []string{"ns1.messwithdns.com.", "ns2.messwithdns.com."},
-		Kind:        &kind,
-		RRsets:      []powerdns.RRset{},
+		Name:   &zoneName,
+		Kind:   &kind,
+		RRsets: []powerdns.RRset{},
 	}
 	_, err := rs.pdns.Zones.Add(ctx, &zone)
 	if err != nil {

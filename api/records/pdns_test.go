@@ -52,8 +52,8 @@ func TestCreateAndGetTxtRecords(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(records) != 4 {
-		t.Fatalf("Expected 4 record, got %d", len(records))
+	if len(records) != 2 {
+		t.Fatalf("Expected 2 record, got %d", len(records))
 	}
 	assert.Equal(t, "@", records[0].Record.Subdomain)
 	assert.Equal(t, "hello world", records[0].Record.Values["Txt"])
@@ -86,8 +86,8 @@ func TestCreateAndGetRecords(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(records) != 4 {
-		t.Fatalf("Expected 4 record, got %d", len(records))
+	if len(records) != 2 {
+		t.Fatalf("Expected 2 record, got %d", len(records))
 	}
 	assert.Equal(t, "@", records[0].Record.Subdomain)
 }
@@ -110,7 +110,7 @@ func TestCreateAndUpdateRecord(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.Equal(t, 4, len(records))
+	assert.Equal(t, 2, len(records))
 	assert.Equal(t, records[len(records)-1].Record.Values["A"], "2.3.4.5")
 }
 
@@ -132,7 +132,7 @@ func TestCreateAndUpdateRecordName(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.Equal(t, 4, len(records))
+	assert.Equal(t, 2, len(records))
 	assert.Equal(t, "test", records[0].Record.Subdomain)
 }
 
@@ -155,7 +155,7 @@ func TestCreateAndUpdateRecordCase(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.Equal(t, 4, len(records))
+	assert.Equal(t, 2, len(records))
 	assert.Equal(t, "banana", records[0].Record.Subdomain)
 }
 
@@ -224,7 +224,7 @@ func TestCreateRecordFixMX(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.Equal(t, 4, len(records))
+	assert.Equal(t, 2, len(records))
 	assert.Equal(t, "example.com.", records[0].Record.Values["Mx"])
 }
 
@@ -304,7 +304,7 @@ func TestDeleteOldRecordsCreate(t *testing.T) {
 	if err2 != nil {
 		t.Fatal(err2)
 	}
-	assert.Equal(t, 4, len(records))
+	assert.Equal(t, 2, len(records))
 }
 
 func TestDeleteOldRecords5Days(t *testing.T) {
@@ -325,7 +325,7 @@ func TestDeleteOldRecords5Days(t *testing.T) {
 	if err2 != nil {
 		t.Fatal(err2)
 	}
-	assert.Equal(t, 4, len(records))
+	assert.Equal(t, 2, len(records))
 }
 
 func TestDeleteOldRecords7Days(t *testing.T) {

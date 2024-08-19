@@ -15,8 +15,8 @@ jobs:
         uses: superfly/flyctl-actions/setup-flyctl@master
       - name: Backup database
         run: |
-          fly ssh console -a mess-with-dns -C  "sqlite3 /data/powerdns.sqlite '.backup /tmp/powerdns.sqlite'"
-          fly ssh console -a mess-with-dns -C  "cat /tmp/powerdns.sqlite'" > powerdns.sqlite
+          flyctl ssh console -a mess-with-dns -C  "sqlite3 /data/powerdns.sqlite '.backup /tmp/powerdns.sqlite'"
+          flyctl ssh console -a mess-with-dns -C  "cat /tmp/powerdns.sqlite'" > powerdns.sqlite
           gzip powerdns.sqlite
       - name: Set up S3cmd cli tool
         if: ${{ env.STORAGE_PROVIDER != 'github' }}

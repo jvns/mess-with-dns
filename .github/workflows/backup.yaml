@@ -1,0 +1,32 @@
+name: Backup database
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 */12 * * *'
+
+jobs:
+  backup-db:
+    name: Backup DB
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Setup Fly.io CLI
+        uses: superfly/flyctl-actions/setup-flyctl@master
+      - name: Backup database
+        run: |
+          fly ssh console -a mess-with-dns -C  "sqlite3 /data/powerdns.sqlite '.backup /tmp/powerdns.sqlite'"
+          fly ssh console -a mess-with-dns -C  "cat /tmp/powerdns.sqlite'" > powerdns.sqlite
+          gzip powerdns.sqlite
+      - name: Set up S3cmd cli tool
+        if: ${{ env.STORAGE_PROVIDER != 'github' }}
+        uses: s3-actions/s3cmd@v1.5.0
+        with:
+          provider: 'aws'
+          region: 'us-east-1'
+          access_key: ${{ secrets.S3_ACCESS_KEY }}
+          secret_key: ${{ secrets.S3_SECRET_ACCESS_KEY }}
+      - name: Upload backup to S3, in yyyy/mm/dd/hh format
+        run: | 
+          export PREFIX=$(date +"%Y/%m/%d-%H")
+          s3cmd put powerdns.sqlite.gz s3://wizardzines-db-backup/mess-with-dns/$PREFIX-powerdns.sqlite.gz

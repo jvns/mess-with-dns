@@ -82,9 +82,9 @@ func main() {
 	}
 	defer otelShutdown()
 	// start pprof
-	// go func() {
-	// 	log.Println(http.ListenAndServe("localhost:6060", nil))
-	// }()
+	go func() {
+		log.Println(http.ListenAndServe("localhost:6060", nil))
+	}()
 
 	config, err := readConfig()
 	if err != nil {

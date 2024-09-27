@@ -1,4 +1,4 @@
-FROM golang:1.20 AS go
+FROM golang:1.23 AS go
 
 ADD ./api/go.mod /app/go.mod
 ADD ./api/go.sum /app/go.sum

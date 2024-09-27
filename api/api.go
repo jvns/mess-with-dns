@@ -16,8 +16,8 @@ import (
 	"time"
 )
 
-func getRecords(ctx context.Context, username string, rs records.RecordService, w http.ResponseWriter, r *http.Request) {
-	records, err := rs.GetRecords(ctx, username)
+func getRecords(username string, rs records.RecordService, w http.ResponseWriter, r *http.Request) {
+	records, err := rs.GetRecords(r.Context(), username)
 	if err != nil {
 		returnError(w, r, err, err.Code)
 		return
@@ -31,8 +31,8 @@ func getRecords(ctx context.Context, username string, rs records.RecordService, 
 	w.Write(jsonOutput)
 }
 
-func deleteRecord(ctx context.Context, username string, id string, rs records.RecordService, w http.ResponseWriter, r *http.Request) {
-	err := rs.DeleteRecord(ctx, username, id)
+func deleteRecord(username string, id string, rs records.RecordService, w http.ResponseWriter, r *http.Request) {
+	err := rs.DeleteRecord(r.Context(), username, id)
 	if err != nil {
 		returnError(w, r, err, err.Code)
 		return
@@ -40,13 +40,13 @@ func deleteRecord(ctx context.Context, username string, id string, rs records.Re
 	w.WriteHeader(http.StatusOK)
 }
 
-func deleteAllRecords(ctx context.Context, username string, rs records.RecordService, w http.ResponseWriter, r *http.Request) {
-	err := rs.DeleteAllRecords(ctx, username)
+func deleteAllRecords(username string, rs records.RecordService, w http.ResponseWriter, r *http.Request) {
+	err := rs.DeleteAllRecords(r.Context(), username)
 	if err != nil {
 		returnError(w, r, err, err.Code)
 		return
 	}
-	_, err2 := rs.CreateZone(ctx, username)
+	_, err2 := rs.CreateZone(r.Context(), username)
 	if err2 != nil {
 		returnError(w, r, err2, http.StatusInternalServerError)
 		return
@@ -54,7 +54,7 @@ func deleteAllRecords(ctx context.Context, username string, rs records.RecordSer
 	w.WriteHeader(http.StatusOK)
 }
 
-func updateRecord(ctx context.Context, username string, id string, rs records.RecordService, w http.ResponseWriter, r *http.Request) {
+func updateRecord(username string, id string, rs records.RecordService, w http.ResponseWriter, r *http.Request) {
 	record := map[string]string{}
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -65,7 +65,7 @@ func updateRecord(ctx context.Context, username string, id string, rs records.Re
 		returnError(w, r, fmt.Errorf("error decoding json: %s, body: %s", err.Error(), string(body)), http.StatusBadRequest)
 		return
 	}
-	err2 := rs.UpdateRecord(ctx, username, id, record)
+	err2 := rs.UpdateRecord(r.Context(), username, id, record)
 	if err2 != nil {
 		returnError(w, r, err2, err2.Code)
 		return
@@ -73,7 +73,7 @@ func updateRecord(ctx context.Context, username string, id string, rs records.Re
 	w.WriteHeader(http.StatusOK)
 }
 
-func createRecord(ctx context.Context, username string, rs records.RecordService, w http.ResponseWriter, r *http.Request) {
+func createRecord(username string, rs records.RecordService, w http.ResponseWriter, r *http.Request) {
 	record := map[string]string{}
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -84,7 +84,7 @@ func createRecord(ctx context.Context, username string, rs records.RecordService
 		returnError(w, r, fmt.Errorf("error decoding json: %s, body: %s", err.Error(), string(body)), http.StatusBadRequest)
 		return
 	}
-	err2 := rs.CreateRecord(ctx, username, record)
+	err2 := rs.CreateRecord(r.Context(), username, record)
 	if err2 != nil {
 		returnError(w, r, err2, err2.Code)
 		return
@@ -92,8 +92,8 @@ func createRecord(ctx context.Context, username string, rs records.RecordService
 	w.WriteHeader(http.StatusOK)
 }
 
-func deleteRequests(ctx context.Context, logger *streamer.Logger, name string, w http.ResponseWriter, r *http.Request) {
-	err := logger.DeleteRequestsForDomain(ctx, name)
+func deleteRequests(logger *streamer.Logger, name string, w http.ResponseWriter, r *http.Request) {
+	err := logger.DeleteRequestsForDomain(r.Context(), name)
 	if err != nil {
 		err := fmt.Errorf("error deleting requests: %s", err.Error())
 		returnError(w, r, err, http.StatusInternalServerError)
@@ -101,8 +101,8 @@ func deleteRequests(ctx context.Context, logger *streamer.Logger, name string, w
 	}
 }
 
-func getRequests(ctx context.Context, logger *streamer.Logger, username string, w http.ResponseWriter, r *http.Request) {
-	requests, err := logger.GetRequests(ctx, username)
+func getRequests(logger *streamer.Logger, username string, w http.ResponseWriter, r *http.Request) {
+	requests, err := logger.GetRequests(r.Context(), username)
 	if err != nil {
 		err := fmt.Errorf("error getting requests: %s", err.Error())
 		returnError(w, r, err, http.StatusInternalServerError)
@@ -118,7 +118,7 @@ func getRequests(ctx context.Context, logger *streamer.Logger, username string, 
 	w.Write(jsonOutput)
 }
 
-func streamRequests(ctx context.Context, logger *streamer.Logger, subdomain string, w http.ResponseWriter, r *http.Request) {
+func streamRequests(logger *streamer.Logger, subdomain string, w http.ResponseWriter, r *http.Request) {
 	// create websocket connection
 	upgrader := websocket.Upgrader{
 		ReadBufferSize:  1024,
@@ -155,7 +155,7 @@ func streamRequests(ctx context.Context, logger *streamer.Logger, subdomain stri
 				return
 			}
 		case msg := <-c:
-			span := trace.SpanFromContext(ctx)
+			span := trace.SpanFromContext(r.Context())
 			span.SetAttributes(attribute.String("stream.request", string(msg)))
 			err := conn.WriteMessage(websocket.TextMessage, msg)
 			if err != nil {

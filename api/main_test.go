@@ -59,7 +59,7 @@ func sendDNSRequest(name string, qtype uint16) (*dns.Msg, error) {
 
 func createTestServer(t *testing.T) *httptest.Server {
 	handler := createTestHandler(t)
-	return httptest.NewServer(handler)
+	return httptest.NewServer(createRoutes(handler))
 }
 
 /* test harness time */

@@ -1,6 +1,6 @@
 module github.com/jvns/mess-with-dns
 
-go 1.20
+go 1.23
 
 require (
 	github.com/gorilla/securecookie v1.1.1

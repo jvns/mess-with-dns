@@ -1,5 +1,4 @@
 set -eu
-source scripts/secrets.sh
 cd api || exit
 go build
 cd .. || exit

@@ -18,10 +18,10 @@ RUN npm install
 ADD ./frontend/ /app/
 RUN bash esbuild.sh
 
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 
 RUN apt-get update
-RUN apt-get install -y ca-certificates wget pdns-backend-sqlite3 pdns-backend-bind sqlite
+RUN apt-get install -y ca-certificates wget pdns-backend-sqlite3 pdns-backend-bind sqlite3 restic
 RUN wget https://iptoasn.com/data/ip2asn-v4.tsv.gz
 RUN gunzip ip2asn-v4.tsv.gz
 RUN wget https://iptoasn.com/data/ip2asn-v6.tsv.gz

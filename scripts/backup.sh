@@ -1,8 +1,10 @@
 #!/bin/bash
 set -eux
 
-# Backup & compress our database to the temp directory.
+rm -f /tmp/*.sqlite.gz /tmp/*.sqlite
 
+# Backup & compress our database to /tmp
+#
 sqlite3 /data/powerdns.sqlite "VACUUM INTO '/tmp/powerdns.sqlite'"
 sqlite3 /data/users.sqlite "VACUUM INTO '/tmp/users.sqlite'"
 sqlite3 /data/requests.sqlite "VACUUM INTO '/tmp/requests.sqlite'"

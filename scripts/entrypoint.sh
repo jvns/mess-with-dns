@@ -11,5 +11,17 @@ export GOMEMLIMIT=250MiB
 # for reducing powerdns memory usage
 export MALLOC_ARENA_MAX=4
 
+# run backup script every 1 hour
+
+backup() {
+    sleep 60
+    while true; do
+        echo "Running hourly backup"
+        bash /app/backup.sh
+        sleep 1h
+    done
+}
+
+backup &
 pdns_server --config-dir=/etc/pdns &
 /usr/bin/mess-with-dns

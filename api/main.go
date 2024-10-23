@@ -4,9 +4,11 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"strings"
+	"sync"
 	"time"
 
 	_ "net/http/pprof"
@@ -20,6 +22,7 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
+	"golang.org/x/time/rate"
 )
 
 var tracer = otel.Tracer("main")
@@ -186,11 +189,51 @@ func (handle *handler) serveDNS(w dns.ResponseWriter, r *dns.Msg) error {
 	return nil
 }
 
+// allow 50 QPS per IP
+func servFail(r *dns.Msg) *dns.Msg {
+	m := new(dns.Msg)
+	m.SetReply(r)
+	m.SetRcode(r, dns.RcodeServerFailure)
+	return m
+}
+
+type Limiters struct {
+	mu sync.Mutex
+	m  map[string]*rate.Limiter
+}
+
+var limiters = Limiters{m: map[string]*rate.Limiter{}, mu: sync.Mutex{}}
+
+func getLimiter(ip string) *rate.Limiter {
+	limiters.mu.Lock()
+	defer limiters.mu.Unlock()
+	limiter, ok := limiters.m[ip]
+	if !ok {
+		limiter = rate.NewLimiter(rate.Limit(50), 50)
+		limiters.m[ip] = limiter
+		// delete the limiter after 10 minutes
+		go func() {
+			time.Sleep(10 * time.Minute)
+			limiters.mu.Lock()
+			defer limiters.mu.Unlock()
+			delete(limiters.m, ip)
+		}()
+	}
+	return limiter
+}
+
 func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	ctx := context.Background()
+	ip, _, _ := net.SplitHostPort(w.RemoteAddr().String())
 	_, span := tracer.Start(ctx, "dns.request")
 	if len(r.Question) > 0 {
 		span.SetAttributes(attribute.String("dns.name", r.Question[0].Name))
+		span.SetAttributes(attribute.String("dns.source", ip))
+	}
+	if !getLimiter(ip).Allow() {
+		w.WriteMsg(servFail(r))
+		span.SetAttributes(attribute.String("dns.ratelimited", "true"))
+		return
 	}
 
 	err := handle.serveDNS(w, r)
@@ -199,10 +242,7 @@ func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 		// return a SERVFAIL
 		fmt.Println("error serving DNS", err)
 		span.RecordError(err)
-		m := new(dns.Msg)
-		m.SetReply(r)
-		m.SetRcode(r, dns.RcodeServerFailure)
-		err = w.WriteMsg(m)
+		err = w.WriteMsg(servFail(r))
 		if err != nil {
 			fmt.Println("error writing SERVFAIL", err)
 			span.RecordError(err)

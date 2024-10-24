@@ -73,10 +73,11 @@ func lookupHost(ctx context.Context, ranges *ip2asn.Ranges, host net.IP) string 
 	_, span := tracer.Start(ctx, "lookupHost")
 	span.SetAttributes(attribute.String("host", host.String()))
 	defer span.End()
-	names, err := net.LookupAddr(host.String())
-	if err == nil && len(names) > 0 {
-		return names[0]
-	}
+	//don't do reverse DNS lookup, it's slow
+	//names, err := net.LookupAddr(host.String())
+	//if err == nil && len(names) > 0 {
+	//	return names[0]
+	//}
 	// otherwise search ASN database
 	r, err := ranges.FindASN(host)
 	if err != nil {

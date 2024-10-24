@@ -21,6 +21,8 @@ jobs:
           gunzip ip2asn-v4.tsv.gz
           wget https://iptoasn.com/data/ip2asn-v6.tsv.gz
           gunzip ip2asn-v6.tsv.gz
+          pip3 install sqlite-utils
+          python3 scripts/import_ip2asn.py
       - name: Install dependencies
         run: |
           cd api

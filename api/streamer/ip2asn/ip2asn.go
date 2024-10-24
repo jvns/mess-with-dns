@@ -1,18 +1,17 @@
 package ip2asn
 
 import (
-	"bufio"
-	"bytes"
-	"errors"
+	"database/sql"
+	"encoding/binary"
+	"fmt"
 	"net"
-	"os"
-	"strconv"
 	"strings"
+
+	_ "modernc.org/sqlite"
 )
 
 type Ranges struct {
-	IPv4Ranges []IPRange
-	IPv6Ranges []IPRange
+	db *sql.DB
 }
 
 type IPRange struct {
@@ -23,82 +22,87 @@ type IPRange struct {
 	Country string
 }
 
-func parseInt(s string) int {
-	i, err := strconv.Atoi(s)
-	if err != nil {
-		return 0
-	}
-	return i
-}
-
-func ReadRanges(workdir string) (Ranges, error) {
-	ipv4Ranges, err := ReadASNs(workdir + "/ip2asn-v4.tsv")
-	if err != nil {
-		return Ranges{}, err
-	}
-	ipv6Ranges, err := ReadASNs(workdir + "/ip2asn-v6.tsv")
-	if err != nil {
-		return Ranges{}, err
-	}
-	return Ranges{
-		IPv4Ranges: ipv4Ranges,
-		IPv6Ranges: ipv6Ranges,
-	}, nil
-}
-
-func (ranges Ranges) FindASN(ip net.IP) (IPRange, error) {
-	if ip.To4() != nil {
-		return FindASN(ranges.IPv4Ranges, ip)
-	} else {
-		return FindASN(ranges.IPv6Ranges, ip)
-	}
-}
-
-func FindASN(lines []IPRange, ip net.IP) (IPRange, error) {
-	// binary search
-	start := 0
-	end := len(lines) - 1
-	for start <= end {
-		mid := (start + end) / 2
-		// check if it's between StartIP and EndIP
-		if bytes.Compare(ip, lines[mid].StartIP) >= 0 && bytes.Compare(ip, lines[mid].EndIP) <= 0 {
-			return lines[mid], nil
-		} else if bytes.Compare(ip, lines[mid].StartIP) < 0 {
-			end = mid - 1
-		} else {
-			start = mid + 1
-		}
-	}
-	return IPRange{}, errors.New("not found")
-}
-
-func ReadASNs(filename string) ([]IPRange, error) {
-	f, err := os.Open(filename)
+func NewRanges(dbFilename string) (*Ranges, error) {
+	db, err := sql.Open("sqlite", dbFilename)
 	if err != nil {
 		return nil, err
 	}
-	defer f.Close()
-	// read lines
-	scanner := bufio.NewScanner(f)
-	var lines []IPRange
-	for scanner.Scan() {
-		line := scanner.Text()
-		// split line
-		fields := strings.Split(line, "\t")
-		// parse fields
-		name := fields[4]
-		// only take part after " - "
-		if strings.Contains(name, " - ") {
-			name = strings.Split(name, " - ")[1]
-		}
-		IPRange := IPRange{
-			StartIP: net.ParseIP(fields[0]),
-			EndIP:   net.ParseIP(fields[1]),
-			Num:     parseInt(fields[2]),
-			Country: fields[3],
-			Name:    name,
-		}
-		lines = append(lines, IPRange)
+	db.SetMaxOpenConns(1)
+	return &Ranges{db: db}, nil
+}
+
+func (ranges *Ranges) FindASN(ip net.IP) (IPRange, error) {
+	if ip.To4() != nil {
+		return ranges.FindASN4(ip)
+	} else {
+		return ranges.FindASN6(ip)
 	}
-	return lines, nil
+}
+
+func ip2int(ip net.IP) uint32 {
+	if len(ip) == 16 {
+		return binary.BigEndian.Uint32(ip[12:16])
+	}
+	return binary.BigEndian.Uint32(ip)
+}
+
+func int2ip(nn uint32) net.IP {
+	ip := make(net.IP, 4)
+	binary.BigEndian.PutUint32(ip, nn)
+	return ip
+}
+
+func (ranges *Ranges) FindASN4(ip net.IP) (IPRange, error) {
+	ipInt := ip2int(ip)
+	rows, err := ranges.db.Query("SELECT * FROM ipv4_ranges WHERE start_ip <= ? AND end_ip >= ?", ipInt, ipInt)
+	if err != nil {
+		return IPRange{}, err
+	}
+	defer rows.Close()
+	// start and end ip are ints, need to parse them maybe
+	var startIP, endIP uint32
+	var r IPRange
+	if rows.Next() {
+		err = rows.Scan(&startIP, &endIP, &r.Num, &r.Name, &r.Country)
+		if err != nil {
+			return IPRange{}, err
+		}
+		r.StartIP = int2ip(startIP)
+		r.EndIP = int2ip(endIP)
+		return r, nil
+	}
+	return IPRange{}, fmt.Errorf("not found")
+}
+
+func expandIPv6(ip net.IP) string {
+	ipv6 := ip.To16()
+	// Create the expanded form
+	var parts []string
+	for i := 0; i < 16; i += 2 {
+		parts = append(parts, fmt.Sprintf("%02x%02x", ipv6[i], ipv6[i+1]))
+	}
+
+	return strings.Join(parts, ":")
+}
+
+func (ranges *Ranges) FindASN6(ip net.IP) (IPRange, error) {
+	ip_str := expandIPv6(ip)
+	fmt.Println(ip_str)
+	rows, err := ranges.db.Query("SELECT * FROM ipv6_ranges WHERE start_ip <= ? AND end_ip >= ?", ip_str, ip_str)
+	if err != nil {
+		return IPRange{}, err
+	}
+	defer rows.Close()
+	var startIP, endIP string
+	var r IPRange
+	if rows.Next() {
+		err = rows.Scan(&startIP, &endIP, &r.Num, &r.Name, &r.Country)
+		if err != nil {
+			return IPRange{}, err
+		}
+		r.StartIP = net.ParseIP(startIP)
+		r.EndIP = net.ParseIP(endIP)
+		return r, nil
+	}
+	return IPRange{}, fmt.Errorf("no rows found")
 }

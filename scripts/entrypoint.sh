@@ -5,6 +5,7 @@ set -m
 
 export REQUEST_DB_FILENAME=/data/requests.sqlite
 export USER_DB_FILENAME=/data/users.sqlite
+export IP_RANGE_DB_FILENAME=/ip2asn/ip-ranges.sqlite
 export GOMEMLIMIT=220MiB
 
 # idea from https://doc.powerdns.com/authoritative/performance.html#caches-memory-allocations-glibc

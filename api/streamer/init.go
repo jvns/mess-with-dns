@@ -18,19 +18,19 @@ type Logger struct {
 	db       *sql.DB
 }
 
-func Init(ctx context.Context, workdir string, dbFilename string, dnstapAddress string) (*Logger, error) {
-	ranges, err := ip2asn.ReadRanges(workdir)
+func Init(ctx context.Context, workdir string, requestDBFilename string, ipRangesDBFilename string) (*Logger, error) {
+	ranges, err := ip2asn.NewRanges(ipRangesDBFilename)
 	if err != nil {
 		return nil, fmt.Errorf("could not read ranges: %v", err)
 	}
 
-	ldb, err := connectDB(dbFilename)
+	ldb, err := connectDB(requestDBFilename)
 	if err != nil {
 		return nil, fmt.Errorf("could not connect to db: %v", err)
 	}
 
 	logger := &Logger{
-		ipRanges: &ranges,
+		ipRanges: ranges,
 		db:       ldb,
 	}
 

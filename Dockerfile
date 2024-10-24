@@ -21,13 +21,19 @@ RUN bash esbuild.sh
 FROM ubuntu:24.04
 
 RUN apt-get update
-RUN apt-get install -y ca-certificates wget pdns-backend-sqlite3 pdns-backend-bind sqlite3 restic curl
+RUN apt-get install -y ca-certificates wget pdns-backend-sqlite3 pdns-backend-bind sqlite3 restic curl python3-pip
+
+RUN update-ca-certificates
+
+RUN mkdir -p /ip2asn
+WORKDIR /ip2asn
 RUN wget https://iptoasn.com/data/ip2asn-v4.tsv.gz
 RUN gunzip ip2asn-v4.tsv.gz
 RUN wget https://iptoasn.com/data/ip2asn-v6.tsv.gz
 RUN gunzip ip2asn-v6.tsv.gz
-
-RUN update-ca-certificates
+ADD ./scripts/import_ip2asn.py /usr/local/bin/import_ip2asn.py
+RUN pip3 install --break-system-packages sqlite-utils
+RUN python3 /usr/local/bin/import_ip2asn.py
 
 RUN mkdir -p /app
 RUN mv ip2asn* /app

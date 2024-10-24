@@ -4,6 +4,8 @@ set -eu
 trap 'kill $(jobs -p)' SIGINT SIGTERM
 export REQUEST_DB_FILENAME=requests-dev.sqlite
 export USER_DB_FILENAME=users-dev.sqlite
+export IP_RANGE_DB_FILENAME=ip-ranges.sqlite
+
 # these are "secrets" but in dev mode it doesn't matter, don't use this script
 # in prod
 export HASH_KEY=CgfCQb/b1yLf251DsG9Zo8CN5h6UKP268QZPxR6ddDw=

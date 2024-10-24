@@ -26,16 +26,15 @@ import (
 var tracer = otel.Tracer("main")
 
 type Config struct {
-	workdir           string // where to read ip2asn files and static files from
+	workdir           string // where to read static files from
 	requestDBFilename string
 	userDBFilename    string
+	ipRangeDBFilename string
 	// for cookies
 	hashKey  string
 	blockKey string
 	// address of powerdns API
 	powerdnsAddress string
-	// where to listen for dnstap messages
-	dnstapAddress string
 }
 
 func readConfig() (*Config, error) {
@@ -51,6 +50,10 @@ func readConfig() (*Config, error) {
 	if userDBFilename == "" {
 		return nil, fmt.Errorf("USER_DB_FILENAME must be set")
 	}
+	ipRangeDBFilename := os.Getenv("IP_RANGE_DB_FILENAME")
+	if ipRangeDBFilename == "" {
+		return nil, fmt.Errorf("IP_RANGE_DB_FILENAME must be set")
+	}
 	hashKey := os.Getenv("HASH_KEY")
 	if hashKey == "" {
 		return nil, fmt.Errorf("HASH_KEY must be set")
@@ -63,10 +66,10 @@ func readConfig() (*Config, error) {
 		workdir:           workdir,
 		requestDBFilename: requestDBFilename,
 		userDBFilename:    userDBFilename,
+		ipRangeDBFilename: ipRangeDBFilename,
 		hashKey:           hashKey,
 		blockKey:          blockKey,
 		powerdnsAddress:   "http://localhost:8081",
-		dnstapAddress:     "localhost:7777",
 	}, nil
 }
 
@@ -124,7 +127,7 @@ func main() {
 }
 
 func createHandler(ctx context.Context, config *Config) (*handler, error) {
-	logger, err := streamer.Init(ctx, config.workdir, config.requestDBFilename, config.dnstapAddress)
+	logger, err := streamer.Init(ctx, config.workdir, config.requestDBFilename, config.ipRangeDBFilename)
 	if err != nil {
 		return nil, fmt.Errorf("error creating logger: %s", err.Error())
 	}

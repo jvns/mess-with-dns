@@ -3,10 +3,11 @@ package main
 import (
 	"context"
 	"fmt"
+	"net/http"
+
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
-	"net/http"
 )
 
 func createRoutes(handle *handler) http.Handler {
@@ -48,7 +49,7 @@ func createRoutes(handle *handler) http.Handler {
 		}
 		streamRequests(handle.logger, username, w, r)
 	}))
-	mux.Handle("GET /login/", addBaseMiddlewares(func(w http.ResponseWriter, r *http.Request) {
+	mux.Handle("GET /login", addBaseMiddlewares(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Cache-Control", "no-store")
 		loginRandom(handle.userService, handle.rs, w, r)
 	}))

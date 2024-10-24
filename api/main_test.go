@@ -4,10 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+
 	"github.com/gorilla/websocket"
+
 	//"github.com/jvns/mess-with-dns/streamer"
-	"github.com/miekg/dns"
-	"github.com/stretchr/testify/assert"
 	"io"
 	"net/http"
 	"net/http/cookiejar"
@@ -16,6 +16,9 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/miekg/dns"
+	"github.com/stretchr/testify/assert"
 )
 
 func fatalIfErr(t *testing.T, err error) {
@@ -31,10 +34,10 @@ func createTestHandler(t *testing.T) *handler {
 		workdir:           "..",
 		requestDBFilename: ":memory:",
 		userDBFilename:    ":memory:",
+		ipRangeDBFilename: "ip-ranges.sqlite",
 		hashKey:           base64Hash,
 		blockKey:          base64Block,
 		powerdnsAddress:   "http://localhost:8082",
-		dnstapAddress:     "localhost:7111",
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())

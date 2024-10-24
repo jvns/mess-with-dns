@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"os"
 	"strings"
-	"sync"
 	"time"
 
 	_ "net/http/pprof"
@@ -22,7 +21,6 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
-	"golang.org/x/time/rate"
 )
 
 var tracer = otel.Tracer("main")
@@ -168,14 +166,23 @@ func logMsg(r *http.Request, msg string) {
 }
 
 func (handle *handler) serveDNS(w dns.ResponseWriter, r *dns.Msg) error {
-	// Proxy it to localhost:5454, using UDP or TCP depending on how the
-	// request came in
-	udp_or_tcp := w.RemoteAddr().Network()
-	c := &dns.Client{Net: udp_or_tcp}
-	c.DialTimeout = time.Second * 1
+	// Proxy it to localhost:5454
+	c := &dns.Client{
+		Net:         "udp",
+		DialTimeout: time.Second * 1,
+	}
 	response, _, err := c.Exchange(r, "localhost:5454")
+
 	if err != nil {
 		return err
+	}
+	if response.Truncated {
+		// try TCP instead if the response was truncated
+		c.Net = "tcp"
+		response, _, err = c.Exchange(r, "localhost:5454")
+		if err != nil {
+			return err
+		}
 	}
 	err = w.WriteMsg(response)
 	if err != nil {
@@ -197,31 +204,6 @@ func servFail(r *dns.Msg) *dns.Msg {
 	return m
 }
 
-type Limiters struct {
-	mu sync.Mutex
-	m  map[string]*rate.Limiter
-}
-
-var limiters = Limiters{m: map[string]*rate.Limiter{}, mu: sync.Mutex{}}
-
-func getLimiter(ip string) *rate.Limiter {
-	limiters.mu.Lock()
-	defer limiters.mu.Unlock()
-	limiter, ok := limiters.m[ip]
-	if !ok {
-		limiter = rate.NewLimiter(rate.Limit(50), 50)
-		limiters.m[ip] = limiter
-		// delete the limiter after 10 minutes
-		go func() {
-			time.Sleep(10 * time.Minute)
-			limiters.mu.Lock()
-			defer limiters.mu.Unlock()
-			delete(limiters.m, ip)
-		}()
-	}
-	return limiter
-}
-
 func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	ctx := context.Background()
 	ip, _, _ := net.SplitHostPort(w.RemoteAddr().String())
@@ -229,11 +211,6 @@ func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	if len(r.Question) > 0 {
 		span.SetAttributes(attribute.String("dns.name", r.Question[0].Name))
 		span.SetAttributes(attribute.String("dns.source", ip))
-	}
-	if !getLimiter(ip).Allow() {
-		w.WriteMsg(servFail(r))
-		span.SetAttributes(attribute.String("dns.ratelimited", "true"))
-		return
 	}
 
 	err := handle.serveDNS(w, r)

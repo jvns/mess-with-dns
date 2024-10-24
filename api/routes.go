@@ -11,16 +11,16 @@ import (
 
 func createRoutes(handle *handler) http.Handler {
 	mux := http.NewServeMux()
-	mux.Handle("GET /records/", handle.addMiddlewares(func(w http.ResponseWriter, r *http.Request) {
+	mux.Handle("GET /records", handle.addMiddlewares(func(w http.ResponseWriter, r *http.Request) {
 		username := r.Context().Value("username").(string)
 		getRecords(username, handle.rs, w, r)
 	}))
-	mux.Handle("DELETE /records/{record_id}/", handle.addMiddlewares(func(w http.ResponseWriter, r *http.Request) {
+	mux.Handle("DELETE /records/{record_id}", handle.addMiddlewares(func(w http.ResponseWriter, r *http.Request) {
 		recordID := r.PathValue("record_id")
 		username := r.Context().Value("username").(string)
 		deleteRecord(username, recordID, handle.rs, w, r)
 	}))
-	mux.Handle("DELETE /records/{$}", handle.addMiddlewares(func(w http.ResponseWriter, r *http.Request) {
+	mux.Handle("DELETE /records", handle.addMiddlewares(func(w http.ResponseWriter, r *http.Request) {
 		username := r.Context().Value("username").(string)
 		deleteAllRecords(username, handle.rs, w, r)
 	}))
@@ -29,19 +29,19 @@ func createRoutes(handle *handler) http.Handler {
 		username := r.Context().Value("username").(string)
 		updateRecord(username, recordID, handle.rs, w, r)
 	}))
-	mux.Handle("POST /records/", handle.addMiddlewares(func(w http.ResponseWriter, r *http.Request) {
+	mux.Handle("POST /records", handle.addMiddlewares(func(w http.ResponseWriter, r *http.Request) {
 		username := r.Context().Value("username").(string)
 		createRecord(username, handle.rs, w, r)
 	}))
-	mux.Handle("GET /requests/", handle.addMiddlewares(func(w http.ResponseWriter, r *http.Request) {
+	mux.Handle("GET /requests", handle.addMiddlewares(func(w http.ResponseWriter, r *http.Request) {
 		username := r.Context().Value("username").(string)
 		getRequests(handle.logger, username, w, r)
 	}))
-	mux.Handle("DELETE /requests/", handle.addMiddlewares(func(w http.ResponseWriter, r *http.Request) {
+	mux.Handle("DELETE /requests", handle.addMiddlewares(func(w http.ResponseWriter, r *http.Request) {
 		username := r.Context().Value("username").(string)
 		deleteRequests(handle.logger, username, w, r)
 	}))
-	mux.Handle("GET /requeststream/{username}/", handle.addMiddlewares(func(w http.ResponseWriter, r *http.Request) {
+	mux.Handle("GET /requeststream/{username}", handle.addMiddlewares(func(w http.ResponseWriter, r *http.Request) {
 		username := r.Context().Value("username").(string)
 		if username == "" {
 			username = r.PathValue("username")

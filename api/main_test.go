@@ -80,7 +80,7 @@ type TestHarness struct {
 
 func (h *TestHarness) CreateRecord(jsonString string) {
 	t := h.t
-	resp, err := h.client.Post(h.ts.URL+"/records/", "application/json", strings.NewReader(jsonString))
+	resp, err := h.client.Post(h.ts.URL+"/records", "application/json", strings.NewReader(jsonString))
 	fatalIfErr(t, err)
 	if resp.StatusCode != 200 {
 		body, _ := io.ReadAll(resp.Body)
@@ -100,7 +100,7 @@ func (h *TestHarness) UpdateRecord(id string, jsonString string) {
 
 func (h *TestHarness) GetRecords() []Record2 {
 	t := h.t
-	resp, err := h.client.Get(h.ts.URL + "/records/")
+	resp, err := h.client.Get(h.ts.URL + "/records")
 	fatalIfErr(t, err)
 	assert.Equal(t, resp.StatusCode, 200)
 	body, _ := io.ReadAll(resp.Body)
@@ -210,7 +210,7 @@ func TestGetRequests(t *testing.T) {
 	client, _, username, err := login(ts)
 	fatalIfErr(t, err)
 	jsonString := `{"subdomain":"@","type":"A","ttl":60,"values":[{"name":"A", "value":"1.2.3.4"}]}`
-	resp, err := client.Post(ts.URL+"/records/", "application/json", strings.NewReader(jsonString))
+	resp, err := client.Post(ts.URL+"/records", "application/json", strings.NewReader(jsonString))
 	fatalIfErr(t, err)
 	assert.Equal(t, resp.StatusCode, 200)
 
@@ -224,7 +224,7 @@ func TestGetRequests(t *testing.T) {
 	fatalIfErr(t, err)
 
 	// get /requests
-	resp, err = client.Get(ts.URL + "/requests/")
+	resp, err = client.Get(ts.URL + "/requests")
 	fatalIfErr(t, err)
 	body, err := io.ReadAll(resp.Body)
 	fatalIfErr(t, err)
@@ -246,7 +246,7 @@ func TestWebsocketMixedCaseRequest(t *testing.T) {
 	defer ws.Close()
 	fatalIfErr(t, err)
 	jsonString := `{"subdomain":"@","type":"A","ttl":60,"values":[{"name":"A", "value":"1.2.3.4"}]}`
-	resp, err := client.Post(ts.URL+"/records/", "application/json", strings.NewReader(jsonString))
+	resp, err := client.Post(ts.URL+"/records", "application/json", strings.NewReader(jsonString))
 	fatalIfErr(t, err)
 	assert.Equal(t, resp.StatusCode, 200)
 

@@ -57,7 +57,7 @@ export const store: Store = reactive({
     },
     async createRecord(record) {
         // Make a copy before cleaning it up
-        const response = await fetch('/records/', {
+        const response = await fetch('/records', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -90,12 +90,12 @@ export const store: Store = reactive({
 });
 
 async function refreshRecords() {
-    const response = await fetch('/records/');
+    const response = await fetch('/records');
     store.records = await response.json();
 }
 
 async function refreshRequests() {
-    const response = await fetch('/requests/');
+    const response = await fetch('/requests');
     store.requests = await response.json();
 }
 

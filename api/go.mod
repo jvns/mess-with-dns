@@ -9,6 +9,7 @@ require (
 	github.com/honeycombio/otel-config-go v1.13.0
 	github.com/joeig/go-powerdns/v3 v3.10.0
 	github.com/miekg/dns v1.1.61
+	github.com/seancfoley/ipaddress-go v1.7.0
 	github.com/stretchr/testify v1.8.4
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.46.1
 	go.opentelemetry.io/otel v1.21.0
@@ -35,6 +36,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/power-devops/perfstat v0.0.0-20221212215047-62379fc7944b // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
+	github.com/seancfoley/bintree v1.3.1 // indirect
 	github.com/sethvargo/go-envconfig v0.9.0 // indirect
 	github.com/shirou/gopsutil/v3 v3.23.10 // indirect
 	github.com/shoenig/go-m1cpu v0.1.6 // indirect

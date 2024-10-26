@@ -11,11 +11,9 @@ export GOMEMLIMIT=220MiB
 # for reducing powerdns memory usage
 export MALLOC_ARENA_MAX=4
 
-# run backup script every 1 hour
-
 backup() {
     while true; do
-        sleep 1h
+        sleep 3h
         echo "Running hourly backup"
         bash /app/backup.sh
     done

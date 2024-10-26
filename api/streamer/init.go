@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"net"
+	"net/netip"
 
 	"github.com/jvns/mess-with-dns/streamer/ip2asn"
 	"github.com/miekg/dns"
@@ -79,7 +80,11 @@ func lookupHost(ctx context.Context, ranges *ip2asn.Ranges, host net.IP) string 
 	//	return names[0]
 	//}
 	// otherwise search ASN database
-	r, err := ranges.FindASN(host)
+	ip, err := netip.ParseAddr(host.String())
+	if err != nil {
+		return ""
+	}
+	r, err := ranges.FindASN(ip)
 	if err != nil {
 		return ""
 	}

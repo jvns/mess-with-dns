@@ -14,11 +14,10 @@ export MALLOC_ARENA_MAX=4
 # run backup script every 1 hour
 
 backup() {
-    sleep 60
     while true; do
+        sleep 1h
         echo "Running hourly backup"
         bash /app/backup.sh
-        sleep 1h
     done
 }
 

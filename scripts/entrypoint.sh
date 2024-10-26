@@ -5,7 +5,8 @@ set -m
 
 export REQUEST_DB_FILENAME=/data/requests.sqlite
 export USER_DB_FILENAME=/data/users.sqlite
-export GOMEMLIMIT=220MiB
+
+export GOMEMLIMIT=160MiB
 
 # idea from https://doc.powerdns.com/authoritative/performance.html#caches-memory-allocations-glibc
 # for reducing powerdns memory usage

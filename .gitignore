@@ -1,1 +1,3 @@
 scripts/secrets.sh
+*.sqlite
+ip2asn*

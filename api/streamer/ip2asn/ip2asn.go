@@ -123,14 +123,14 @@ func FindASN(lines []IPRange, ip netip.Addr) (IPRange, error) {
 	for start <= end {
 		mid := (start + end) / 2
 		// check if it's between StartIP and EndIP
-		if ip.Compare(lines[mid].StartIP) >= 0 {
-			if ip.Compare(lines[mid].EndIP) <= 0 {
-				return lines[mid], nil
-			} else {
-				start = mid + 1
-			}
-		} else {
+		above_start := ip.Compare(lines[mid].StartIP) >= 0
+		below_end := ip.Compare(lines[mid].EndIP) <= 0
+		if above_start && below_end {
+			return lines[mid], nil
+		} else if !above_start {
 			end = mid - 1
+		} else {
+			start = mid + 1
 		}
 	}
 	return IPRange{}, errors.New("not found")

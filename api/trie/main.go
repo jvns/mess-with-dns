@@ -13,6 +13,20 @@ import (
 	"github.com/seancfoley/ipaddress-go/ipaddr"
 )
 
+func memusage() {
+	runtime.GC()
+	var m runtime.MemStats
+	runtime.ReadMemStats(&m)
+	fmt.Printf("Alloc = %v MiB\n", m.Alloc/1024/1024)
+	// write mem.prof
+	f, err := os.Create("mem.prof")
+	if err != nil {
+		log.Fatal(err)
+	}
+	pprof.WriteHeapProfile(f)
+	f.Close()
+}
+
 func main() {
 	// Create a new ASN trie
 	lookup := NewASNTrie()
@@ -32,6 +46,7 @@ func main() {
 			continue
 		}
 	}
+	memusage()
 
 	// Example lookups
 	testIPs := []string{
@@ -135,7 +150,6 @@ func (t *ASNTrie) AddRecord(line string) error {
 	ipRange := ipaddr.NewSequentialRange(startAddr, endAddr)
 	prefixBlocks := ipRange.SpanWithPrefixBlocks()
 	for _, block := range prefixBlocks {
-		fmt.Println(block)
 		t.trie.Put(block, info)
 	}
 

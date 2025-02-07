@@ -14,11 +14,5 @@ probably missing some important steps:
 
 ### Disclaimers
 
-Two main disclaimers:
-
-1. There's no license yet, partly because I don't think this code is very
-   suitable for anyone other than me to run, there's a bunch of hardcoded stuff
-   like "a wizard zines project" and a metrics integration. Not sure if I'll
-   add a license.
-2. Probably won't be very actively maintained. I have kept the site up for 3
-   years so far though and I plan to keep it running.
+Probably won't be very actively maintained. I have kept the site up for 3 years
+so far though and I plan to keep it running.

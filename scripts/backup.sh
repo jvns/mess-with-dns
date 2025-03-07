@@ -15,6 +15,9 @@ gzip /tmp/users.sqlite
 export RESTIC_PASSWORD='notasecret'
 # try to reduce memory usage
 export GOGC=20
+# Sometimes the backup gets OOM killed and so it stays locked, do an unlock
+restic -r s3://s3.amazonaws.com/wizardzines-db-backup/messwithdns/ unlock
+# Do the backup
 restic -r s3://s3.amazonaws.com/wizardzines-db-backup/messwithdns/ backup /tmp/powerdns.sqlite.gz /tmp/users.sqlite.gz
 restic -r s3://s3.amazonaws.com/wizardzines-db-backup/messwithdns/ snapshots
 restic -r s3://s3.amazonaws.com/wizardzines-db-backup/messwithdns/ forget -l 1 -H 6 -d 2 -w 2 -m 2 -y 2

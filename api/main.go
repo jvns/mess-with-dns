@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"log"
 	"net"
@@ -11,6 +12,8 @@ import (
 	"time"
 
 	_ "net/http/pprof"
+
+	_ "modernc.org/sqlite"
 
 	"github.com/honeycombio/honeycomb-opentelemetry-go"
 	"github.com/honeycombio/otel-config-go/otelconfig"
@@ -228,13 +231,27 @@ func (handle *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	span.End()
 }
 
+func deleteOldRecords() error {
+	two_weeks_ago := time.Now().Add(-14 * 24 * time.Hour).Format("2006-01-02")
+	// delete from domains where created_at < '2025-05-01' ;
+	db, err := sql.Open("sqlite", "/data/powerdns.sqlite")
+	if err != nil {
+		return err
+	}
+	_, err = db.Exec("DELETE FROM domains WHERE created_at < ?", two_weeks_ago)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (handle *handler) cleanup() {
 	ctx := context.Background()
 	_, span := tracer.Start(ctx, "cleanup")
 	defer span.End()
 	for {
 		fmt.Println("Deleting old records & requests...")
-		err := handle.rs.DeleteOldRecords(ctx, time.Now())
+		err := deleteOldRecords()
 		if err != nil {
 			span.RecordError(fmt.Errorf("error deleting old records: %s", err))
 			fmt.Println("error deleting old records:", err)

@@ -4,11 +4,12 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
-	powerdns "github.com/joeig/go-powerdns/v3"
-	"github.com/jvns/mess-with-dns/parsing"
 	"net/http"
 	"strings"
 	"time"
+
+	powerdns "github.com/joeig/go-powerdns/v3"
+	"github.com/jvns/mess-with-dns/parsing"
 )
 
 type RecordService struct {
@@ -212,32 +213,6 @@ func zoneName(username string) string {
 type Record struct {
 	ID     string                 `json:"id"`
 	Record parsing.RecordResponse `json:"record"`
-}
-
-func (rs RecordService) DeleteOldRecords(ctx context.Context, now time.Time) error {
-	days := 7
-	// Deletes any zones that haven't been updated in the last $DAYS days
-	zones, err := rs.pdns.Zones.List(ctx)
-	if err != nil {
-		return fmt.Errorf("could not list zones: %v", err)
-	}
-	for _, zone := range zones {
-		if *zone.Name == "messwithdns.com." {
-			continue
-		}
-		date, err := ParseSerial(*zone.Serial)
-		if err != nil {
-			return fmt.Errorf("could not parse serial for %s: %v", *zone.Name, err)
-		}
-		if now.Sub(date).Hours() < float64(days*24) {
-			continue
-		}
-		err = rs.pdns.Zones.Delete(ctx, *zone.Name)
-		if err != nil {
-			return fmt.Errorf("could not delete zone %s: %v", *zone.Name, err)
-		}
-	}
-	return nil
 }
 
 func ParseSerial(serial uint32) (time.Time, error) {

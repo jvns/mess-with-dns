@@ -3,13 +3,14 @@ package records_test
 import (
 	"context"
 	"fmt"
+	"math/rand"
+	"testing"
+	"time"
+
 	"github.com/joeig/go-powerdns/v3"
 	"github.com/jvns/mess-with-dns/records"
 	"github.com/miekg/dns"
 	"github.com/stretchr/testify/assert"
-	"math/rand"
-	"testing"
-	"time"
 )
 
 func setup() (records.RecordService, context.Context, string) {
@@ -276,75 +277,4 @@ func TestParseSerial(t *testing.T) {
 		t.Fatal(err)
 	}
 	assert.Equal(t, time.Date(2021, 9, 10, 0, 0, 0, 0, time.UTC), serialInt)
-}
-
-func TestDeleteOldRecordsEmpty(t *testing.T) {
-	rs, ctx, _ := setup()
-	err := rs.DeleteOldRecords(ctx, time.Now())
-	if err != nil {
-		t.Fatal(err)
-	}
-
-}
-
-func TestDeleteOldRecordsCreate(t *testing.T) {
-	rs, ctx, username := setup()
-	// create a record
-	record := map[string]string{"subdomain": "@", "type": "A", "ttl": "60", "value_A": "1.2.3.4"}
-	if err2 := rs.CreateRecord(ctx, username, record); err2 != nil {
-		t.Fatal(err2)
-	}
-
-	// test that deleting old records doesn't do anything
-	if err := rs.DeleteOldRecords(ctx, time.Now()); err != nil {
-		t.Fatal(err)
-	}
-
-	records, err2 := rs.GetRecords(ctx, username)
-	if err2 != nil {
-		t.Fatal(err2)
-	}
-	assert.Equal(t, 2, len(records))
-}
-
-func TestDeleteOldRecords5Days(t *testing.T) {
-	rs, ctx, username := setup()
-	// create a record
-	record := map[string]string{"subdomain": "@", "type": "A", "ttl": "60", "value_A": "1.2.3.4"}
-	if err2 := rs.CreateRecord(ctx, username, record); err2 != nil {
-		t.Fatal(err2)
-	}
-	// set now = now + 8 days & check if record is still there
-	now := time.Now().Add(5 * 24 * time.Hour)
-	err := rs.DeleteOldRecords(ctx, now)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	records, err2 := rs.GetRecords(ctx, username)
-	if err2 != nil {
-		t.Fatal(err2)
-	}
-	assert.Equal(t, 2, len(records))
-}
-
-func TestDeleteOldRecords7Days(t *testing.T) {
-	rs, ctx, username := setup()
-	// create a record
-	record := map[string]string{"subdomain": "@", "type": "A", "ttl": "60", "value_A": "1.2.3.4"}
-	if err2 := rs.CreateRecord(ctx, username, record); err2 != nil {
-		t.Fatal(err2)
-	}
-	// set now = now + 8 days & check if record is still there
-	now := time.Now().Add(8 * 24 * time.Hour)
-	err := rs.DeleteOldRecords(ctx, now)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	records, err2 := rs.GetRecords(ctx, username)
-	if err2 != nil {
-		t.Fatal(err2)
-	}
-	assert.Equal(t, 0, len(records))
 }

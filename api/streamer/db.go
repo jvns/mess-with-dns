@@ -5,11 +5,12 @@ import (
 	"database/sql"
 	_ "embed"
 	"encoding/base64"
+	"net"
+
 	"github.com/miekg/dns"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	_ "modernc.org/sqlite"
-	"net"
 )
 
 //go:embed create.sql
@@ -34,7 +35,7 @@ func (logger Logger) DeleteOldRequests(ctx context.Context) error {
 	_, span := tracer.Start(ctx, "db.DeleteOldRequests")
 	defer span.End()
 	// delete requests where created_at timestamp is more than a day ago
-	_, err := logger.db.Exec("DELETE FROM dns_requests WHERE created_at < (strftime('%s', 'now') - (7 * 24 * 60 * 60));")
+	_, err := logger.db.Exec("DELETE FROM dns_requests WHERE created_at < (strftime('%s', 'now') - (2 * 24 * 60 * 60));")
 	if err != nil {
 		return err
 	}

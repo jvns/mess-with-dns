@@ -6,6 +6,7 @@ WORKDIR /app
 RUN go mod download
 ADD ./api /app
 RUN go build
+RUN go install github.com/equinix-labs/otel-cli@latest
 
 FROM node:16.9.1 AS node
 
@@ -33,6 +34,7 @@ RUN mkdir -p /app
 RUN mv ip2asn* /app
 
 COPY --from=go /app/mess-with-dns /usr/bin/mess-with-dns
+COPY --from=go /go/bin/otel-cli /usr/bin/otel-cli
 
 WORKDIR /app
 COPY ./frontend/index.html /app/frontend/index.html
